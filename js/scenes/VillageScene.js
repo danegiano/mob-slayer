@@ -4,7 +4,7 @@ class VillageScene extends Phaser.Scene {
     // Helper: place a tile from the tilemap at (x,y) scaled 2x (so 16px tile = 32px)
     tile(x, y, frame, scale) {
         scale = scale || 2;
-        return this.add.image(x, y, 'tilemap', frame).setScale(scale);
+        return this.add.image(x, y, 'tilemap', 'tile_' + frame).setScale(scale);
     }
 
     create(data) {

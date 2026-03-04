@@ -60,11 +60,12 @@ class BootScene extends Phaser.Scene {
         this.textures.get('troll').add(1, 0, 64, 0, 64, 80);
 
         // Tilemap: 132 frames of 16x16 (12 columns x 11 rows)
+        // Use string names like 'tile_0' to avoid conflicts with default frame '0'
         const tm = this.textures.get('tilemap');
         for (let row = 0; row < 11; row++) {
             for (let col = 0; col < 12; col++) {
                 const frameId = row * 12 + col;
-                tm.add(frameId, 0, col * 16, row * 16, 16, 16);
+                tm.add('tile_' + frameId, 0, col * 16, row * 16, 16, 16);
             }
         }
 

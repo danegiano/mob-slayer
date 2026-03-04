@@ -3,7 +3,7 @@ class House2Scene extends Phaser.Scene {
 
     tile(x, y, frame, scale) {
         scale = scale || 2;
-        return this.add.image(x, y, 'tilemap', frame).setScale(scale);
+        return this.add.image(x, y, 'tilemap', 'tile_' + frame).setScale(scale);
     }
 
     create() {
