@@ -54,48 +54,45 @@ class VillageScene extends Phaser.Scene {
             this.walls.add(wall);
         };
 
-        // Top-left house (big brown one)
-        addWall(200, 105, 160, 110);
-
+        // === HOUSES ===
+        // Top-left big house (brown + red roof)
+        addWall(201, 96, 176, 128);
         // Top-middle house (blue/gray roof)
-        addWall(410, 90, 130, 100);
+        addWall(409, 88, 144, 112);
+        // Small house top-right
+        addWall(601, 56, 80, 80);
+        // Bottom-left house
+        addWall(153, 312, 176, 112);
 
-        // Bottom-left house (brown)
-        addWall(145, 310, 150, 100);
+        // === CASTLE (gate opening at x=737 to x=801) ===
+        // Castle left wall
+        addWall(697, 258, 80, 226);
+        // Castle right wall
+        addWall(850, 258, 98, 226);
+        // Castle top (above gate)
+        addWall(778, 155, 244, 50);
 
-        // Castle — left wall (left of gate)
-        addWall(700, 200, 60, 160);
-        // Castle — right wall (right of gate)
-        addWall(820, 200, 80, 160);
-        // Castle — top (above gate)
-        addWall(760, 140, 200, 50);
-        // Castle — towers on sides
-        addWall(670, 300, 30, 100);
-        addWall(870, 300, 30, 100);
+        // === TREES ===
+        // Top-left cluster
+        addWall(32, 72, 65, 80);
+        addWall(32, 192, 65, 64);
+        // Bottom-left
+        addWall(24, 304, 48, 64);
+        // Scattered top
+        addWall(281, 24, 48, 48);
+        addWall(329, 32, 48, 64);
+        addWall(449, 184, 32, 48);
+        addWall(521, 40, 48, 48);
+        // Right side
+        addWall(884, 80, 68, 64);
+        addWall(884, 384, 68, 68);
+        // Bottom
+        addWall(65, 418, 96, 64);
+        addWall(876, 434, 84, 56);
 
-        // Trees — top-left cluster
-        addWall(30, 80, 50, 60);
-        addWall(30, 190, 50, 50);
-        addWall(30, 310, 40, 50);
-
-        // Trees — scattered
-        addWall(300, 20, 40, 50);
-        addWall(360, 30, 30, 40);
-        addWall(470, 190, 30, 40);
-        addWall(530, 50, 30, 40);
-
-        // Trees — right side
-        addWall(830, 80, 40, 50);
-        addWall(880, 140, 40, 50);
-        addWall(870, 360, 40, 50);
-
-        // Trees — bottom
-        addWall(60, 430, 50, 40);
-        addWall(830, 440, 60, 30);
-
-        // Fences
-        addWall(80, 230, 70, 10);
-        addWall(410, 410, 250, 10);
+        // === FENCES ===
+        addWall(81, 216, 64, 16);
+        addWall(401, 392, 288, 16);
 
         // Collide player with walls
         this.physics.add.collider(this.player, this.walls);
@@ -144,7 +141,7 @@ const config = {
     backgroundColor: '#5a8f3c',
     physics: {
         default: 'arcade',
-        arcade: { gravity: { y: 0 }, debug: false }
+        arcade: { gravity: { y: 0 }, debug: true }
     },
     scene: [BootScene, VillageScene]
 };
