@@ -1,20 +1,32 @@
 class House1Scene extends Phaser.Scene {
     constructor() { super('House1'); }
 
+    tile(x, y, frame, scale) {
+        scale = scale || 2;
+        return this.add.image(x, y, 'tilemap', frame).setScale(scale);
+    }
+
     create() {
-        // Floor — wooden planks
-        this.add.rectangle(400, 350, 800, 200, 0x9B7924);
-        // Plank lines
-        for (let x = 0; x < 800; x += 80) {
-            this.add.rectangle(x, 350, 2, 200, 0x7a5c14);
+        // Warm indoor background
+        this.add.rectangle(400, 225, 800, 450, 0xc4a050);
+
+        // === BACK WALL — wooden wall tiles ===
+        for (let i = 0; i < 26; i++) {
+            this.tile(16 + i * 32, 240, 72);  // wooden wall
+            this.tile(16 + i * 32, 208, 60);  // upper wall
         }
 
-        // Walls
-        this.add.rectangle(400, 200, 800, 100, 0xc4a556); // back wall
-        this.add.rectangle(400, 250, 800, 4, 0x8B6914);   // wall-floor line
+        // === FLOOR — wooden plank tiles ===
+        for (let i = 0; i < 26; i++) {
+            this.tile(16 + i * 32, 414, 37);  // wood floor
+            this.tile(16 + i * 32, 382, 37);  // wood floor upper
+            this.tile(16 + i * 32, 446, 37);  // wood floor lower
+        }
+        // Wall-floor divider
+        this.add.rectangle(400, 260, 800, 4, 0x8B6914);
 
         // Ground for physics
-        this.ground = this.add.rectangle(400, 430, 800, 40, 0x8B6914);
+        this.ground = this.add.rectangle(400, 430, 800, 40, 0x000000, 0);
         this.physics.add.existing(this.ground, true);
 
         // Player — spawns near door
@@ -24,52 +36,41 @@ class House1Scene extends Phaser.Scene {
         // HUD
         this.hud = new HUD(this);
 
-        // --- Furniture ---
+        // --- Furniture using tiles ---
 
-        // Bed (left side) — frame + pillow + blanket
-        this.add.rectangle(120, 390, 80, 40, 0x5a3a1a); // bed frame
-        this.add.rectangle(120, 385, 70, 30, 0x4488cc); // blue blanket
-        this.add.rectangle(85, 380, 20, 20, 0xeeeeee);  // pillow
+        // Bed (left side) — tile 81 looks like a bed/couch
+        this.tile(100, 395, 81, 2.5);
+        // Table (center) — tile 80
+        this.tile(300, 395, 80, 2.5);
+        // Candle on table — tile 95 (orange glowy item)
+        this.tile(300, 365, 95, 1.8);
 
-        // Small table (center)
-        this.add.rectangle(350, 395, 60, 30, 0x8B6914); // tabletop
-        this.add.rectangle(330, 410, 6, 20, 0x5a3a1a);  // leg left
-        this.add.rectangle(370, 410, 6, 20, 0x5a3a1a);  // leg right
+        // Chest — tile 82 (box/chest item)
+        this.tile(200, 395, 82, 2.5);
 
-        // Candle on table
-        this.add.rectangle(350, 377, 4, 10, 0xffeedd);   // candle
-        this.add.circle(350, 370, 4, 0xffaa00);          // flame
+        // Window on back wall — tile 73 has a window
+        this.tile(200, 220, 73, 2.5);
+        this.tile(450, 220, 73, 2.5);
 
-        // Rug on floor
-        this.add.rectangle(250, 405, 100, 40, 0xcc4444).setAlpha(0.5);
-
-        // Window on back wall
-        this.add.rectangle(200, 200, 40, 30, 0x88ccff); // window glass
-        this.add.rectangle(200, 200, 42, 2, 0x5a3a1a);  // window frame h
-        this.add.rectangle(200, 200, 2, 32, 0x5a3a1a);  // window frame v
+        // Rug (keep as rectangle — no rug tile)
+        this.add.rectangle(400, 405, 120, 40, 0xcc4444).setAlpha(0.3);
 
         // Scene label
         this.add.text(16, 16, 'House', { fontSize: '18px', fill: '#333' });
-
-        // Flavor text
-        this.add.text(400, 270, 'A cozy little home.', {
+        this.add.text(400, 280, 'A cozy little home.', {
             fontSize: '14px', fill: '#665533', fontStyle: 'italic'
         }).setOrigin(0.5);
 
         // --- Exit door (right side) ---
-        this.add.rectangle(740, 390, 30, 50, 0x5a3a1a); // door
-        this.add.circle(732, 390, 3, 0xffcc00);          // doorknob
+        this.tile(740, 390, 74, 2.5);  // door tile
 
-        // Door exit zone
         this.doorZone = this.add.rectangle(740, 390, 40, 60, 0x000000, 0);
         this.physics.add.existing(this.doorZone, true);
 
-        // "Press E" prompt
         this.exitPrompt = this.add.text(740, 355, 'Press E to leave', {
             fontSize: '11px', fill: '#fff', backgroundColor: '#000'
         }).setOrigin(0.5).setVisible(false).setDepth(50);
 
-        // E key
         this.eKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
     }
 
@@ -77,7 +78,6 @@ class House1Scene extends Phaser.Scene {
         this.player.update();
         this.hud.update();
 
-        // Check if near door
         const dist = Phaser.Math.Distance.Between(
             this.player.x, this.player.y,
             this.doorZone.x, this.doorZone.y

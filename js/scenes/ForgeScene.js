@@ -1,22 +1,31 @@
 class ForgeScene extends Phaser.Scene {
     constructor() { super('Forge'); }
 
+    tile(x, y, frame, scale) {
+        scale = scale || 2;
+        return this.add.image(x, y, 'tilemap', frame).setScale(scale);
+    }
+
     create() {
-        // Stone floor
-        this.add.rectangle(400, 350, 800, 200, 0x555555);
-        for (let x = 0; x < 800; x += 50) {
-            this.add.rectangle(x, 350, 1, 200, 0x444444);
-        }
-        for (let y = 280; y < 450; y += 50) {
-            this.add.rectangle(400, y, 800, 1, 0x444444);
+        // Dark stone background
+        this.add.rectangle(400, 225, 800, 450, 0x444444);
+
+        // === BACK WALL — stone wall tiles ===
+        for (let i = 0; i < 26; i++) {
+            this.tile(16 + i * 32, 240, 48);  // stone wall
+            this.tile(16 + i * 32, 208, 49);  // stone wall upper
         }
 
-        // Walls — dark stone
-        this.add.rectangle(400, 200, 800, 100, 0x666666);
-        this.add.rectangle(400, 250, 800, 4, 0x555555);
+        // === FLOOR — stone floor tiles ===
+        for (let i = 0; i < 26; i++) {
+            this.tile(16 + i * 32, 414, 50);  // stone floor
+            this.tile(16 + i * 32, 382, 50);
+            this.tile(16 + i * 32, 446, 51);
+        }
+        this.add.rectangle(400, 260, 800, 4, 0x555555);
 
         // Ground for physics
-        this.ground = this.add.rectangle(400, 430, 800, 40, 0x555555);
+        this.ground = this.add.rectangle(400, 430, 800, 40, 0x000000, 0);
         this.physics.add.existing(this.ground, true);
 
         // Player
@@ -28,16 +37,16 @@ class ForgeScene extends Phaser.Scene {
 
         // --- Forge furniture ---
 
-        // Furnace (left side) — big stone box with orange glow
-        this.add.rectangle(100, 380, 70, 60, 0x444444);  // furnace body
-        this.add.rectangle(100, 365, 60, 25, 0xff4400);  // fire opening
-        this.add.rectangle(100, 365, 50, 18, 0xff8800);  // inner fire
-        this.add.rectangle(100, 360, 30, 10, 0xffcc00);  // bright center
+        // Furnace (left side) — use brick wall tiles + fire glow
+        this.tile(80, 380, 52, 2.5);   // brick/furnace body
+        this.tile(120, 380, 53, 2.5);  // brick/furnace body
+        // Fire opening (keep as colored rectangles for the glow effect)
+        this.add.rectangle(100, 365, 50, 18, 0xff4400);
+        this.add.rectangle(100, 365, 40, 12, 0xff8800);
+        this.add.rectangle(100, 362, 24, 8, 0xffcc00);
 
         // Furnace glow effect
         this.furnaceGlow = this.add.circle(100, 375, 50, 0xff6600, 0.15);
-
-        // Animate the glow
         this.tweens.add({
             targets: this.furnaceGlow,
             alpha: { from: 0.1, to: 0.25 },
@@ -48,58 +57,44 @@ class ForgeScene extends Phaser.Scene {
             repeat: -1
         });
 
-        // Anvil (center)
-        this.add.rectangle(300, 405, 40, 20, 0x333333); // anvil base
-        this.add.rectangle(300, 393, 50, 8, 0x444444);  // anvil top
-        this.add.rectangle(315, 397, 15, 4, 0x444444);  // anvil horn
+        // Anvil (center) — tile 119 area (tool-ish)
+        this.add.rectangle(300, 405, 40, 20, 0x333333);
+        this.add.rectangle(300, 393, 50, 8, 0x444444);
+        this.add.rectangle(315, 397, 15, 4, 0x444444);
 
-        // Hammer on anvil
-        this.add.rectangle(290, 387, 6, 14, 0x8B4513);  // handle
-        this.add.rectangle(290, 378, 12, 8, 0x666666);  // head
+        // Hammer on anvil — tile 117 (tool)
+        this.tile(290, 385, 117, 2);
 
-        // Weapon rack on back wall
-        this.add.rectangle(500, 210, 80, 50, 0x5a3a1a); // rack frame
-        // Swords on rack
-        this.add.rectangle(480, 200, 4, 35, 0xaaaaaa);  // sword 1
-        this.add.rectangle(480, 180, 8, 4, 0x8B4513);   // hilt 1
-        this.add.rectangle(500, 205, 4, 30, 0xaaaaaa);  // sword 2
-        this.add.rectangle(500, 188, 8, 4, 0x8B4513);   // hilt 2
-        this.add.rectangle(520, 200, 4, 35, 0xcccccc);  // sword 3 (shiny)
-        this.add.rectangle(520, 180, 8, 4, 0xffcc00);   // hilt 3 (gold)
+        // Weapon rack on back wall — use sword/shield tiles
+        this.tile(480, 220, 93, 2.5);   // sword
+        this.tile(510, 220, 106, 2.5);  // shield/weapon
+        this.tile(540, 220, 93, 2.5);   // another sword
 
-        // Barrel in corner
-        this.add.rectangle(180, 400, 30, 35, 0x8B4513);
-        this.add.rectangle(180, 390, 32, 3, 0x666666);  // barrel ring
-        this.add.rectangle(180, 405, 32, 3, 0x666666);  // barrel ring
+        // Barrel — tile 95 (barrel/pot item)
+        this.tile(180, 395, 95, 2.5);
 
         // Scene label
         this.add.text(16, 16, 'Forge', { fontSize: '18px', fill: '#ff8800' });
-
-        // Flavor text
-        this.add.text(400, 270, 'The forge is warm.', {
+        this.add.text(400, 280, 'The forge is warm.', {
             fontSize: '14px', fill: '#cc8844', fontStyle: 'italic'
         }).setOrigin(0.5);
 
-        // --- Blacksmith NPC (pixel art loaded in BootScene) ---
-
+        // --- Blacksmith NPC ---
         this.blacksmith = this.add.sprite(400, 386, 'blacksmith');
-        this.physics.add.existing(this.blacksmith, true); // true = static body
+        this.physics.add.existing(this.blacksmith, true);
         this.blacksmith.play('blacksmith_idle');
         this.add.text(400, 350, 'Blacksmith', {
             fontSize: '12px', fill: '#ddd'
         }).setOrigin(0.5);
 
-        // Talk prompt
         this.talkPrompt = this.add.text(400, 340, 'Press E to talk', {
             fontSize: '11px', fill: '#fff', backgroundColor: '#000'
         }).setOrigin(0.5).setVisible(false).setDepth(50);
 
-        // Dialogue
         this.dialogue = new DialogueBox(this);
 
-        // --- Exit door (right side) ---
-        this.add.rectangle(740, 390, 30, 50, 0x5a3a1a);
-        this.add.circle(732, 390, 3, 0xffcc00);
+        // --- Exit door ---
+        this.tile(740, 390, 91, 2.5);  // stone door
 
         this.doorZone = this.add.rectangle(740, 390, 40, 60, 0x000000, 0);
         this.physics.add.existing(this.doorZone, true);
@@ -108,12 +103,10 @@ class ForgeScene extends Phaser.Scene {
             fontSize: '11px', fill: '#fff', backgroundColor: '#000'
         }).setOrigin(0.5).setVisible(false).setDepth(50);
 
-        // E key
         this.eKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
     }
 
     update() {
-        // Freeze player during dialogue
         if (this.dialogue && this.dialogue.isOpen) {
             this.dialogue.update();
             this.player.setVelocityX(0);
@@ -157,7 +150,7 @@ class ForgeScene extends Phaser.Scene {
                         "Blacksmith: Be careful out there. It's getting dark..."
                     ]);
                 }
-                return; // don't also check door
+                return;
             }
         } else {
             this.talkPrompt.setVisible(false);
