@@ -34,6 +34,9 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.attackDamage = 10; // wood sword damage
         this.attackHitbox = null;
         this.currentHitDamage = 10;
+        this.comboCount = 0;
+        this.comboTimer = null;
+        this.comboWindow = 400; // ms to press next attack in combo
         this.isHurt = false;
 
         // Dodge
@@ -44,21 +47,64 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
     attack() {
         if (this.isAttacking) return;
+
+        // If combos unlocked, track combo chain
+        if (GameState.comboUnlocked) {
+            this.comboCount++;
+            if (this.comboCount > 3) this.comboCount = 1;
+
+            // Reset combo timer
+            if (this.comboTimer) this.comboTimer.remove();
+            this.comboTimer = this.scene.time.delayedCall(this.comboWindow, () => {
+                this.comboCount = 0;
+            });
+        } else {
+            this.comboCount = 1; // always first hit when no combos
+        }
+
         this.isAttacking = true;
 
-        this.currentHitDamage = this.attackDamage;
+        // Visual feedback based on combo hit
+        let hitDamage = this.attackDamage;
+        let hitboxWidth = 24;
+        let hitColor = 0xffffff;
 
-        // Visual feedback — flash white briefly
-        this.setTint(0xffffff);
+        if (this.comboCount === 2) {
+            hitDamage = this.attackDamage * 1.2;
+            hitboxWidth = 28;
+            hitColor = 0xffff88;
+        } else if (this.comboCount === 3) {
+            hitDamage = this.attackDamage * 2; // BIG swing
+            hitboxWidth = 36;
+            hitColor = 0xff4400;
+        }
 
-        // Create a hitbox in front of the player
+        this.setTint(hitColor);
+        this.currentHitDamage = hitDamage;
+
+        // Create hitbox
         const offsetX = this.facing === 'right' ? 30 : -30;
-        this.attackHitbox = this.scene.add.rectangle(this.x + offsetX, this.y, 24, 40);
+        this.attackHitbox = this.scene.add.rectangle(
+            this.x + offsetX, this.y, hitboxWidth, 40
+        );
         this.scene.physics.add.existing(this.attackHitbox, false);
         this.attackHitbox.body.setAllowGravity(false);
 
-        // Remove hitbox after short delay
-        this.scene.time.delayedCall(150, () => {
+        // Combo 3 text flash
+        if (this.comboCount === 3 && GameState.comboUnlocked) {
+            const comboText = this.scene.add.text(this.x, this.y - 40, 'COMBO!', {
+                fontSize: '16px', fill: '#ff4400'
+            }).setOrigin(0.5);
+            this.scene.tweens.add({
+                targets: comboText,
+                alpha: 0, y: this.y - 70,
+                duration: 600,
+                onComplete: () => comboText.destroy()
+            });
+        }
+
+        const attackDuration = this.comboCount === 3 ? 250 : 150;
+        this.scene.time.delayedCall(attackDuration, () => {
             if (this.attackHitbox) {
                 this.attackHitbox.destroy();
                 this.attackHitbox = null;
