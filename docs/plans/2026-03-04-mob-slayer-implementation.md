@@ -2,21 +2,23 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Build a 2D side-view exploration game where the player discovers a mysterious sword and fights mobs and a troll boss.
+**Goal:** Build a 2D side-view action game where the player discovers a mysterious Japanese sword, fights cursed creatures, defeats a troll boss, and unlocks combo attacks.
 
-**Architecture:** Scene-based Phaser 3 game. Each area (village, woods, boss arena) is a separate Phaser scene. Shared game state (health, weapon, story progress) lives in a GameState object passed between scenes. All art is colored rectangles for fast prototyping.
+**Architecture:** Scene-based Phaser 3 game. Each area (village, woods day, woods night, boss arena) is a separate Phaser scene. Shared game state (health, weapon, story progress) lives in a `GameState` object accessible to all scenes. All art is colored rectangles for fast prototyping. Player, enemies, and NPC logic live in separate JS files.
 
-**Tech Stack:** Phaser 3 (loaded via CDN), vanilla JavaScript, single index.html entry point, no build tools.
+**Tech Stack:** Phaser 3 (loaded via CDN), vanilla JavaScript, single `index.html` entry point, no build tools. Test by opening in browser.
+
+**Testing approach:** No automated tests — this is a CDN-loaded browser game. Each step has a "Verify" section describing what to check in browser + dev console.
 
 ---
 
-### Task 1: Project Setup & Boilerplate
+### Task 1: Project Boilerplate
 
 **Files:**
 - Create: `index.html`
 - Create: `js/main.js`
 
-**Step 1: Create index.html with Phaser CDN and canvas**
+**Step 1: Create index.html**
 
 ```html
 <!DOCTYPE html>
@@ -26,8 +28,7 @@
     <title>Mob Slayer</title>
     <style>
         * { margin: 0; padding: 0; }
-        body { background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        canvas { display: block; }
+        body { background: #000; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
     </style>
 </head>
 <body>
@@ -37,26 +38,23 @@
 </html>
 ```
 
-**Step 2: Create js/main.js with Phaser config and a placeholder scene**
+**Step 2: Create js/main.js with game config and GameState**
 
 ```js
-// Game state shared between scenes
 const GameState = {
     health: 100,
     maxHealth: 100,
-    weapon: 'wood', // 'wood' or 'slayer'
-    storyPhase: 0,
-    // 0 = start, 1 = found sword, 2 = talked to blacksmith, 3 = mobs appear
-    playerX: 100 // remember position between scene transitions
+    weapon: 'wood',       // 'wood' or 'slayer'
+    comboUnlocked: false,  // unlocked after beating troll
+    storyPhase: 0          // 0=start, 1=found sword, 2=talked to blacksmith, 3=night mode
 };
 
 class BootScene extends Phaser.Scene {
-    constructor() {
-        super('Boot');
-    }
-
+    constructor() { super('Boot'); }
     create() {
-        this.scene.start('Village');
+        this.add.text(400, 225, 'Mob Slayer', { fontSize: '48px', fill: '#fff' }).setOrigin(0.5);
+        this.add.text(400, 280, 'Loading...', { fontSize: '20px', fill: '#aaa' }).setOrigin(0.5);
+        this.time.delayedCall(1000, () => this.scene.start('Village'));
     }
 }
 
@@ -67,10 +65,7 @@ const config = {
     backgroundColor: '#87CEEB',
     physics: {
         default: 'arcade',
-        arcade: {
-            gravity: { y: 800 },
-            debug: false
-        }
+        arcade: { gravity: { y: 800 }, debug: false }
     },
     scene: [BootScene]
 };
@@ -78,10 +73,9 @@ const config = {
 const game = new Phaser.Game(config);
 ```
 
-**Step 3: Open in browser to verify blue sky background appears**
+**Step 3: Verify in browser**
 
-Run: Open `index.html` in a browser (or use a local server).
-Expected: Blue sky canvas, no errors in console.
+Open `index.html` in browser. Expected: Blue sky background, "Mob Slayer" title text, then blank blue screen after 1 second (Village scene doesn't exist yet — that's fine, no console errors).
 
 **Step 4: Commit**
 
@@ -97,82 +91,90 @@ git commit -m "project setup with Phaser 3 boilerplate"
 **Files:**
 - Create: `js/Player.js`
 - Modify: `index.html` (add script tag)
-- Modify: `js/main.js` (add test scene with player)
+- Create: `js/scenes/VillageScene.js`
+- Modify: `index.html` (add script tag)
+- Modify: `js/main.js` (register VillageScene)
 
-**Step 1: Create js/Player.js with player class**
+**Step 1: Create js/Player.js**
 
-The Player is a colored rectangle with physics. Handles movement, jumping, and facing direction.
+The Player class extends `Phaser.Physics.Arcade.Sprite`. It handles movement (left/right/jump) using arrow keys and WASD. It's a blue rectangle.
 
 ```js
-class Player extends Phaser.GameObjects.Rectangle {
+class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y) {
-        // Blue rectangle: 32 wide, 48 tall
-        super(scene, x, y, 32, 48, 0x3333ff);
+        // Create a blue rectangle texture for the player
+        const gfx = scene.add.graphics();
+        gfx.fillStyle(0x3366ff);
+        gfx.fillRect(0, 0, 32, 48);
+        gfx.generateTexture('player', 32, 48);
+        gfx.destroy();
+
+        super(scene, x, y, 'player');
         scene.add.existing(this);
         scene.physics.add.existing(this);
 
-        this.body.setCollideWorldBounds(true);
-
-        // Movement properties
-        this.speed = 200;
-        this.jumpPower = -400;
-        this.isOnGround = false;
-        this.facingRight = true;
+        this.setCollideWorldBounds(true);
+        this.body.setSize(32, 48);
 
         // Input
         this.cursors = scene.input.keyboard.createCursorKeys();
         this.wasd = scene.input.keyboard.addKeys({
-            up: 'W', down: 'S', left: 'A', right: 'D'
+            up: Phaser.Input.Keyboard.KeyCodes.W,
+            down: Phaser.Input.Keyboard.KeyCodes.S,
+            left: Phaser.Input.Keyboard.KeyCodes.A,
+            right: Phaser.Input.Keyboard.KeyCodes.D
         });
+
+        this.moveSpeed = 200;
+        this.jumpSpeed = -400;
+        this.facing = 'right';
     }
 
     update() {
-        this.isOnGround = this.body.blocked.down;
+        const left = this.cursors.left.isDown || this.wasd.left.isDown;
+        const right = this.cursors.right.isDown || this.wasd.right.isDown;
+        const jump = this.cursors.up.isDown || this.wasd.up.isDown;
 
         // Horizontal movement
-        if (this.cursors.left.isDown || this.wasd.left.isDown) {
-            this.body.setVelocityX(-this.speed);
-            this.facingRight = false;
-        } else if (this.cursors.right.isDown || this.wasd.right.isDown) {
-            this.body.setVelocityX(this.speed);
-            this.facingRight = true;
+        if (left) {
+            this.setVelocityX(-this.moveSpeed);
+            this.setFlipX(true);
+            this.facing = 'left';
+        } else if (right) {
+            this.setVelocityX(this.moveSpeed);
+            this.setFlipX(false);
+            this.facing = 'right';
         } else {
-            this.body.setVelocityX(0);
+            this.setVelocityX(0);
         }
 
-        // Jump
-        if ((this.cursors.up.isDown || this.wasd.up.isDown) && this.isOnGround) {
-            this.body.setVelocityY(this.jumpPower);
+        // Jump — only when on the ground
+        if (jump && this.body.onFloor()) {
+            this.setVelocityY(this.jumpSpeed);
         }
     }
 }
 ```
 
-**Step 2: Add Player.js script to index.html (before main.js)**
+**Step 2: Create js/scenes/VillageScene.js**
 
-Add this line in index.html before the main.js script tag:
-```html
-<script src="js/Player.js"></script>
-```
-
-**Step 3: Create a test scene in main.js to try the player**
-
-Replace BootScene with a TestScene that has ground and a player:
+A simple scene with ground, sky, and the player.
 
 ```js
-class TestScene extends Phaser.Scene {
-    constructor() {
-        super('Test');
-    }
+class VillageScene extends Phaser.Scene {
+    constructor() { super('Village'); }
 
     create() {
-        // Ground
-        const ground = this.add.rectangle(400, 430, 800, 40, 0x8B4513);
-        this.physics.add.existing(ground, true); // true = static
+        // Ground — brown rectangle across the bottom
+        this.ground = this.add.rectangle(400, 430, 800, 40, 0x8B4513);
+        this.physics.add.existing(this.ground, true); // true = static body
 
         // Player
-        this.player = new Player(this, 100, 300);
-        this.physics.add.collider(this.player, ground);
+        this.player = new Player(this, 100, 350);
+        this.physics.add.collider(this.player, this.ground);
+
+        // Scene label
+        this.add.text(16, 16, 'Village', { fontSize: '18px', fill: '#333' });
     }
 
     update() {
@@ -181,139 +183,175 @@ class TestScene extends Phaser.Scene {
 }
 ```
 
-Update the config scene array to: `scene: [TestScene]`
+**Step 3: Update index.html — add script tags before main.js**
 
-**Step 4: Test in browser**
+Add these lines before the `main.js` script tag:
 
-Expected: Blue player rectangle on brown ground. Arrow keys / WASD to move and jump.
+```html
+    <script src="js/Player.js"></script>
+    <script src="js/scenes/VillageScene.js"></script>
+```
 
-**Step 5: Commit**
+**Step 4: Update js/main.js — register VillageScene**
+
+Replace the scene array:
+```js
+    scene: [BootScene, VillageScene]
+```
+
+**Step 5: Verify in browser**
+
+Open `index.html`. Expected: After boot screen, you see a blue rectangle (player) standing on a brown ground strip. Arrow keys / WASD move left/right. Up arrow / W makes player jump. Player falls back down with gravity. Player can't walk off screen edges.
+
+**Step 6: Commit**
 
 ```bash
-git add js/Player.js js/main.js index.html
-git commit -m "add player with movement and jumping"
+git add js/Player.js js/scenes/VillageScene.js index.html js/main.js
+git commit -m "add player movement and village scene with ground"
 ```
 
 ---
 
-### Task 3: Combat System — Combo Attacks & Dodge
+### Task 3: Player Attack (Single Hit)
 
 **Files:**
-- Modify: `js/Player.js` (add attack and dodge)
+- Modify: `js/Player.js` (add attack logic)
 
-**Step 1: Add attack combo system to Player**
+**Step 1: Add attack to Player.js**
 
-Add these properties in the constructor:
+Add spacebar input in constructor:
 ```js
-// Combat
-this.attackKey = scene.input.keyboard.addKey('SPACE');
-this.dodgeKey = scene.input.keyboard.addKey('SHIFT');
-
-this.isAttacking = false;
-this.comboCount = 0; // 0, 1, 2 for 3-hit combo
-this.comboTimer = 0;
-this.comboWindow = 500; // ms to chain next hit
-this.attackDuration = 300; // ms per attack
-this.attackTimer = 0;
-
-this.isDodging = false;
-this.dodgeSpeed = 400;
-this.dodgeDuration = 250; // ms
-this.dodgeCooldown = 500; // ms
-this.dodgeTimer = 0;
-this.lastDodgeTime = 0;
-
-// Attack hitbox (invisible, created during attacks)
-this.attackBox = null;
-
-// Damage based on weapon and combo
-this.getDamage = function() {
-    const base = GameState.weapon === 'slayer' ? 25 : 10;
-    const multiplier = this.comboCount === 2 ? 2 : 1; // big swing on 3rd hit
-    return base * multiplier;
-};
+        this.attackKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        this.isAttacking = false;
+        this.attackTimer = null;
+        this.attackDamage = 10; // wood sword damage
 ```
 
-**Step 2: Add attack logic to update()**
-
+Add attack hitbox creation method and attack method:
 ```js
-// In update(), after movement code:
-const time = this.scene.time.now;
+    attack() {
+        if (this.isAttacking) return;
+        this.isAttacking = true;
 
-// Dodge
-if (Phaser.Input.Keyboard.JustDown(this.dodgeKey) && !this.isDodging &&
-    time - this.lastDodgeTime > this.dodgeCooldown) {
-    this.isDodging = true;
-    this.dodgeTimer = time;
-    this.lastDodgeTime = time;
-    this.setAlpha(0.5); // visual feedback: semi-transparent
-    const dir = this.facingRight ? 1 : -1;
-    this.body.setVelocityX(dir * this.dodgeSpeed);
-}
+        // Visual feedback — flash white briefly
+        this.setTint(0xffffff);
 
-if (this.isDodging && time - this.dodgeTimer > this.dodgeDuration) {
-    this.isDodging = false;
-    this.setAlpha(1);
-}
+        // Create a hitbox in front of the player
+        const offsetX = this.facing === 'right' ? 30 : -30;
+        this.attackHitbox = this.scene.add.rectangle(this.x + offsetX, this.y, 24, 40);
+        this.scene.physics.add.existing(this.attackHitbox, false);
+        this.attackHitbox.body.setAllowGravity(false);
 
-// Attack
-if (Phaser.Input.Keyboard.JustDown(this.attackKey) && !this.isAttacking && !this.isDodging) {
-    // Check if within combo window
-    if (time - this.comboTimer < this.comboWindow && this.comboCount < 2) {
-        this.comboCount++;
-    } else {
-        this.comboCount = 0;
+        // Remove hitbox after short delay
+        this.scene.time.delayedCall(150, () => {
+            if (this.attackHitbox) {
+                this.attackHitbox.destroy();
+                this.attackHitbox = null;
+            }
+            this.clearTint();
+            this.isAttacking = false;
+        });
     }
-
-    this.isAttacking = true;
-    this.attackTimer = time;
-
-    // Create attack hitbox in front of player
-    const offsetX = this.facingRight ? 30 : -30;
-    const width = this.comboCount === 2 ? 50 : 35; // big swing = wider
-    this.attackBox = this.scene.add.rectangle(
-        this.x + offsetX, this.y, width, 40, 0xffff00
-    );
-    this.attackBox.setAlpha(0.5);
-    this.scene.physics.add.existing(this.attackBox);
-    this.attackBox.body.setAllowGravity(false);
-}
-
-if (this.isAttacking && time - this.attackTimer > this.attackDuration) {
-    this.isAttacking = false;
-    this.comboTimer = time;
-    if (this.attackBox) {
-        this.attackBox.destroy();
-        this.attackBox = null;
-    }
-}
-
-// Keep attack box following player
-if (this.attackBox) {
-    const offsetX = this.facingRight ? 30 : -30;
-    this.attackBox.x = this.x + offsetX;
-    this.attackBox.y = this.y;
-}
 ```
 
-**Step 3: Test in browser**
+Add to update() — check for spacebar press:
+```js
+        // Attack
+        if (Phaser.Input.Keyboard.JustDown(this.attackKey)) {
+            this.attack();
+        }
+```
 
-Expected: Press SPACE to see yellow attack hitbox flash. Press multiple times quickly for combo. Press SHIFT to dodge (player goes semi-transparent and dashes).
+**Step 2: Verify in browser**
 
-**Step 4: Commit**
+Press spacebar. Expected: Player flashes white briefly. No errors in console. A small hitbox appears in front of the player (you can set `debug: true` in physics config to see it, then turn it back off).
+
+**Step 3: Commit**
 
 ```bash
 git add js/Player.js
-git commit -m "add combo attack system and dodge roll"
+git commit -m "add single-hit attack with hitbox"
 ```
 
 ---
 
-### Task 4: HUD — Health Bar & Weapon Display
+### Task 4: Dodge Roll
+
+**Files:**
+- Modify: `js/Player.js` (add dodge roll)
+
+**Step 1: Add dodge to Player.js**
+
+Add in constructor:
+```js
+        this.dodgeKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
+        this.isDodging = false;
+        this.dodgeCooldown = false;
+```
+
+Add dodge method:
+```js
+    dodge() {
+        if (this.isDodging || this.dodgeCooldown) return;
+        this.isDodging = true;
+        this.dodgeCooldown = true;
+
+        // Dash in facing direction
+        const dashSpeed = this.facing === 'right' ? 400 : -400;
+        this.setVelocityX(dashSpeed);
+
+        // Brief invincibility — make semi-transparent
+        this.setAlpha(0.4);
+        this.body.checkCollision.none = true;
+
+        // End dodge after 200ms
+        this.scene.time.delayedCall(200, () => {
+            this.isDodging = false;
+            this.setAlpha(1);
+            this.body.checkCollision.none = false;
+        });
+
+        // Cooldown — can't dodge again for 500ms
+        this.scene.time.delayedCall(500, () => {
+            this.dodgeCooldown = false;
+        });
+    }
+```
+
+Add to update():
+```js
+        // Dodge
+        if (Phaser.Input.Keyboard.JustDown(this.dodgeKey)) {
+            this.dodge();
+        }
+```
+
+Also, prevent movement input during dodge — wrap the existing movement code in update():
+```js
+        if (!this.isDodging) {
+            // ... existing left/right/jump movement code ...
+        }
+```
+
+**Step 2: Verify in browser**
+
+Press Shift. Expected: Player dashes forward quickly, goes semi-transparent for a moment, then returns to normal. Can't dodge again for half a second.
+
+**Step 3: Commit**
+
+```bash
+git add js/Player.js
+git commit -m "add dodge roll with invincibility and cooldown"
+```
+
+---
+
+### Task 5: HUD — Health Bar
 
 **Files:**
 - Create: `js/HUD.js`
 - Modify: `index.html` (add script tag)
+- Modify: `js/scenes/VillageScene.js` (add HUD)
 
 **Step 1: Create js/HUD.js**
 
@@ -322,65 +360,73 @@ class HUD {
     constructor(scene) {
         this.scene = scene;
 
-        // Health bar background (gray)
-        this.healthBg = scene.add.rectangle(120, 25, 204, 20, 0x333333);
-        this.healthBg.setScrollFactor(0);
-        this.healthBg.setDepth(100);
+        // Health bar background (dark red)
+        this.healthBarBg = scene.add.rectangle(120, 30, 200, 20, 0x660000);
+        this.healthBarBg.setScrollFactor(0); // stays on screen
+        this.healthBarBg.setDepth(100);
 
-        // Health bar fill (red)
-        this.healthBar = scene.add.rectangle(120, 25, 200, 16, 0xff0000);
-        this.healthBar.setScrollFactor(0);
-        this.healthBar.setDepth(101);
+        // Health bar fill (green)
+        this.healthBarFill = scene.add.rectangle(120, 30, 200, 20, 0x00cc00);
+        this.healthBarFill.setScrollFactor(0);
+        this.healthBarFill.setDepth(101);
 
-        // Health label
-        this.healthLabel = scene.add.text(20, 15, 'HP', {
-            fontSize: '16px',
-            fontFamily: 'monospace',
-            color: '#ffffff'
-        });
-        this.healthLabel.setScrollFactor(0);
-        this.healthLabel.setDepth(101);
+        // Health text
+        this.healthText = scene.add.text(120, 30, '100/100', {
+            fontSize: '12px', fill: '#fff'
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(102);
 
-        // Weapon display
-        this.weaponText = scene.add.text(20, 42, '', {
-            fontSize: '14px',
-            fontFamily: 'monospace',
-            color: '#ffffff'
-        });
-        this.weaponText.setScrollFactor(0);
-        this.weaponText.setDepth(101);
+        // Weapon label
+        this.weaponText = scene.add.text(16, 50, 'Weapon: Wood Sword', {
+            fontSize: '14px', fill: '#333'
+        }).setScrollFactor(0).setDepth(100);
     }
 
     update() {
-        const ratio = GameState.health / GameState.maxHealth;
-        this.healthBar.width = 200 * ratio;
-        // Shift bar left as it shrinks so it drains from right
-        this.healthBar.x = 120 - (200 - this.healthBar.width) / 2;
+        const pct = GameState.health / GameState.maxHealth;
+        this.healthBarFill.setScale(pct, 1);
+        // Shift the bar left as it shrinks so it drains from right to left
+        this.healthBarFill.setX(120 - (1 - pct) * 100);
+        this.healthText.setText(`${GameState.health}/${GameState.maxHealth}`);
 
-        const weaponName = GameState.weapon === 'slayer' ? 'Slayer of the Mobs' : 'Wood Sword';
-        this.weaponText.setText('Weapon: ' + weaponName);
+        if (GameState.weapon === 'slayer') {
+            this.weaponText.setText('Weapon: モブスレイヤー');
+        }
     }
 }
 ```
 
-**Step 2: Add HUD.js script to index.html**
+**Step 2: Add script tag to index.html before main.js**
 
 ```html
-<script src="js/HUD.js"></script>
+    <script src="js/HUD.js"></script>
 ```
 
-**Step 3: Test by adding HUD to TestScene, verify it renders**
+**Step 3: Add HUD to VillageScene.js**
 
-**Step 4: Commit**
+In `create()`:
+```js
+        this.hud = new HUD(this);
+```
+
+In `update()`:
+```js
+        this.hud.update();
+```
+
+**Step 4: Verify in browser**
+
+Expected: Green health bar in top-left showing "100/100". "Weapon: Wood Sword" text below it.
+
+**Step 5: Commit**
 
 ```bash
-git add js/HUD.js index.html
+git add js/HUD.js index.html js/scenes/VillageScene.js
 git commit -m "add HUD with health bar and weapon display"
 ```
 
 ---
 
-### Task 5: Dialogue System
+### Task 6: Dialogue System
 
 **Files:**
 - Create: `js/DialogueBox.js`
@@ -388,89 +434,68 @@ git commit -m "add HUD with health bar and weapon display"
 
 **Step 1: Create js/DialogueBox.js**
 
+A reusable dialogue box that shows text at the bottom of the screen. Press E to advance through lines. Calls a callback when done.
+
 ```js
 class DialogueBox {
     constructor(scene) {
         this.scene = scene;
-        this.isActive = false;
+        this.isOpen = false;
         this.lines = [];
         this.currentLine = 0;
+        this.onComplete = null;
 
-        // Dark box at bottom of screen
-        this.box = scene.add.rectangle(400, 390, 760, 100, 0x000000, 0.8);
-        this.box.setScrollFactor(0);
-        this.box.setDepth(200);
-        this.box.setVisible(false);
+        // Dark semi-transparent background box
+        this.bg = scene.add.rectangle(400, 400, 760, 80, 0x000000, 0.8);
+        this.bg.setScrollFactor(0).setDepth(200);
+        this.bg.setVisible(false);
 
-        // Speaker name
-        this.nameText = scene.add.text(40, 350, '', {
-            fontSize: '16px',
-            fontFamily: 'monospace',
-            color: '#ffcc00',
-            fontStyle: 'bold'
-        });
-        this.nameText.setScrollFactor(0);
-        this.nameText.setDepth(201);
-        this.nameText.setVisible(false);
-
-        // Dialogue text
+        // Text
         this.text = scene.add.text(40, 375, '', {
-            fontSize: '14px',
-            fontFamily: 'monospace',
-            color: '#ffffff',
-            wordWrap: { width: 720 }
-        });
-        this.text.setScrollFactor(0);
-        this.text.setDepth(201);
+            fontSize: '16px', fill: '#fff', wordWrap: { width: 720 }
+        }).setScrollFactor(0).setDepth(201);
         this.text.setVisible(false);
 
-        // "Press E" prompt
-        this.prompt = scene.add.text(680, 420, '[E] Next', {
-            fontSize: '12px',
-            fontFamily: 'monospace',
-            color: '#aaaaaa'
-        });
-        this.prompt.setScrollFactor(0);
-        this.prompt.setDepth(201);
-        this.prompt.setVisible(false);
+        // "Press E" hint
+        this.hint = scene.add.text(720, 420, '[E]', {
+            fontSize: '12px', fill: '#aaa'
+        }).setScrollFactor(0).setDepth(201);
+        this.hint.setVisible(false);
 
-        // E key listener
-        this.advanceKey = scene.input.keyboard.addKey('E');
+        // E key
+        this.eKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
     }
 
-    show(speaker, lines) {
+    open(lines, onComplete) {
         this.lines = lines;
         this.currentLine = 0;
-        this.isActive = true;
-        this.speaker = speaker;
-
-        this.box.setVisible(true);
-        this.nameText.setVisible(true);
-        this.nameText.setText(speaker);
+        this.onComplete = onComplete || null;
+        this.isOpen = true;
+        this.bg.setVisible(true);
         this.text.setVisible(true);
-        this.text.setText(lines[0]);
-        this.prompt.setVisible(true);
+        this.hint.setVisible(true);
+        this.text.setText(this.lines[0]);
     }
 
     update() {
-        if (!this.isActive) return;
+        if (!this.isOpen) return;
 
-        if (Phaser.Input.Keyboard.JustDown(this.advanceKey)) {
+        if (Phaser.Input.Keyboard.JustDown(this.eKey)) {
             this.currentLine++;
             if (this.currentLine >= this.lines.length) {
-                this.hide();
+                this.close();
             } else {
                 this.text.setText(this.lines[this.currentLine]);
             }
         }
     }
 
-    hide() {
-        this.isActive = false;
-        this.box.setVisible(false);
-        this.nameText.setVisible(false);
+    close() {
+        this.isOpen = false;
+        this.bg.setVisible(false);
         this.text.setVisible(false);
-        this.prompt.setVisible(false);
+        this.hint.setVisible(false);
+        if (this.onComplete) this.onComplete();
     }
 }
 ```
@@ -478,476 +503,505 @@ class DialogueBox {
 **Step 2: Add script tag to index.html**
 
 ```html
-<script src="js/DialogueBox.js"></script>
+    <script src="js/DialogueBox.js"></script>
 ```
 
-**Step 3: Commit**
+**Step 3: Verify — we'll test this in the next task with the blacksmith**
 
-```bash
-git add js/DialogueBox.js index.html
-git commit -m "add dialogue box system for NPC conversations"
-```
-
----
-
-### Task 6: Village Scene
-
-**Files:**
-- Create: `js/scenes/VillageScene.js`
-- Modify: `index.html` (add script tag)
-- Modify: `js/main.js` (register scene)
-
-**Step 1: Create js/scenes/VillageScene.js**
-
-```js
-class VillageScene extends Phaser.Scene {
-    constructor() {
-        super('Village');
-    }
-
-    create() {
-        // Sky is already the background color
-
-        // Ground
-        this.ground = this.add.rectangle(400, 430, 800, 40, 0x8B4513);
-        this.physics.add.existing(this.ground, true);
-
-        // Village buildings (simple rectangles as houses)
-        this.add.rectangle(150, 360, 100, 100, 0x654321); // house 1
-        this.add.rectangle(150, 300, 110, 20, 0x8B0000);  // roof 1
-        this.add.rectangle(400, 370, 80, 80, 0x654321);   // house 2
-        this.add.rectangle(400, 320, 90, 20, 0x8B0000);   // roof 2
-
-        // Blacksmith (orange rectangle NPC)
-        this.blacksmith = this.add.rectangle(400, 386, 28, 44, 0xFF8C00);
-        this.physics.add.existing(this.blacksmith, true);
-
-        // "Blacksmith" label
-        this.add.text(370, 350, 'Blacksmith', {
-            fontSize: '10px',
-            fontFamily: 'monospace',
-            color: '#ffffff'
-        });
-
-        // "Press E" indicator (shown when near blacksmith)
-        this.talkPrompt = this.add.text(370, 340, '[E] Talk', {
-            fontSize: '10px',
-            fontFamily: 'monospace',
-            color: '#ffcc00'
-        });
-        this.talkPrompt.setVisible(false);
-
-        // Exit sign on right
-        this.add.text(740, 380, '→ Woods', {
-            fontSize: '12px',
-            fontFamily: 'monospace',
-            color: '#ffffff'
-        });
-
-        // Player
-        const startX = GameState.playerX || 100;
-        this.player = new Player(this, startX, 300);
-        this.physics.add.collider(this.player, this.ground);
-
-        // HUD
-        this.hud = new HUD(this);
-
-        // Dialogue
-        this.dialogue = new DialogueBox(this);
-
-        // E key for talking
-        this.talkKey = this.input.keyboard.addKey('E');
-        this.canTalk = false;
-    }
-
-    update() {
-        if (this.dialogue.isActive) {
-            this.dialogue.update();
-            return; // freeze player during dialogue
-        }
-
-        this.player.update();
-        this.hud.update();
-
-        // Check if near blacksmith
-        const dist = Phaser.Math.Distance.Between(
-            this.player.x, this.player.y,
-            this.blacksmith.x, this.blacksmith.y
-        );
-        this.canTalk = dist < 60;
-        this.talkPrompt.setVisible(this.canTalk);
-
-        // Talk to blacksmith
-        if (this.canTalk && Phaser.Input.Keyboard.JustDown(this.talkKey)) {
-            this.startBlacksmithDialogue();
-        }
-
-        // Scene transition: walk off right edge → Woods
-        if (this.player.x > 780) {
-            GameState.playerX = 30;
-            this.scene.start('Woods');
-        }
-    }
-
-    startBlacksmithDialogue() {
-        if (GameState.storyPhase === 0) {
-            this.dialogue.show('Blacksmith', [
-                'Hey there! Be careful in the woods today.',
-                'I heard strange noises coming from deep in the forest...'
-            ]);
-        } else if (GameState.storyPhase === 1) {
-            // Player found the sword and came back
-            this.dialogue.show('Blacksmith', [
-                'What is THAT?! Let me see that sword...',
-                'This is... the Slayer of the Mobs! An ancient weapon!',
-                'I\'ll give you 1000 gold for it! What do you say?'
-            ]);
-            // After this dialogue ends, advance story
-            this.time.delayedCall(100, () => {
-                const check = this.time.addEvent({
-                    delay: 100,
-                    loop: true,
-                    callback: () => {
-                        if (!this.dialogue.isActive) {
-                            check.remove();
-                            this.dialogue.show('You', [
-                                'Uhh... no. It must be very special.',
-                                'I\'m going to keep it.'
-                            ]);
-                            // After player refuses, advance to phase 2
-                            const check2 = this.time.addEvent({
-                                delay: 100,
-                                loop: true,
-                                callback: () => {
-                                    if (!this.dialogue.isActive) {
-                                        check2.remove();
-                                        GameState.storyPhase = 2;
-                                    }
-                                }
-                            });
-                        }
-                    }
-                });
-            });
-        } else if (GameState.storyPhase >= 2) {
-            this.dialogue.show('Blacksmith', [
-                'Be careful with that sword. It attracts... things.',
-                'Go to the woods if you dare. But be ready to fight!'
-            ]);
-            if (GameState.storyPhase === 2) {
-                GameState.storyPhase = 3; // mobs now appear in woods
-            }
-        }
-    }
-}
-```
-
-**Step 2: Add script tag and register scene in config**
-
-Add to index.html:
-```html
-<script src="js/scenes/VillageScene.js"></script>
-```
-
-Update main.js config scene array:
-```js
-scene: [BootScene, VillageScene]
-```
-
-Remove TestScene from main.js (no longer needed).
-
-**Step 3: Test in browser**
-
-Expected: Village with houses, blacksmith NPC. Walk around, talk to blacksmith with E key. Walk off right edge to trigger scene change (will error since Woods doesn't exist yet — that's ok).
+No visual test yet — just make sure no console errors when loading.
 
 **Step 4: Commit**
 
 ```bash
-git add js/scenes/VillageScene.js js/main.js index.html
-git commit -m "add village scene with blacksmith NPC and dialogue"
+git add js/DialogueBox.js index.html
+git commit -m "add reusable dialogue box system"
 ```
 
 ---
 
-### Task 7: Woods Scene with Sword Pickup & Enemies
+### Task 7: Blacksmith NPC in Village
 
 **Files:**
-- Create: `js/Enemy.js`
-- Create: `js/scenes/WoodsScene.js`
-- Modify: `index.html` (add script tags)
-- Modify: `js/main.js` (register scene)
+- Modify: `js/scenes/VillageScene.js` (add blacksmith NPC and dialogue)
 
-**Step 1: Create js/Enemy.js — small creature**
+**Step 1: Add blacksmith to VillageScene.js**
 
-```js
-class Enemy extends Phaser.GameObjects.Rectangle {
-    constructor(scene, x, y) {
-        // Green rectangle: 24 wide, 24 tall
-        super(scene, x, y, 24, 24, 0x00cc00);
-        scene.add.existing(this);
-        scene.physics.add.existing(this);
-
-        this.body.setCollideWorldBounds(true);
-
-        this.health = 30;
-        this.speed = 60;
-        this.damage = 10;
-        this.knockbackForce = 200;
-        this.attackCooldown = 1000; // ms between attacks
-        this.lastAttackTime = 0;
-        this.isAlive = true;
-    }
-
-    update(playerX) {
-        if (!this.isAlive) return;
-
-        // Walk toward player
-        if (playerX < this.x) {
-            this.body.setVelocityX(-this.speed);
-        } else {
-            this.body.setVelocityX(this.speed);
-        }
-    }
-
-    takeDamage(amount, fromRight) {
-        this.health -= amount;
-        // Flash white
-        this.setFillStyle(0xffffff);
-        this.scene.time.delayedCall(100, () => {
-            if (this.isAlive) this.setFillStyle(0x00cc00);
-        });
-        // Knockback
-        const dir = fromRight ? 1 : -1;
-        this.body.setVelocityX(dir * this.knockbackForce);
-
-        if (this.health <= 0) {
-            this.die();
-        }
-    }
-
-    die() {
-        this.isAlive = false;
-        this.setAlpha(0);
-        this.body.setEnable(false);
-        // Remove after a short delay
-        this.scene.time.delayedCall(200, () => {
-            this.destroy();
-        });
-    }
-}
-```
-
-**Step 2: Create js/scenes/WoodsScene.js**
+In `create()` add the blacksmith as an orange rectangle, dialogue box, and interaction zone:
 
 ```js
-class WoodsScene extends Phaser.Scene {
-    constructor() {
-        super('Woods');
-    }
+        // Blacksmith NPC — orange rectangle
+        const bsGfx = this.add.graphics();
+        bsGfx.fillStyle(0xff8800);
+        bsGfx.fillRect(0, 0, 32, 48);
+        bsGfx.generateTexture('blacksmith', 32, 48);
+        bsGfx.destroy();
 
-    create() {
-        // Darker green background for woods
-        this.cameras.main.setBackgroundColor('#2d5a1e');
+        this.blacksmith = this.physics.add.staticImage(600, 386, 'blacksmith');
 
-        // Ground
-        this.ground = this.add.rectangle(400, 430, 800, 40, 0x3d2b1f);
-        this.physics.add.existing(this.ground, true);
+        // Label above blacksmith
+        this.add.text(600, 350, 'Blacksmith', {
+            fontSize: '12px', fill: '#333'
+        }).setOrigin(0.5);
 
-        // Trees (dark green rectangles with brown trunks)
-        this.addTree(100, 340);
-        this.addTree(300, 350);
-        this.addTree(550, 330);
-        this.addTree(700, 345);
+        // "Press E" prompt — shown when player is close
+        this.talkPrompt = this.add.text(600, 340, 'Press E to talk', {
+            fontSize: '11px', fill: '#fff', backgroundColor: '#000'
+        }).setOrigin(0.5).setVisible(false).setDepth(50);
 
-        // Player
-        const startX = GameState.playerX || 30;
-        this.player = new Player(this, startX, 300);
-        this.physics.add.collider(this.player, this.ground);
-
-        // HUD
-        this.hud = new HUD(this);
-
-        // Dialogue
+        // Dialogue box
         this.dialogue = new DialogueBox(this);
 
-        // Mysterious sword pickup (only if not found yet)
-        this.swordPickup = null;
-        if (GameState.storyPhase === 0) {
-            // Glowing yellow rectangle = the sword on the ground
-            this.swordPickup = this.add.rectangle(600, 400, 8, 30, 0xFFD700);
-            this.physics.add.existing(this.swordPickup, true);
+        // E key for NPC interaction
+        this.eKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+```
 
-            // Glow effect — pulsing
+In `update()` add proximity check and dialogue:
+
+```js
+        // Dialogue system
+        this.dialogue.update();
+
+        // Show "Press E" when near blacksmith
+        const dist = Phaser.Math.Distance.Between(
+            this.player.x, this.player.y,
+            this.blacksmith.x, this.blacksmith.y
+        );
+
+        if (dist < 60 && !this.dialogue.isOpen) {
+            this.talkPrompt.setVisible(true);
+
+            if (Phaser.Input.Keyboard.JustDown(this.eKey)) {
+                this.talkPrompt.setVisible(false);
+
+                if (GameState.storyPhase === 0) {
+                    this.dialogue.open([
+                        "Blacksmith: Hey there! Heading out to the woods?",
+                        "Blacksmith: Be careful — strange things have been happening lately.",
+                        "Blacksmith: If you find anything interesting, come show me!"
+                    ]);
+                } else if (GameState.storyPhase === 1) {
+                    this.dialogue.open([
+                        "Blacksmith: What's that sword?! Let me see...",
+                        "Blacksmith: This is... モブスレイヤー — the Slayer of Mobs!",
+                        "Blacksmith: I'll give you 1000 gold for it! That's a fortune!",
+                        "You: Uhhh... no. I think I'll keep it.",
+                        "Blacksmith: Your choice, kid. But be careful with that thing."
+                    ], () => {
+                        GameState.storyPhase = 2;
+                    });
+                } else {
+                    this.dialogue.open([
+                        "Blacksmith: Be careful out there. It's getting dark..."
+                    ]);
+                }
+            }
+        } else {
+            this.talkPrompt.setVisible(false);
+        }
+```
+
+**Step 2: Verify in browser**
+
+Expected: Orange rectangle blacksmith in the village. Walk up to him, "Press E to talk" appears. Press E, dialogue box opens at bottom. Press E to advance through lines. Different dialogue plays based on story phase.
+
+**Step 3: Commit**
+
+```bash
+git add js/scenes/VillageScene.js
+git commit -m "add blacksmith NPC with story-based dialogue"
+```
+
+---
+
+### Task 8: Woods Day Scene — Sword Pickup
+
+**Files:**
+- Create: `js/scenes/WoodsDayScene.js`
+- Modify: `index.html` (add script tag)
+- Modify: `js/main.js` (register scene)
+- Modify: `js/scenes/VillageScene.js` (add scene transition)
+
+**Step 1: Create js/scenes/WoodsDayScene.js**
+
+```js
+class WoodsDayScene extends Phaser.Scene {
+    constructor() { super('WoodsDay'); }
+
+    create() {
+        // Darker green sky for woods
+        this.cameras.main.setBackgroundColor('#4a8c3f');
+
+        // Ground
+        this.ground = this.add.rectangle(400, 430, 800, 40, 0x5a3a1a);
+        this.physics.add.existing(this.ground, true);
+
+        // Trees (dark green rectangles as decoration)
+        for (let i = 0; i < 6; i++) {
+            const tx = 80 + i * 130;
+            this.add.rectangle(tx, 340, 30, 120, 0x2d5a1e); // trunk
+            this.add.rectangle(tx, 270, 70, 60, 0x1a4010);  // leaves
+        }
+
+        // Player
+        this.player = new Player(this, 50, 350);
+        this.physics.add.collider(this.player, this.ground);
+
+        // The Slayer sword — glowing yellow rectangle
+        if (GameState.storyPhase === 0) {
+            const swordGfx = this.add.graphics();
+            swordGfx.fillStyle(0xffdd00);
+            swordGfx.fillRect(0, 0, 12, 36);
+            swordGfx.generateTexture('slayer-sword', 12, 36);
+            swordGfx.destroy();
+
+            this.sword = this.physics.add.staticImage(650, 392, 'slayer-sword');
+
+            // Glow effect — pulsing tint
             this.tweens.add({
-                targets: this.swordPickup,
-                alpha: 0.4,
-                duration: 500,
+                targets: this.sword,
+                alpha: { from: 0.6, to: 1 },
+                duration: 600,
                 yoyo: true,
                 repeat: -1
             });
 
-            this.add.text(575, 370, '???', {
-                fontSize: '12px',
-                fontFamily: 'monospace',
-                color: '#FFD700'
+            // Pickup label
+            this.swordLabel = this.add.text(650, 360, '???', {
+                fontSize: '12px', fill: '#ffdd00'
+            }).setOrigin(0.5);
+
+            // Overlap for pickup
+            this.physics.add.overlap(this.player, this.sword, () => {
+                this.pickUpSword();
             });
         }
 
-        // Enemies (only if storyPhase >= 3)
-        this.enemies = [];
-        if (GameState.storyPhase >= 3) {
-            this.spawnEnemies();
-        }
+        // HUD
+        this.hud = new HUD(this);
 
-        // Exit labels
-        this.add.text(10, 380, '← Village', {
-            fontSize: '12px',
-            fontFamily: 'monospace',
-            color: '#ffffff'
+        // Scene label
+        this.add.text(16, 16, 'The Woods', { fontSize: '18px', fill: '#ddd' });
+
+        // Dialogue box
+        this.dialogue = new DialogueBox(this);
+
+        // Left edge — back to village
+        this.exitZone = this.add.rectangle(0, 225, 20, 450, 0x000000, 0);
+        this.physics.add.existing(this.exitZone, true);
+        this.physics.add.overlap(this.player, this.exitZone, () => {
+            this.scene.start('Village');
         });
-
-        if (GameState.storyPhase >= 3) {
-            this.add.text(720, 380, '→ Deep Woods', {
-                fontSize: '12px',
-                fontFamily: 'monospace',
-                color: '#ff4444'
-            });
-        }
     }
 
-    addTree(x, y) {
-        // Trunk
-        this.add.rectangle(x, y + 30, 20, 60, 0x5c3a1e);
-        // Leaves
-        this.add.rectangle(x, y - 20, 60, 50, 0x0a4a0a);
-    }
+    pickUpSword() {
+        if (GameState.storyPhase !== 0) return;
+        GameState.storyPhase = 1;
+        GameState.weapon = 'slayer';
+        this.player.attackDamage = 25;
 
-    spawnEnemies() {
-        const positions = [200, 350, 500, 650];
-        positions.forEach(x => {
-            const enemy = new Enemy(this, x, 380);
-            this.physics.add.collider(enemy, this.ground);
-            this.enemies.push(enemy);
-        });
+        this.sword.destroy();
+        this.swordLabel.destroy();
+
+        this.dialogue.open([
+            "You found a glowing sword!",
+            "The blade reads: モブスレイヤー",
+            "\"Slayer of the Mobs\"",
+            "You feel its power flowing through you..."
+        ]);
     }
 
     update() {
-        if (this.dialogue.isActive) {
-            this.dialogue.update();
-            return;
-        }
-
         this.player.update();
         this.hud.update();
+        this.dialogue.update();
 
-        // Sword pickup
-        if (this.swordPickup && GameState.storyPhase === 0) {
-            const dist = Phaser.Math.Distance.Between(
-                this.player.x, this.player.y,
-                this.swordPickup.x, this.swordPickup.y
-            );
-            if (dist < 40) {
-                this.swordPickup.destroy();
-                this.swordPickup = null;
-                GameState.weapon = 'slayer';
-                GameState.storyPhase = 1;
-                this.dialogue.show('You', [
-                    'What is this...?',
-                    'There\'s writing on it: "Slayer of the Mobs"',
-                    'I should show this to the Blacksmith!'
-                ]);
-            }
-        }
-
-        // Enemy AI and combat
-        this.enemies.forEach(enemy => {
-            if (!enemy.isAlive) return;
-
-            enemy.update(this.player.x);
-
-            // Enemy damages player
-            const dist = Phaser.Math.Distance.Between(
-                this.player.x, this.player.y,
-                enemy.x, enemy.y
-            );
-            const time = this.time.now;
-            if (dist < 30 && !this.player.isDodging &&
-                time - enemy.lastAttackTime > enemy.attackCooldown) {
-                enemy.lastAttackTime = time;
-                GameState.health -= enemy.damage;
-                // Knockback player
-                const dir = this.player.x < enemy.x ? -1 : 1;
-                this.player.body.setVelocityX(dir * 200);
-            }
-
-            // Player attack hits enemy
-            if (this.player.attackBox && this.player.isAttacking) {
-                const atkDist = Phaser.Math.Distance.Between(
-                    this.player.attackBox.x, this.player.attackBox.y,
-                    enemy.x, enemy.y
-                );
-                if (atkDist < 40) {
-                    const fromRight = this.player.x < enemy.x;
-                    enemy.takeDamage(this.player.getDamage(), fromRight);
-                }
-            }
-        });
-
-        // Clean up dead enemies
-        this.enemies = this.enemies.filter(e => e.isAlive);
-
-        // Check player death
-        if (GameState.health <= 0) {
-            GameState.health = GameState.maxHealth;
-            GameState.playerX = 100;
-            this.scene.start('Village');
-        }
-
-        // Scene transitions
-        if (this.player.x < 20) {
-            GameState.playerX = 750;
-            this.scene.start('Village');
-        }
-
-        if (this.player.x > 780 && GameState.storyPhase >= 3) {
-            GameState.playerX = 30;
-            this.scene.start('BossArena');
+        // Don't move player during dialogue
+        if (this.dialogue.isOpen) {
+            this.player.setVelocityX(0);
         }
     }
 }
 ```
 
-**Step 3: Add script tags and register scenes**
+**Step 2: Add script tag to index.html**
 
-Add to index.html:
 ```html
-<script src="js/Enemy.js"></script>
-<script src="js/scenes/WoodsScene.js"></script>
+    <script src="js/scenes/WoodsDayScene.js"></script>
 ```
 
-Update main.js scene array:
+**Step 3: Register in js/main.js scene array**
+
 ```js
-scene: [BootScene, VillageScene, WoodsScene]
+    scene: [BootScene, VillageScene, WoodsDayScene]
 ```
 
-**Step 4: Test the full flow**
+**Step 4: Add exit zone in VillageScene.js — right edge goes to woods**
 
-1. Start in village, talk to blacksmith
-2. Walk right to woods
-3. Find the glowing sword
-4. Walk left back to village, talk to blacksmith (sword dialogue plays)
-5. Walk right to woods again — enemies should appear
+In VillageScene `create()`:
+```js
+        // Right edge — go to woods
+        this.exitRight = this.add.rectangle(800, 225, 20, 450, 0x000000, 0);
+        this.physics.add.existing(this.exitRight, true);
+        this.physics.add.overlap(this.player, this.exitRight, () => {
+            if (GameState.storyPhase < 2) {
+                this.scene.start('WoodsDay');
+            } else {
+                this.scene.start('WoodsNight');
+            }
+        });
+```
 
-**Step 5: Commit**
+**Step 5: Verify in browser**
+
+Walk right in village → transition to woods. See trees, darker background. Walk to glowing yellow sword → dialogue about finding it. Walk left → back to village. Talk to blacksmith → new dialogue about the sword and 1000 gold offer.
+
+**Step 6: Commit**
 
 ```bash
-git add js/Enemy.js js/scenes/WoodsScene.js js/main.js index.html
-git commit -m "add woods scene with sword pickup and enemy combat"
+git add js/scenes/WoodsDayScene.js index.html js/main.js js/scenes/VillageScene.js
+git commit -m "add woods day scene with sword pickup and scene transitions"
 ```
 
 ---
 
-### Task 8: Boss Arena & Troll Boss Fight
+### Task 9: Woods Night Scene — Cursed Creatures
+
+**Files:**
+- Create: `js/Enemy.js`
+- Create: `js/scenes/WoodsNightScene.js`
+- Modify: `index.html` (add script tags)
+- Modify: `js/main.js` (register scene)
+
+**Step 1: Create js/Enemy.js**
+
+```js
+class Enemy extends Phaser.Physics.Arcade.Sprite {
+    constructor(scene, x, y, color, health, damage, speed) {
+        // Generate texture from color
+        const key = 'enemy_' + color.toString(16);
+        if (!scene.textures.exists(key)) {
+            const gfx = scene.add.graphics();
+            gfx.fillStyle(color);
+            gfx.fillRect(0, 0, 24, 24);
+            gfx.generateTexture(key, 24, 24);
+            gfx.destroy();
+        }
+
+        super(scene, x, y, key);
+        scene.add.existing(this);
+        scene.physics.add.existing(this);
+
+        this.setCollideWorldBounds(true);
+        this.health = health;
+        this.maxHealth = health;
+        this.damage = damage;
+        this.speed = speed;
+        this.isHit = false;
+
+        // Health bar above enemy
+        this.hpBar = scene.add.rectangle(x, y - 20, 24, 4, 0x00cc00).setDepth(10);
+    }
+
+    update(playerX) {
+        if (this.isHit) return;
+
+        // Simple AI: walk toward player
+        if (playerX < this.x) {
+            this.setVelocityX(-this.speed);
+        } else {
+            this.setVelocityX(this.speed);
+        }
+
+        // Update health bar position
+        this.hpBar.setPosition(this.x, this.y - 20);
+        this.hpBar.setScale(this.health / this.maxHealth, 1);
+    }
+
+    takeDamage(amount) {
+        this.health -= amount;
+        this.isHit = true;
+        this.setTint(0xff0000);
+
+        // Knockback
+        this.scene.time.delayedCall(200, () => {
+            this.isHit = false;
+            this.clearTint();
+        });
+
+        if (this.health <= 0) {
+            this.hpBar.destroy();
+            this.destroy();
+            return true; // dead
+        }
+        return false; // alive
+    }
+}
+```
+
+**Step 2: Create js/scenes/WoodsNightScene.js**
+
+```js
+class WoodsNightScene extends Phaser.Scene {
+    constructor() { super('WoodsNight'); }
+
+    create() {
+        // Dark blue night sky
+        this.cameras.main.setBackgroundColor('#1a1a3a');
+
+        // Ground
+        this.ground = this.add.rectangle(400, 430, 800, 40, 0x3a2a1a);
+        this.physics.add.existing(this.ground, true);
+
+        // Dark trees
+        for (let i = 0; i < 6; i++) {
+            const tx = 80 + i * 130;
+            this.add.rectangle(tx, 340, 30, 120, 0x1a3a0e);
+            this.add.rectangle(tx, 270, 70, 60, 0x0e2a08);
+        }
+
+        // Player
+        this.player = new Player(this, 50, 350);
+        this.physics.add.collider(this.player, this.ground);
+
+        // Enemies — cursed creatures (green rectangles)
+        this.enemies = this.add.group();
+        this.spawnEnemies();
+
+        // Collisions
+        this.physics.add.collider(this.enemies, this.ground);
+
+        // HUD
+        this.hud = new HUD(this);
+
+        // Scene label
+        this.add.text(16, 16, 'The Dark Woods', { fontSize: '18px', fill: '#aa88cc' });
+
+        // Dialogue
+        this.dialogue = new DialogueBox(this);
+
+        // Intro dialogue
+        this.dialogue.open([
+            "The woods are different at night...",
+            "The animals — they're cursed! Their eyes glow red!",
+            "Prepare to fight!"
+        ]);
+
+        // Right edge — to boss arena
+        this.exitRight = this.add.rectangle(800, 225, 20, 450, 0x000000, 0);
+        this.physics.add.existing(this.exitRight, true);
+        this.physics.add.overlap(this.player, this.exitRight, () => {
+            if (this.enemies.countActive() === 0) {
+                this.scene.start('BossArena');
+            }
+        });
+
+        this.enemiesDefeatedOnce = false;
+    }
+
+    spawnEnemies() {
+        const positions = [250, 400, 550, 680];
+        positions.forEach(x => {
+            const enemy = new Enemy(this, x, 380, 0x33cc33, 30, 10, 60);
+            this.enemies.add(enemy);
+            this.physics.add.collider(enemy, this.ground);
+        });
+    }
+
+    update() {
+        this.player.update();
+        this.hud.update();
+        this.dialogue.update();
+
+        if (this.dialogue.isOpen) {
+            this.player.setVelocityX(0);
+            return;
+        }
+
+        // Enemy AI
+        this.enemies.getChildren().forEach(enemy => {
+            enemy.update(this.player.x);
+
+            // Enemy damages player on contact
+            if (!this.player.isDodging && !enemy.isHit) {
+                const dist = Phaser.Math.Distance.Between(
+                    this.player.x, this.player.y,
+                    enemy.x, enemy.y
+                );
+                if (dist < 30) {
+                    this.playerTakeDamage(enemy.damage);
+                }
+            }
+        });
+
+        // Check player attack hitbox vs enemies
+        if (this.player.attackHitbox) {
+            this.enemies.getChildren().forEach(enemy => {
+                const overlap = Phaser.Geom.Intersects.RectangleToRectangle(
+                    this.player.attackHitbox.getBounds(),
+                    enemy.getBounds()
+                );
+                if (overlap) {
+                    enemy.takeDamage(this.player.attackDamage);
+                }
+            });
+        }
+
+        // All enemies defeated — show message
+        if (this.enemies.countActive() === 0 && !this.enemiesDefeatedOnce) {
+            this.enemiesDefeatedOnce = true;
+            this.dialogue.open([
+                "The cursed creatures are defeated!",
+                "But you sense something bigger deeper in the woods..."
+            ]);
+        }
+    }
+
+    playerTakeDamage(amount) {
+        if (this.player.isHurt) return;
+        this.player.isHurt = true;
+        GameState.health = Math.max(0, GameState.health - amount);
+        this.player.setTint(0xff0000);
+        this.time.delayedCall(500, () => {
+            this.player.isHurt = false;
+            this.player.clearTint();
+        });
+
+        if (GameState.health <= 0) {
+            // Simple death — restart scene
+            GameState.health = GameState.maxHealth;
+            this.scene.restart();
+        }
+    }
+}
+```
+
+**Step 3: Add script tags to index.html**
+
+```html
+    <script src="js/Enemy.js"></script>
+    <script src="js/scenes/WoodsNightScene.js"></script>
+```
+
+**Step 4: Register in js/main.js**
+
+```js
+    scene: [BootScene, VillageScene, WoodsDayScene, WoodsNightScene]
+```
+
+**Step 5: Verify in browser**
+
+Complete the story flow: find sword → talk to blacksmith → walk right → dark woods scene. Green enemies walk toward you. Attack them with spacebar. They flash red and take damage. When all defeated, dialogue appears. Can proceed right to boss arena (scene doesn't exist yet — that's OK).
+
+**Step 6: Commit**
+
+```bash
+git add js/Enemy.js js/scenes/WoodsNightScene.js index.html js/main.js
+git commit -m "add woods night scene with cursed creature enemies"
+```
+
+---
+
+### Task 10: Troll Boss Fight
 
 **Files:**
 - Create: `js/TrollBoss.js`
@@ -958,169 +1012,184 @@ git commit -m "add woods scene with sword pickup and enemy combat"
 **Step 1: Create js/TrollBoss.js**
 
 ```js
-class TrollBoss extends Phaser.GameObjects.Rectangle {
+class TrollBoss extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y) {
-        // Big red rectangle: 64 wide, 80 tall
-        super(scene, x, y, 64, 80, 0xcc0000);
+        // Big red rectangle
+        const gfx = scene.add.graphics();
+        gfx.fillStyle(0xcc2222);
+        gfx.fillRect(0, 0, 64, 80);
+        gfx.generateTexture('troll', 64, 80);
+        gfx.destroy();
+
+        super(scene, x, y, 'troll');
         scene.add.existing(this);
         scene.physics.add.existing(this);
 
-        this.body.setCollideWorldBounds(true);
+        this.setCollideWorldBounds(true);
+        this.body.setSize(64, 80);
 
-        this.health = 300;
-        this.maxHealth = 300;
-        this.speed = 80;
-        this.isAlive = true;
-
-        // Attack state
-        this.currentAttack = null; // 'slam', 'swing', 'charge'
-        this.attackTimer = 0;
-        this.attackCooldown = 2000;
-        this.lastAttackTime = 0;
+        this.health = 200;
+        this.maxHealth = 200;
+        this.damage = 20;
         this.isAttacking = false;
-        this.attackHitbox = null;
+        this.isHit = false;
+        this.currentAttack = null;
+        this.attackCooldown = false;
 
-        // Health bar (above boss)
-        this.healthBg = scene.add.rectangle(x, y - 55, 70, 8, 0x333333);
-        this.healthBg.setDepth(50);
-        this.healthFill = scene.add.rectangle(x, y - 55, 66, 6, 0xff0000);
-        this.healthFill.setDepth(51);
-        this.nameTag = scene.add.text(x - 30, y - 70, 'TROLL', {
-            fontSize: '12px',
-            fontFamily: 'monospace',
-            color: '#ff4444',
-            fontStyle: 'bold'
-        });
-        this.nameTag.setDepth(51);
+        // Boss health bar (wide, at top of screen)
+        this.hpBarBg = scene.add.rectangle(400, 60, 300, 16, 0x660000)
+            .setScrollFactor(0).setDepth(100);
+        this.hpBarFill = scene.add.rectangle(400, 60, 300, 16, 0xcc0000)
+            .setScrollFactor(0).setDepth(101);
+        this.hpLabel = scene.add.text(400, 60, 'TROLL', {
+            fontSize: '11px', fill: '#fff'
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(102);
     }
 
-    update(playerX, playerY, time) {
-        if (!this.isAlive) return;
+    update(playerX) {
+        if (this.isHit || this.isAttacking) return;
 
-        // Update health bar position
-        this.healthBg.x = this.x;
-        this.healthBg.y = this.y - 55;
-        this.healthFill.x = this.x;
-        this.healthFill.y = this.y - 55;
-        const ratio = this.health / this.maxHealth;
-        this.healthFill.width = 66 * ratio;
-        this.nameTag.x = this.x - 30;
-        this.nameTag.y = this.y - 70;
-
-        if (this.isAttacking) return;
-
-        // Choose and execute attacks
-        if (time - this.lastAttackTime > this.attackCooldown) {
-            const dist = Math.abs(this.x - playerX);
-            if (dist < 80) {
-                // Close range: slam or swing
-                this.currentAttack = Math.random() > 0.5 ? 'slam' : 'swing';
-            } else {
-                // Far range: charge
-                this.currentAttack = 'charge';
-            }
-            this.startAttack(playerX, time);
+        // Walk toward player slowly
+        const speed = 50;
+        if (playerX < this.x - 40) {
+            this.setVelocityX(-speed);
+        } else if (playerX > this.x + 40) {
+            this.setVelocityX(speed);
         } else {
-            // Walk toward player slowly
-            if (playerX < this.x) {
-                this.body.setVelocityX(-this.speed);
-            } else {
-                this.body.setVelocityX(this.speed);
+            this.setVelocityX(0);
+        }
+
+        // Random attacks
+        if (!this.attackCooldown) {
+            const dist = Math.abs(playerX - this.x);
+            if (dist < 120) {
+                this.chooseAttack(playerX);
             }
         }
+
+        // Update boss health bar
+        const pct = this.health / this.maxHealth;
+        this.hpBarFill.setScale(pct, 1);
+        this.hpBarFill.setX(400 - (1 - pct) * 150);
     }
 
-    startAttack(playerX, time) {
+    chooseAttack(playerX) {
+        this.attackCooldown = true;
+        const attacks = ['slam', 'swing', 'charge'];
+        this.currentAttack = Phaser.Utils.Array.GetRandom(attacks);
         this.isAttacking = true;
-        this.lastAttackTime = time;
-        this.body.setVelocityX(0);
+        this.setVelocityX(0);
 
-        // Flash to warn player
-        this.setFillStyle(0xff4444);
-
-        const scene = this.scene;
-
-        if (this.currentAttack === 'slam') {
-            // Ground slam — delay then area damage
-            scene.time.delayedCall(500, () => {
-                if (!this.isAlive) return;
-                this.setFillStyle(0xcc0000);
-                // Area hitbox on ground
-                this.attackHitbox = scene.add.rectangle(this.x, 410, 120, 30, 0xff6600, 0.5);
-                scene.physics.add.existing(this.attackHitbox);
-                this.attackHitbox.body.setAllowGravity(false);
-
-                scene.time.delayedCall(300, () => {
-                    if (this.attackHitbox) this.attackHitbox.destroy();
-                    this.attackHitbox = null;
-                    this.isAttacking = false;
-                });
-            });
-        } else if (this.currentAttack === 'swing') {
-            // Club swing — horizontal attack
-            scene.time.delayedCall(400, () => {
-                if (!this.isAlive) return;
-                this.setFillStyle(0xcc0000);
-                const dir = playerX < this.x ? -1 : 1;
-                this.attackHitbox = scene.add.rectangle(
-                    this.x + dir * 50, this.y, 60, 50, 0xff6600, 0.5
-                );
-                scene.physics.add.existing(this.attackHitbox);
-                this.attackHitbox.body.setAllowGravity(false);
-
-                scene.time.delayedCall(300, () => {
-                    if (this.attackHitbox) this.attackHitbox.destroy();
-                    this.attackHitbox = null;
-                    this.isAttacking = false;
-                });
-            });
-        } else if (this.currentAttack === 'charge') {
-            // Charge at player
-            scene.time.delayedCall(600, () => {
-                if (!this.isAlive) return;
-                this.setFillStyle(0xcc0000);
-                const dir = playerX < this.x ? -1 : 1;
-                this.body.setVelocityX(dir * 350);
-
-                scene.time.delayedCall(800, () => {
-                    this.body.setVelocityX(0);
-                    this.isAttacking = false;
-                });
-            });
+        switch (this.currentAttack) {
+            case 'slam':
+                this.doSlam();
+                break;
+            case 'swing':
+                this.doSwing();
+                break;
+            case 'charge':
+                this.doCharge(playerX);
+                break;
         }
+
+        // Cooldown between attacks
+        this.scene.time.delayedCall(2000, () => {
+            this.attackCooldown = false;
+        });
     }
 
-    takeDamage(amount, fromRight) {
+    doSlam() {
+        // Jump up then slam down — area damage
+        this.setTint(0xff8800);
+
+        // Warning text
+        const warn = this.scene.add.text(this.x, this.y - 60, 'SLAM!', {
+            fontSize: '16px', fill: '#ff8800'
+        }).setOrigin(0.5);
+
+        this.scene.time.delayedCall(500, () => {
+            // Create ground shockwave hitbox
+            this.slamHitbox = this.scene.add.rectangle(this.x, 410, 160, 30);
+            this.scene.physics.add.existing(this.slamHitbox, false);
+            this.slamHitbox.body.setAllowGravity(false);
+
+            // Screen shake
+            this.scene.cameras.main.shake(200, 0.01);
+
+            this.scene.time.delayedCall(300, () => {
+                if (this.slamHitbox) this.slamHitbox.destroy();
+                this.slamHitbox = null;
+                warn.destroy();
+                this.clearTint();
+                this.isAttacking = false;
+            });
+        });
+    }
+
+    doSwing() {
+        // Horizontal club swing — jump to dodge
+        this.setTint(0xff4444);
+
+        const warn = this.scene.add.text(this.x, this.y - 60, 'SWING!', {
+            fontSize: '16px', fill: '#ff4444'
+        }).setOrigin(0.5);
+
+        this.scene.time.delayedCall(400, () => {
+            // Hitbox at player height — need to jump over
+            this.swingHitbox = this.scene.add.rectangle(this.x, 400, 200, 20);
+            this.scene.physics.add.existing(this.swingHitbox, false);
+            this.swingHitbox.body.setAllowGravity(false);
+
+            this.scene.time.delayedCall(300, () => {
+                if (this.swingHitbox) this.swingHitbox.destroy();
+                this.swingHitbox = null;
+                warn.destroy();
+                this.clearTint();
+                this.isAttacking = false;
+            });
+        });
+    }
+
+    doCharge(playerX) {
+        // Charge at the player
+        this.setTint(0xffff00);
+
+        const warn = this.scene.add.text(this.x, this.y - 60, 'CHARGE!', {
+            fontSize: '16px', fill: '#ffff00'
+        }).setOrigin(0.5);
+
+        this.scene.time.delayedCall(600, () => {
+            const dir = playerX < this.x ? -1 : 1;
+            this.setVelocityX(dir * 350);
+
+            this.scene.time.delayedCall(800, () => {
+                this.setVelocityX(0);
+                warn.destroy();
+                this.clearTint();
+                this.isAttacking = false;
+            });
+        });
+    }
+
+    takeDamage(amount) {
         this.health -= amount;
-        this.setFillStyle(0xffffff);
-        this.scene.time.delayedCall(100, () => {
-            if (this.isAlive) this.setFillStyle(0xcc0000);
+        this.isHit = true;
+        this.setTint(0xffffff);
+        this.setVelocityX(0);
+
+        this.scene.time.delayedCall(300, () => {
+            this.isHit = false;
+            this.clearTint();
         });
 
         if (this.health <= 0) {
-            this.die();
+            this.hpBarBg.destroy();
+            this.hpBarFill.destroy();
+            this.hpLabel.destroy();
+            this.destroy();
+            return true; // dead
         }
-    }
-
-    die() {
-        this.isAlive = false;
-        this.healthBg.setVisible(false);
-        this.healthFill.setVisible(false);
-        this.nameTag.setVisible(false);
-        if (this.attackHitbox) {
-            this.attackHitbox.destroy();
-            this.attackHitbox = null;
-        }
-
-        // Death animation — flash and fade
-        this.scene.tweens.add({
-            targets: this,
-            alpha: 0,
-            duration: 1000,
-            onComplete: () => {
-                this.destroy();
-            }
-        });
+        return false;
     }
 }
 ```
@@ -1129,238 +1198,426 @@ class TrollBoss extends Phaser.GameObjects.Rectangle {
 
 ```js
 class BossArenaScene extends Phaser.Scene {
-    constructor() {
-        super('BossArena');
-    }
+    constructor() { super('BossArena'); }
 
     create() {
-        // Dark red-tinted background
-        this.cameras.main.setBackgroundColor('#1a0a0a');
+        // Dark red sky
+        this.cameras.main.setBackgroundColor('#2a0a0a');
 
         // Ground
-        this.ground = this.add.rectangle(400, 430, 800, 40, 0x2a1a1a);
+        this.ground = this.add.rectangle(400, 430, 800, 40, 0x4a2a1a);
         this.physics.add.existing(this.ground, true);
 
-        // Dead trees for atmosphere
-        this.add.rectangle(100, 360, 15, 80, 0x3a2a1a);
-        this.add.rectangle(700, 350, 15, 90, 0x3a2a1a);
-
-        // Warning text
-        this.warningText = this.add.text(300, 200, 'TROLL APPROACHES...', {
-            fontSize: '20px',
-            fontFamily: 'monospace',
-            color: '#ff4444',
-            fontStyle: 'bold'
-        });
-        this.warningText.setAlpha(0);
-
         // Player
-        this.player = new Player(this, 50, 300);
+        this.player = new Player(this, 100, 350);
         this.physics.add.collider(this.player, this.ground);
+
+        // Troll boss
+        this.boss = new TrollBoss(this, 600, 350);
+        this.physics.add.collider(this.boss, this.ground);
 
         // HUD
         this.hud = new HUD(this);
 
+        // Scene label
+        this.add.text(16, 16, 'Boss Arena', { fontSize: '18px', fill: '#cc4444' });
+
         // Dialogue
         this.dialogue = new DialogueBox(this);
+        this.dialogue.open([
+            "A massive troll blocks your path!",
+            "Its eyes glow with the same curse...",
+            "Fight!"
+        ]);
 
-        // Spawn boss after dramatic pause
-        this.troll = null;
-        this.bossSpawned = false;
+        this.bossDefeated = false;
+    }
+
+    update() {
+        this.player.update();
+        this.hud.update();
+        this.dialogue.update();
+
+        if (this.dialogue.isOpen) {
+            this.player.setVelocityX(0);
+            return;
+        }
+
+        if (this.boss && this.boss.active) {
+            this.boss.update(this.player.x);
+
+            // Boss contact damage
+            if (!this.player.isDodging && !this.player.isHurt) {
+                const dist = Phaser.Math.Distance.Between(
+                    this.player.x, this.player.y,
+                    this.boss.x, this.boss.y
+                );
+                if (dist < 50) {
+                    this.playerTakeDamage(this.boss.damage);
+                }
+            }
+
+            // Boss attack hitboxes damage player
+            ['slamHitbox', 'swingHitbox'].forEach(hb => {
+                if (this.boss[hb] && !this.player.isDodging && !this.player.isHurt) {
+                    const overlap = Phaser.Geom.Intersects.RectangleToRectangle(
+                        this.boss[hb].getBounds(),
+                        this.player.getBounds()
+                    );
+                    if (overlap) {
+                        this.playerTakeDamage(this.boss.damage);
+                    }
+                }
+            });
+
+            // Player attack hits boss
+            if (this.player.attackHitbox) {
+                const overlap = Phaser.Geom.Intersects.RectangleToRectangle(
+                    this.player.attackHitbox.getBounds(),
+                    this.boss.getBounds()
+                );
+                if (overlap && !this.boss.isHit) {
+                    const dead = this.boss.takeDamage(this.player.attackDamage);
+                    if (dead) {
+                        this.onBossDefeated();
+                    }
+                }
+            }
+        }
+    }
+
+    onBossDefeated() {
+        if (this.bossDefeated) return;
+        this.bossDefeated = true;
+
+        // Screen flash
+        this.cameras.main.flash(1000, 255, 255, 100);
+
+        // Japanese letter glow effect
+        const glow = this.add.text(400, 200, 'モブスレイヤー', {
+            fontSize: '48px', fill: '#ffdd00'
+        }).setOrigin(0.5).setAlpha(0);
 
         this.tweens.add({
-            targets: this.warningText,
+            targets: glow,
             alpha: 1,
-            duration: 1000,
-            hold: 1500,
-            yoyo: true,
+            scale: { from: 0.5, to: 1.5 },
+            duration: 2000,
             onComplete: () => {
-                this.spawnBoss();
+                GameState.comboUnlocked = true;
+                this.dialogue.open([
+                    "The troll falls!",
+                    "The sword glows with ancient power...",
+                    "モブスレイヤー — Slayer of the Mobs!",
+                    "You feel new power coursing through you...",
+                    "COMBO ATTACKS UNLOCKED!",
+                    "Press ATTACK rapidly for a 3-hit combo!"
+                ], () => {
+                    this.scene.start('Victory');
+                });
             }
         });
     }
 
-    spawnBoss() {
-        this.troll = new TrollBoss(this, 650, 350);
-        this.physics.add.collider(this.troll, this.ground);
-        this.bossSpawned = true;
-    }
+    playerTakeDamage(amount) {
+        if (this.player.isHurt) return;
+        this.player.isHurt = true;
+        GameState.health = Math.max(0, GameState.health - amount);
+        this.player.setTint(0xff0000);
+        this.time.delayedCall(500, () => {
+            this.player.isHurt = false;
+            this.player.clearTint();
+        });
 
-    update() {
-        if (this.dialogue.isActive) {
-            this.dialogue.update();
-            return;
-        }
-
-        this.player.update();
-        this.hud.update();
-
-        if (!this.bossSpawned || !this.troll) return;
-
-        const time = this.time.now;
-        this.troll.update(this.player.x, this.player.y, time);
-
-        // Boss hitbox damages player
-        if (this.troll.attackHitbox && !this.player.isDodging) {
-            const dist = Phaser.Math.Distance.Between(
-                this.player.x, this.player.y,
-                this.troll.attackHitbox.x, this.troll.attackHitbox.y
-            );
-            if (dist < 50) {
-                GameState.health -= 20;
-                // Knockback
-                const dir = this.player.x < this.troll.x ? -1 : 1;
-                this.player.body.setVelocityX(dir * 300);
-                this.player.body.setVelocityY(-150);
-            }
-        }
-
-        // Boss body damages player (charge attack)
-        if (this.troll.currentAttack === 'charge' && !this.player.isDodging) {
-            const bodyDist = Phaser.Math.Distance.Between(
-                this.player.x, this.player.y,
-                this.troll.x, this.troll.y
-            );
-            if (bodyDist < 45 && Math.abs(this.troll.body.velocity.x) > 100) {
-                GameState.health -= 25;
-                const dir = this.player.x < this.troll.x ? -1 : 1;
-                this.player.body.setVelocityX(dir * 350);
-                this.player.body.setVelocityY(-200);
-            }
-        }
-
-        // Player attack hits boss
-        if (this.player.attackBox && this.player.isAttacking && this.troll.isAlive) {
-            const atkDist = Phaser.Math.Distance.Between(
-                this.player.attackBox.x, this.player.attackBox.y,
-                this.troll.x, this.troll.y
-            );
-            if (atkDist < 50) {
-                const fromRight = this.player.x < this.troll.x;
-                this.troll.takeDamage(this.player.getDamage(), fromRight);
-            }
-        }
-
-        // Boss defeated!
-        if (!this.troll.isAlive && !this.victoryShown) {
-            this.victoryShown = true;
-            this.time.delayedCall(1500, () => {
-                this.dialogue.show('', [
-                    'The troll has been defeated!',
-                    'The Slayer of the Mobs glows with power...',
-                    'You are the true Mob Slayer!',
-                    'CONGRATULATIONS! You beat the game!'
-                ]);
-            });
-        }
-
-        // Player death
         if (GameState.health <= 0) {
             GameState.health = GameState.maxHealth;
-            GameState.playerX = 100;
-            this.scene.start('Village');
-        }
-
-        // Prevent walking off left edge back to woods during boss fight
-        if (this.player.x < 20) {
-            this.player.x = 20;
+            this.scene.restart();
         }
     }
 }
 ```
 
-**Step 3: Add script tags and register scenes**
+**Step 3: Add script tags to index.html**
 
-Add to index.html:
 ```html
-<script src="js/TrollBoss.js"></script>
-<script src="js/scenes/BossArenaScene.js"></script>
+    <script src="js/TrollBoss.js"></script>
+    <script src="js/scenes/BossArenaScene.js"></script>
 ```
 
-Update main.js scene array:
+**Step 4: Register in js/main.js**
+
 ```js
-scene: [BootScene, VillageScene, WoodsScene, BossArenaScene]
+    scene: [BootScene, VillageScene, WoodsDayScene, WoodsNightScene, BossArenaScene]
 ```
 
-**Step 4: Test the complete game flow**
+**Step 5: Verify in browser**
 
-1. Village → talk to blacksmith → go to woods
-2. Find sword → go back to village → talk to blacksmith (refuses gold)
-3. Go to woods → fight creatures → go right to boss arena
-4. Fight troll boss → win!
-5. Test dying and respawning in village
+Play through the whole story to reach the boss. Troll is a big red rectangle. It walks toward you and does random attacks (SLAM, SWING, CHARGE) with warning text. Hit it with spacebar. Its health bar drains. When health reaches 0: screen flashes, Japanese text glows, dialogue plays about combo unlock.
 
-**Step 5: Commit**
+**Step 6: Commit**
 
 ```bash
-git add js/TrollBoss.js js/scenes/BossArenaScene.js js/main.js index.html
-git commit -m "add boss arena with troll boss fight and victory screen"
+git add js/TrollBoss.js js/scenes/BossArenaScene.js index.html js/main.js
+git commit -m "add troll boss fight with 3 attack patterns"
 ```
 
 ---
 
-### Task 9: Final Polish & README
+### Task 11: Victory Scene
+
+**Files:**
+- Create: `js/scenes/VictoryScene.js`
+- Modify: `index.html` (add script tag)
+- Modify: `js/main.js` (register scene)
+
+**Step 1: Create js/scenes/VictoryScene.js**
+
+```js
+class VictoryScene extends Phaser.Scene {
+    constructor() { super('Victory'); }
+
+    create() {
+        this.cameras.main.setBackgroundColor('#0a0a2a');
+
+        this.add.text(400, 120, 'モブスレイヤー', {
+            fontSize: '56px', fill: '#ffdd00'
+        }).setOrigin(0.5);
+
+        this.add.text(400, 180, 'MOB SLAYER', {
+            fontSize: '28px', fill: '#ffffff'
+        }).setOrigin(0.5);
+
+        this.add.text(400, 240, 'You defeated the troll and unlocked combo attacks!', {
+            fontSize: '16px', fill: '#aaaacc'
+        }).setOrigin(0.5);
+
+        this.add.text(400, 280, 'The curse on the woods has been lifted...', {
+            fontSize: '14px', fill: '#8888aa'
+        }).setOrigin(0.5);
+
+        this.add.text(400, 320, 'Or has it?', {
+            fontSize: '14px', fill: '#cc4444'
+        }).setOrigin(0.5);
+
+        this.add.text(400, 380, 'Press SPACE to play again', {
+            fontSize: '18px', fill: '#ffffff'
+        }).setOrigin(0.5);
+
+        this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE).on('down', () => {
+            // Reset game state
+            GameState.health = 100;
+            GameState.weapon = 'wood';
+            GameState.comboUnlocked = false;
+            GameState.storyPhase = 0;
+            this.scene.start('Village');
+        });
+    }
+}
+```
+
+**Step 2: Add script tag to index.html**
+
+```html
+    <script src="js/scenes/VictoryScene.js"></script>
+```
+
+**Step 3: Register in js/main.js**
+
+```js
+    scene: [BootScene, VillageScene, WoodsDayScene, WoodsNightScene, BossArenaScene, VictoryScene]
+```
+
+**Step 4: Verify in browser**
+
+After beating troll → victory screen with Japanese text, congratulations, "Or has it?" teaser, and play again option.
+
+**Step 5: Commit**
+
+```bash
+git add js/scenes/VictoryScene.js index.html js/main.js
+git commit -m "add victory screen with play-again option"
+```
+
+---
+
+### Task 12: Combo Attack System
+
+**Files:**
+- Modify: `js/Player.js` (add combo chain logic)
+
+**Step 1: Add combo state to Player constructor**
+
+```js
+        this.comboCount = 0;
+        this.comboTimer = null;
+        this.comboWindow = 400; // ms to press next attack in combo
+```
+
+**Step 2: Replace the attack() method with combo-aware version**
+
+```js
+    attack() {
+        if (this.isAttacking) return;
+
+        // If combos unlocked, track combo chain
+        if (GameState.comboUnlocked) {
+            this.comboCount++;
+            if (this.comboCount > 3) this.comboCount = 1;
+
+            // Reset combo timer
+            if (this.comboTimer) this.comboTimer.remove();
+            this.comboTimer = this.scene.time.delayedCall(this.comboWindow, () => {
+                this.comboCount = 0; // reset if too slow
+            });
+        } else {
+            this.comboCount = 1; // always first hit when no combos
+        }
+
+        this.isAttacking = true;
+
+        // Visual feedback based on combo hit
+        let hitDamage = this.attackDamage;
+        let hitboxWidth = 24;
+        let hitColor = 0xffffff;
+
+        if (this.comboCount === 2) {
+            hitDamage = this.attackDamage * 1.2;
+            hitboxWidth = 28;
+            hitColor = 0xffff88;
+        } else if (this.comboCount === 3) {
+            hitDamage = this.attackDamage * 2; // BIG swing
+            hitboxWidth = 36;
+            hitColor = 0xff4400;
+        }
+
+        this.setTint(hitColor);
+        this.currentHitDamage = hitDamage;
+
+        // Create hitbox
+        const offsetX = this.facing === 'right' ? 30 : -30;
+        this.attackHitbox = this.scene.add.rectangle(
+            this.x + offsetX, this.y, hitboxWidth, 40
+        );
+        this.scene.physics.add.existing(this.attackHitbox, false);
+        this.attackHitbox.body.setAllowGravity(false);
+
+        // Combo 3 text flash
+        if (this.comboCount === 3 && GameState.comboUnlocked) {
+            const comboText = this.scene.add.text(this.x, this.y - 40, 'COMBO!', {
+                fontSize: '16px', fill: '#ff4400'
+            }).setOrigin(0.5);
+            this.scene.tweens.add({
+                targets: comboText,
+                alpha: 0, y: this.y - 70,
+                duration: 600,
+                onComplete: () => comboText.destroy()
+            });
+        }
+
+        const attackDuration = this.comboCount === 3 ? 250 : 150;
+        this.scene.time.delayedCall(attackDuration, () => {
+            if (this.attackHitbox) {
+                this.attackHitbox.destroy();
+                this.attackHitbox = null;
+            }
+            this.clearTint();
+            this.isAttacking = false;
+        });
+    }
+```
+
+**Step 3: Update enemy/boss hit detection to use currentHitDamage**
+
+In WoodsNightScene.js and BossArenaScene.js, change:
+```js
+enemy.takeDamage(this.player.attackDamage);
+```
+to:
+```js
+enemy.takeDamage(this.player.currentHitDamage || this.player.attackDamage);
+```
+
+Same for boss:
+```js
+this.boss.takeDamage(this.player.currentHitDamage || this.player.attackDamage);
+```
+
+**Step 4: Verify in browser**
+
+Before troll: spacebar does single hits (white flash, same damage each time). After troll (on replay or if you set `GameState.comboUnlocked = true` in console): pressing spacebar 3 times quickly does slash → slash → BIG SWING with "COMBO!" text and extra damage on 3rd hit.
+
+**Step 5: Commit**
+
+```bash
+git add js/Player.js js/scenes/WoodsNightScene.js js/scenes/BossArenaScene.js
+git commit -m "add 3-hit combo system unlocked after troll defeat"
+```
+
+---
+
+### Task 13: README and Polish
 
 **Files:**
 - Create: `README.md`
-- Possible tweaks to any file for bugs found during final testing
 
-**Step 1: Full playtest**
-
-Play through the entire game start to finish. Check for:
-- Movement feels good
-- Combo attacks work
-- Dodge works against all enemy attacks
-- Story dialogue plays in correct order
-- Scene transitions work both ways
-- Boss fight is beatable but challenging
-- Health bar updates correctly
-
-**Step 2: Create README.md**
+**Step 1: Create README.md**
 
 ```markdown
-# Mob Slayer
+# Mob Slayer モブスレイヤー
 
-A 2D side-scrolling adventure game built with Phaser 3.
+A 2D side-view action game built with Phaser 3.
 
 ## How to Play
 
-Open `index.html` in a web browser.
+Open `index.html` in your browser — no install needed!
 
 ### Controls
-- **Arrow Keys / WASD** — Move and jump
-- **SPACE** — Attack (press multiple times for combos!)
-- **SHIFT** — Dodge roll
-- **E** — Talk to NPCs
+
+| Key | Action |
+|-----|--------|
+| Arrow keys / WASD | Move & Jump |
+| Spacebar | Attack |
+| Shift | Dodge Roll |
+| E | Talk to NPCs |
 
 ### Story
-You live in a small village. One day you discover a mysterious sword in the woods called "Slayer of the Mobs". When creatures begin to attack, you must fight your way through and defeat the giant troll boss!
 
-## Tech
-- Phaser 3
+You start in a village with a wood sword. Explore the woods to find the legendary
+モブスレイヤー (Mob Slayer) sword. But when night falls, cursed creatures attack!
+Fight through them and defeat the troll boss to unlock combo attacks!
+
+## Built With
+
+- [Phaser 3](https://phaser.io/) — game framework
 - Vanilla JavaScript
-- No build tools required
+- Made by Dane
 ```
 
-**Step 3: Commit**
+**Step 2: Commit**
 
 ```bash
 git add README.md
-git commit -m "add README with game instructions"
+git commit -m "add README with controls and story summary"
 ```
 
 ---
 
 ## Summary
 
-| Task | What it builds |
+| Task | What It Builds |
 |------|---------------|
-| 1 | Project setup, Phaser boilerplate |
-| 2 | Player movement & jumping |
-| 3 | Combo attacks & dodge roll |
-| 4 | HUD (health bar, weapon display) |
-| 5 | Dialogue system |
-| 6 | Village scene with blacksmith |
-| 7 | Woods scene with sword & enemies |
-| 8 | Boss arena with troll fight |
-| 9 | Polish & README |
+| 1 | Project boilerplate — HTML + Phaser config |
+| 2 | Player movement, jumping, physics |
+| 3 | Single-hit attack with hitbox |
+| 4 | Dodge roll with invincibility |
+| 5 | HUD — health bar + weapon display |
+| 6 | Dialogue box system |
+| 7 | Blacksmith NPC with story dialogue |
+| 8 | Woods day scene — sword pickup |
+| 9 | Woods night — cursed creatures |
+| 10 | Troll boss fight |
+| 11 | Victory screen |
+| 12 | 3-hit combo system |
+| 13 | README |
+
+Each task builds on the last. After task 8, you can play through the first half of the story. After task 11, the full game works. Task 12 adds the combo reward.
