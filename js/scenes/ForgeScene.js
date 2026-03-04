@@ -82,7 +82,8 @@ class ForgeScene extends Phaser.Scene {
 
         // --- Blacksmith NPC (pixel art loaded in BootScene) ---
 
-        this.blacksmith = this.physics.add.staticImage(400, 386, 'blacksmith');
+        this.blacksmith = this.physics.add.staticSprite(400, 386, 'blacksmith');
+        this.blacksmith.play('blacksmith_idle');
         this.add.text(400, 350, 'Blacksmith', {
             fontSize: '12px', fill: '#ddd'
         }).setOrigin(0.5);

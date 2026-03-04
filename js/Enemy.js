@@ -14,6 +14,11 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         scene.add.existing(this);
         scene.physics.add.existing(this);
 
+        // Play idle animation if using a sprite sheet
+        if (textureKey) {
+            this.play(textureKey + '_idle');
+        }
+
         this.setCollideWorldBounds(true);
         this.health = health;
         this.maxHealth = health;

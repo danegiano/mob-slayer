@@ -1,10 +1,12 @@
 class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y) {
         // Use the pixel art sprite loaded in BootScene
-
         super(scene, x, y, 'player');
         scene.add.existing(this);
         scene.physics.add.existing(this);
+
+        // Play idle animation
+        this.play('player_idle');
 
         this.setCollideWorldBounds(true);
         this.body.setSize(32, 48);

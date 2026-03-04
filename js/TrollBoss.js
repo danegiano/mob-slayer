@@ -1,10 +1,12 @@
 class TrollBoss extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y) {
         // Use the pixel art troll sprite loaded in BootScene
-
         super(scene, x, y, 'troll');
         scene.add.existing(this);
         scene.physics.add.existing(this);
+
+        // Play idle animation
+        this.play('troll_idle');
 
         this.setCollideWorldBounds(true);
         this.body.setSize(64, 80);
