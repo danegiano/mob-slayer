@@ -26,6 +26,41 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.moveSpeed = 200;
         this.jumpSpeed = -400;
         this.facing = 'right';
+
+        // Attack
+        this.attackKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        this.isAttacking = false;
+        this.attackTimer = null;
+        this.attackDamage = 10; // wood sword damage
+        this.attackHitbox = null;
+        this.currentHitDamage = 10;
+        this.isHurt = false;
+    }
+
+    attack() {
+        if (this.isAttacking) return;
+        this.isAttacking = true;
+
+        this.currentHitDamage = this.attackDamage;
+
+        // Visual feedback — flash white briefly
+        this.setTint(0xffffff);
+
+        // Create a hitbox in front of the player
+        const offsetX = this.facing === 'right' ? 30 : -30;
+        this.attackHitbox = this.scene.add.rectangle(this.x + offsetX, this.y, 24, 40);
+        this.scene.physics.add.existing(this.attackHitbox, false);
+        this.attackHitbox.body.setAllowGravity(false);
+
+        // Remove hitbox after short delay
+        this.scene.time.delayedCall(150, () => {
+            if (this.attackHitbox) {
+                this.attackHitbox.destroy();
+                this.attackHitbox = null;
+            }
+            this.clearTint();
+            this.isAttacking = false;
+        });
     }
 
     update() {
@@ -49,6 +84,11 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         // Jump — only when on the ground
         if (jump && this.body.onFloor()) {
             this.setVelocityY(this.jumpSpeed);
+        }
+
+        // Attack
+        if (Phaser.Input.Keyboard.JustDown(this.attackKey)) {
+            this.attack();
         }
     }
 }
