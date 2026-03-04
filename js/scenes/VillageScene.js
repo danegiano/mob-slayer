@@ -13,6 +13,28 @@ class VillageScene extends Phaser.Scene {
         // Scene label
         this.add.text(16, 16, 'Village', { fontSize: '18px', fill: '#333' });
 
+        // Houses — simple rectangles to make it look like a village
+        // House 1 (left side)
+        this.add.rectangle(120, 370, 80, 60, 0x8B6914); // wall
+        this.add.rectangle(120, 330, 90, 20, 0xcc3333); // roof
+        this.add.rectangle(120, 385, 20, 30, 0x5a3a1a); // door
+
+        // House 2 (middle)
+        this.add.rectangle(320, 360, 100, 80, 0x9B7924); // wall
+        this.add.rectangle(320, 310, 110, 20, 0xcc3333); // roof
+        this.add.rectangle(320, 385, 20, 30, 0x5a3a1a); // door
+        this.add.rectangle(290, 360, 15, 15, 0x88ccff); // window
+
+        // Blacksmith shop (behind blacksmith)
+        this.add.rectangle(600, 360, 100, 80, 0x666666); // stone wall
+        this.add.rectangle(600, 310, 110, 20, 0x444444); // roof
+        this.add.text(600, 310, 'Forge', { fontSize: '10px', fill: '#ff8800' }).setOrigin(0.5);
+
+        // Village sign
+        this.add.rectangle(50, 390, 6, 30, 0x5a3a1a); // post
+        this.add.rectangle(50, 370, 60, 20, 0x8B6914); // sign board
+        this.add.text(50, 370, 'Village', { fontSize: '9px', fill: '#fff' }).setOrigin(0.5);
+
         // HUD
         this.hud = new HUD(this);
 
