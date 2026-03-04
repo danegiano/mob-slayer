@@ -2,91 +2,102 @@
 
 ## Overview
 
-A 2D side-view exploration game built with Phaser 3. The player lives in a village, discovers a mysterious sword in the woods, and must fight creatures and a giant troll boss.
+A 2D side-view action game built with Phaser 3. The player lives in a village, discovers a mysterious Japanese sword in the woods, and must fight cursed creatures and a troll boss. Defeating the troll unlocks combo attacks.
 
-## Story
+## Story Flow
 
-1. You live in a small village. You have a wood sword.
-2. You go to the woods and find a mysterious sword: "Slayer of the Mobs".
-3. You bring it back to the village. The blacksmith offers 1000 gold — you refuse.
-4. You return to the woods. Small creatures attack you.
-5. You fight through them and reach the troll boss.
-6. Defeat the troll to win.
+1. You wake up in a **village** with a **wood sword**
+2. You walk into the **woods** and find a glowing sword — **"モブスレイヤー"** (Mob Slayer in Japanese)
+3. You bring it back. The **blacksmith** says "I'll give you 1000 gold for that sword!" — you say no
+4. **Night falls.** You go out into the dark woods. The animals are cursed — they attack you!
+5. You fight through cursed creatures until you reach the **troll boss**
+6. You beat the troll. A **Japanese letter glows** on the sword — you unlock **combo attacks!**
+7. Victory screen — sets up a potential sequel
 
-## Architecture: Scene-Based
+## Scenes
 
-Each area is a separate Phaser scene. Walking to the edge transitions to the next scene.
-
-### Scenes
-
-1. **Village** — peaceful, walk around, talk to blacksmith NPC. Exit right leads to woods.
-2. **Woods** — find the sword, fight small creatures. Exit left leads to village, exit right leads to boss arena.
-3. **Boss Arena** — deep in the woods, fight the giant troll.
+| Scene | What Happens | Transitions |
+|-------|-------------|-------------|
+| **Village** | Walk around, talk to blacksmith NPC | Exit right → Woods |
+| **Woods (Day)** | Explore, find the Slayer sword | Exit left → Village |
+| **Woods (Night)** | Dark version, cursed creatures attack | Exit right → Boss Arena |
+| **Boss Arena** | Fight the troll boss | Beat him → Victory + combo unlock |
 
 ## Player
 
-- **Movement:** Arrow keys or WASD to walk left/right and jump
-- **Attack:** Spacebar — press multiple times for a 3-hit combo (slash, slash, big swing)
-- **Dodge:** Shift key — quick dash with brief invincibility
+- **Movement:** Arrow keys or WASD — walk left/right, jump
+- **Attack:** Spacebar — single hit before troll, 3-hit combo after troll
+- **Dodge:** Shift — quick dash with brief invincibility
+- **Talk:** E — interact with NPCs
 - **Health bar** displayed on screen
-- **Weapons:**
-  - Wood sword (starting) — low damage
-  - Slayer of the Mobs (found in woods) — high damage
+
+### Weapons
+
+- **Wood sword** (starting) — low damage, single attacks only
+- **モブスレイヤー / Slayer of the Mobs** (found in woods) — high damage, combo unlock after troll
+
+### Combo System
+
+- **Before beating troll:** Single attacks only. Each spacebar press = one swing.
+- **After beating troll:** 3-hit combo chain. Press spacebar 3 times fast = slash → slash → BIG swing (extra damage on 3rd hit).
 
 ## Enemies
 
-### Small Creatures (slimes/goblins)
-- Low health
-- Basic AI: walk toward player, attack when close
-- Appear in the woods after finding the sword
+### Cursed Creatures (Woods at Night)
 
-### Troll Boss
-- Large sprite, high health
-- Attack patterns:
-  - Ground slam — area damage, dodge roll to avoid
-  - Club swing — dodge by jumping
-  - Charge attack — run away to avoid
-- Health bar displayed on screen
+- Small, low health
+- Basic AI: walk toward player, attack when close
+- Easy to kill — good for practicing combat
+
+### Troll Boss (Boss Arena)
+
+- Large sprite, high health, health bar on screen
+- 3 attack patterns:
+  - **Ground Slam** — area damage, dodge roll to avoid
+  - **Club Swing** — jump over it
+  - **Charge** — runs at player, get out of the way
+- Defeating troll triggers Japanese letter glow + combo unlock
 
 ## NPCs & Dialogue
 
-- **Blacksmith** in the village — press E to talk
-- Dialogue system: text box at bottom of screen, press E to advance
-- Story dialogue about the sword's meaning and the 1000 gold offer
+- **Blacksmith** in village — press E to talk
+- Dialogue: text box at bottom of screen, press E to advance
+- Key dialogue: blacksmith explains the sword, offers 1000 gold, player refuses
 
 ## Art Style (Version 1)
 
-- Colored rectangles as placeholders for fast prototyping
-  - Player: blue
-  - Small creatures: green
-  - Troll boss: big red
-  - Blacksmith: orange
-  - Ground/platforms: brown
-  - Sky: light blue background
-- Swap in real sprites later
+Colored rectangles as placeholders for fast prototyping:
+- Player: blue
+- Cursed creatures: green
+- Troll boss: big red
+- Blacksmith: orange
+- Ground/platforms: brown
+- Sky: light blue (day), dark blue (night)
+
+Real pixel art sprites added later.
 
 ## Tech Stack
 
-- **Phaser 3** — game framework
+- **Phaser 3** — game framework (loaded via CDN)
 - **JavaScript** — game logic
-- **HTML** — single index.html to run in browser
-- No build tools needed — just open in browser
+- **HTML** — single index.html entry point
+- No build tools — just open in browser
 
 ## Version 1 Scope
 
-Included:
-- 3 scenes (village, woods, boss arena)
-- Player movement, jumping, combo attacks, dodge roll
+**Included:**
+- 4 scenes (village, woods day, woods night, boss arena)
+- Player movement, jumping, single attacks, dodge roll
+- Sword pickup with Japanese text display
 - Blacksmith NPC with dialogue
-- Mysterious sword pickup
-- Small creature enemies
-- Troll boss fight
-- Win condition (defeat troll)
+- Cursed creature enemies
+- Troll boss fight with 3 attack patterns
+- Combo unlock after troll defeat
+- Victory screen
 
-Not included (future versions):
-- Wood/coal gathering tasks
+**Not included (future versions):**
 - Inventory system
-- More NPCs
-- More areas (caves, castles)
+- More NPCs and areas
 - Real sprite art
 - Sound effects and music
+- Save system
