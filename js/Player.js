@@ -35,6 +35,11 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.attackHitbox = null;
         this.currentHitDamage = 10;
         this.isHurt = false;
+
+        // Dodge
+        this.dodgeKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
+        this.isDodging = false;
+        this.dodgeCooldown = false;
     }
 
     attack() {
@@ -63,32 +68,65 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         });
     }
 
+    dodge() {
+        if (this.isDodging || this.dodgeCooldown) return;
+        this.isDodging = true;
+        this.dodgeCooldown = true;
+
+        // Dash in facing direction
+        const dashSpeed = this.facing === 'right' ? 400 : -400;
+        this.setVelocityX(dashSpeed);
+
+        // Brief invincibility — make semi-transparent
+        this.setAlpha(0.4);
+        this.body.checkCollision.none = true;
+
+        // End dodge after 200ms
+        this.scene.time.delayedCall(200, () => {
+            this.isDodging = false;
+            this.setAlpha(1);
+            this.body.checkCollision.none = false;
+        });
+
+        // Cooldown — can't dodge again for 500ms
+        this.scene.time.delayedCall(500, () => {
+            this.dodgeCooldown = false;
+        });
+    }
+
     update() {
-        const left = this.cursors.left.isDown || this.wasd.left.isDown;
-        const right = this.cursors.right.isDown || this.wasd.right.isDown;
-        const jump = this.cursors.up.isDown || this.wasd.up.isDown;
+        if (!this.isDodging) {
+            const left = this.cursors.left.isDown || this.wasd.left.isDown;
+            const right = this.cursors.right.isDown || this.wasd.right.isDown;
+            const jump = this.cursors.up.isDown || this.wasd.up.isDown;
 
-        // Horizontal movement
-        if (left) {
-            this.setVelocityX(-this.moveSpeed);
-            this.setFlipX(true);
-            this.facing = 'left';
-        } else if (right) {
-            this.setVelocityX(this.moveSpeed);
-            this.setFlipX(false);
-            this.facing = 'right';
-        } else {
-            this.setVelocityX(0);
-        }
+            // Horizontal movement
+            if (left) {
+                this.setVelocityX(-this.moveSpeed);
+                this.setFlipX(true);
+                this.facing = 'left';
+            } else if (right) {
+                this.setVelocityX(this.moveSpeed);
+                this.setFlipX(false);
+                this.facing = 'right';
+            } else {
+                this.setVelocityX(0);
+            }
 
-        // Jump — only when on the ground
-        if (jump && this.body.onFloor()) {
-            this.setVelocityY(this.jumpSpeed);
+            // Jump — only when on the ground
+            if (jump && this.body.onFloor()) {
+                this.setVelocityY(this.jumpSpeed);
+            }
         }
 
         // Attack
         if (Phaser.Input.Keyboard.JustDown(this.attackKey)) {
             this.attack();
+        }
+
+        // Dodge
+        if (Phaser.Input.Keyboard.JustDown(this.dodgeKey)) {
+            this.dodge();
         }
     }
 }
