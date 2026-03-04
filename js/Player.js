@@ -1,11 +1,13 @@
 class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y) {
-        // Create a blue rectangle texture for the player
-        const gfx = scene.add.graphics();
-        gfx.fillStyle(0x3366ff);
-        gfx.fillRect(0, 0, 32, 48);
-        gfx.generateTexture('player', 32, 48);
-        gfx.destroy();
+        // Create a blue rectangle texture for the player (only once)
+        if (!scene.textures.exists('player')) {
+            const gfx = scene.add.graphics();
+            gfx.fillStyle(0x3366ff);
+            gfx.fillRect(0, 0, 32, 48);
+            gfx.generateTexture('player', 32, 48);
+            gfx.destroy();
+        }
 
         super(scene, x, y, 'player');
         scene.add.existing(this);
@@ -31,7 +33,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.attackKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         this.isAttacking = false;
         this.attackTimer = null;
-        this.attackDamage = 10; // wood sword damage
+        this.attackDamage = GameState.weapon === 'slayer' ? 25 : 10;
         this.attackHitbox = null;
         this.currentHitDamage = 10;
         this.comboCount = 0;
@@ -125,13 +127,11 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
         // Brief invincibility — make semi-transparent
         this.setAlpha(0.4);
-        this.body.checkCollision.none = true;
 
         // End dodge after 200ms
         this.scene.time.delayedCall(200, () => {
             this.isDodging = false;
             this.setAlpha(1);
-            this.body.checkCollision.none = false;
         });
 
         // Cooldown — can't dodge again for 500ms

@@ -1,10 +1,12 @@
 class TrollBoss extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y) {
-        const gfx = scene.add.graphics();
-        gfx.fillStyle(0xcc2222);
-        gfx.fillRect(0, 0, 64, 80);
-        gfx.generateTexture('troll', 64, 80);
-        gfx.destroy();
+        if (!scene.textures.exists('troll')) {
+            const gfx = scene.add.graphics();
+            gfx.fillStyle(0xcc2222);
+            gfx.fillRect(0, 0, 64, 80);
+            gfx.generateTexture('troll', 64, 80);
+            gfx.destroy();
+        }
 
         super(scene, x, y, 'troll');
         scene.add.existing(this);

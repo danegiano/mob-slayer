@@ -17,11 +17,13 @@ class VillageScene extends Phaser.Scene {
         this.hud = new HUD(this);
 
         // Blacksmith NPC — orange rectangle
-        const bsGfx = this.add.graphics();
-        bsGfx.fillStyle(0xff8800);
-        bsGfx.fillRect(0, 0, 32, 48);
-        bsGfx.generateTexture('blacksmith', 32, 48);
-        bsGfx.destroy();
+        if (!this.textures.exists('blacksmith')) {
+            const bsGfx = this.add.graphics();
+            bsGfx.fillStyle(0xff8800);
+            bsGfx.fillRect(0, 0, 32, 48);
+            bsGfx.generateTexture('blacksmith', 32, 48);
+            bsGfx.destroy();
+        }
 
         this.blacksmith = this.physics.add.staticImage(600, 386, 'blacksmith');
 

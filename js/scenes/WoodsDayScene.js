@@ -22,11 +22,13 @@ class WoodsDayScene extends Phaser.Scene {
 
         // The Slayer sword — glowing yellow rectangle
         if (GameState.storyPhase === 0) {
-            const swordGfx = this.add.graphics();
-            swordGfx.fillStyle(0xffdd00);
-            swordGfx.fillRect(0, 0, 12, 36);
-            swordGfx.generateTexture('slayer-sword', 12, 36);
-            swordGfx.destroy();
+            if (!this.textures.exists('slayer-sword')) {
+                const swordGfx = this.add.graphics();
+                swordGfx.fillStyle(0xffdd00);
+                swordGfx.fillRect(0, 0, 12, 36);
+                swordGfx.generateTexture('slayer-sword', 12, 36);
+                swordGfx.destroy();
+            }
 
             this.sword = this.physics.add.staticImage(650, 392, 'slayer-sword');
 
