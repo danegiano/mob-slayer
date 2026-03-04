@@ -2,7 +2,8 @@ class BossArenaScene extends Phaser.Scene {
     constructor() { super('BossArena'); }
 
     create() {
-        this.cameras.main.setBackgroundColor('#2a0a0a');
+        // Animated background — red sky, embers, ground cracks, smoke
+        Background.bossArena(this);
 
         this.ground = this.add.rectangle(400, 430, 800, 40, 0x4a2a1a);
         this.physics.add.existing(this.ground, true);

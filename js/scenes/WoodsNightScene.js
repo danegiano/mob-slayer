@@ -2,7 +2,8 @@ class WoodsNightScene extends Phaser.Scene {
     constructor() { super('WoodsNight'); }
 
     create() {
-        this.cameras.main.setBackgroundColor('#1a1a3a');
+        // Animated background — stars, moon, fireflies, fog
+        Background.woodsNight(this);
 
         this.ground = this.add.rectangle(400, 430, 800, 40, 0x3a2a1a);
         this.physics.add.existing(this.ground, true);

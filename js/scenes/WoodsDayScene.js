@@ -2,8 +2,8 @@ class WoodsDayScene extends Phaser.Scene {
     constructor() { super('WoodsDay'); }
 
     create() {
-        // Darker green sky for woods
-        this.cameras.main.setBackgroundColor('#4a8c3f');
+        // Animated background — canopy, light rays, pollen, mushrooms
+        Background.woodsDay(this);
 
         // Ground
         this.ground = this.add.rectangle(400, 430, 800, 40, 0x5a3a1a);

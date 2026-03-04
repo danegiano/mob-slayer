@@ -2,6 +2,9 @@ class VillageScene extends Phaser.Scene {
     constructor() { super('Village'); }
 
     create(data) {
+        // Animated background — sky, clouds, sun, grass, flowers
+        Background.village(this);
+
         // Ground — brown rectangle across the bottom
         this.ground = this.add.rectangle(400, 430, 800, 40, 0x8B4513);
         this.physics.add.existing(this.ground, true); // true = static body
