@@ -12,9 +12,13 @@ class VillageScene extends Phaser.Scene {
 
         // Scene label
         this.add.text(16, 16, 'Village', { fontSize: '18px', fill: '#333' });
+
+        // HUD
+        this.hud = new HUD(this);
     }
 
     update() {
         this.player.update();
+        this.hud.update();
     }
 }
