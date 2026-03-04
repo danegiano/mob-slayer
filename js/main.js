@@ -24,7 +24,7 @@ const config = {
         default: 'arcade',
         arcade: { gravity: { y: 800 }, debug: false }
     },
-    scene: [BootScene, VillageScene]
+    scene: [BootScene, VillageScene, WoodsDayScene]
 };
 
 const game = new Phaser.Game(config);
