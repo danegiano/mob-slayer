@@ -1,7 +1,8 @@
 class Enemy extends Phaser.Physics.Arcade.Sprite {
-    constructor(scene, x, y, color, health, damage, speed) {
-        const key = 'enemy_' + color.toString(16);
-        if (!scene.textures.exists(key)) {
+    constructor(scene, x, y, color, health, damage, speed, textureKey) {
+        // Use pixel art sprite if provided, otherwise fall back to colored rectangle
+        const key = textureKey || 'enemy_' + color.toString(16);
+        if (!textureKey && !scene.textures.exists(key)) {
             const gfx = scene.add.graphics();
             gfx.fillStyle(color);
             gfx.fillRect(0, 0, 24, 24);

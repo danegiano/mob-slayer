@@ -47,7 +47,7 @@ class WoodsNightScene extends Phaser.Scene {
     spawnEnemies() {
         const positions = [250, 400, 550, 680];
         positions.forEach(x => {
-            const enemy = new Enemy(this, x, 380, 0x33cc33, 30, 10, 60);
+            const enemy = new Enemy(this, x, 380, 0x33cc33, 30, 10, 60, 'night_goblin');
             this.enemies.add(enemy);
             this.physics.add.collider(enemy, this.ground);
         });

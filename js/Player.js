@@ -1,13 +1,6 @@
 class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y) {
-        // Create a blue rectangle texture for the player (only once)
-        if (!scene.textures.exists('player')) {
-            const gfx = scene.add.graphics();
-            gfx.fillStyle(0x3366ff);
-            gfx.fillRect(0, 0, 32, 48);
-            gfx.generateTexture('player', 32, 48);
-            gfx.destroy();
-        }
+        // Use the pixel art sprite loaded in BootScene
 
         super(scene, x, y, 'player');
         scene.add.existing(this);

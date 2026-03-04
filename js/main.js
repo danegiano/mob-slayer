@@ -8,6 +8,14 @@ const GameState = {
 
 class BootScene extends Phaser.Scene {
     constructor() { super('Boot'); }
+    preload() {
+        // Load all pixel art sprites
+        this.load.image('player', 'assets/player.png');
+        this.load.image('blacksmith', 'assets/blacksmith.png');
+        this.load.image('goblin', 'assets/goblin.png');
+        this.load.image('night_goblin', 'assets/night_goblin.png');
+        this.load.image('troll', 'assets/troll.png');
+    }
     create() {
         this.add.text(400, 225, 'Mob Slayer', { fontSize: '48px', fill: '#fff' }).setOrigin(0.5);
         this.add.text(400, 280, 'Loading...', { fontSize: '20px', fill: '#aaa' }).setOrigin(0.5);

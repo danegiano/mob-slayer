@@ -80,14 +80,7 @@ class ForgeScene extends Phaser.Scene {
             fontSize: '14px', fill: '#cc8844', fontStyle: 'italic'
         }).setOrigin(0.5);
 
-        // --- Blacksmith NPC ---
-        if (!this.textures.exists('blacksmith')) {
-            const bsGfx = this.add.graphics();
-            bsGfx.fillStyle(0xff8800);
-            bsGfx.fillRect(0, 0, 32, 48);
-            bsGfx.generateTexture('blacksmith', 32, 48);
-            bsGfx.destroy();
-        }
+        // --- Blacksmith NPC (pixel art loaded in BootScene) ---
 
         this.blacksmith = this.physics.add.staticImage(400, 386, 'blacksmith');
         this.add.text(400, 350, 'Blacksmith', {
