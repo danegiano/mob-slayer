@@ -1,111 +1,141 @@
 // ============================================
 // Mob Slayer — Village Preview
-// Uses Kenney Tiny Town tileset (16x16 tiles)
-// 12 columns x 11 rows = 132 tiles
+// Kenney Tiny Town tileset (16x16, 12 cols x 11 rows)
+// Hand-crafted village map — every tile placed on purpose!
 // ============================================
 
-const TILE = {
+// Short names so the map grid is easy to read
+const T = {
     // Ground
-    GRASS1: 0,
-    GRASS2: 1,
-    GRASS_FLOWER: 2,
-    DIRT1: 24,
-    DIRT2: 25,
-    DIRT3: 26,
+    g1: 0,    // grass
+    g2: 1,    // grass variant
+    gf: 2,    // grass with flowers
+    d1: 24,   // dirt
+    d2: 25,   // dirt variant
+    d3: 26,   // dirt edge
 
-    // Green trees (2x2)
-    GTREE_TL: 3,
-    GTREE_TR: 4,
-    GTREE_BL: 15,
-    GTREE_BR: 16,
+    // Green tree (2x2 block)
+    Tl: 3,    // tree top-left
+    Tr: 4,    // tree top-right
+    tl: 15,   // tree bottom-left
+    tr: 16,   // tree bottom-right
 
-    // Small green things
-    BUSH_TL: 5,
-    BUSH_TR: 6,
-    BUSH_BL: 17,
-    BUSH_BR: 18,
+    // Autumn tree (2x2 block)
+    Al: 9,    // autumn top-left
+    Ar: 10,   // autumn top-right
+    al: 21,   // autumn bottom-left
+    ar: 22,   // autumn bottom-right
 
-    // Autumn trees (2x2)
-    ATREE_TL: 9,
-    ATREE_TR: 10,
-    ATREE_BL: 21,
-    ATREE_BR: 22,
+    // Bush (2x2 block)
+    Bl: 5,    // bush top-left
+    Br: 6,    // bush top-right
+    bl: 17,   // bush bottom-left
+    br: 18,   // bush bottom-right
 
-    // Orange trees
-    OTREE_TL: 11,
-    OTREE_TR: 23,
+    // Round tree (2x2 block)
+    Rl: 7,    // round top-left
+    Rr: 8,    // round top-right
+    rl: 19,   // round bottom-left
+    rr: 20,   // round bottom-right
 
-    // Mushroom / flower
-    MUSHROOM: 29,
-    FLOWER1: 27,
-    FLOWER2: 28,
+    // House 1 — brown roof (row 3-4, cols 0-2)
+    h1: 36,   // roof left
+    h2: 37,   // roof mid
+    h3: 38,   // roof right
+    h4: 48,   // wall left
+    h5: 49,   // wall door
+    h6: 50,   // wall right/window
 
-    // House 1 — brown roof
-    ROOF1_L: 36,
-    ROOF1_M: 37,
-    ROOF1_R: 38,
-    WALL1_L: 48,
-    WALL1_M: 49,
-    WALL1_R: 50,
+    // House 2 — red roof (row 3-4, cols 3-5)
+    r1: 39,   // roof left
+    r2: 40,   // roof mid
+    r3: 41,   // roof right
+    r4: 51,   // wall left
+    r5: 52,   // wall window
+    r6: 50,   // wall right
 
-    // House 2 — red/orange roof
-    ROOF2_L: 39,
-    ROOF2_M: 40,
-    ROOF2_R: 41,
-    WALL2_L: 51,
-    WALL2_M: 52,
+    // Big building front pieces
+    s1: 60,   // stone top-left
+    s2: 61,   // stone top-mid
+    s3: 62,   // stone top-right
+    s4: 72,   // stone mid-left
+    s5: 73,   // stone mid-mid
+    s6: 74,   // stone mid-right
+    s7: 84,   // stone bot-left
+    s8: 85,   // stone bot-mid
+    s9: 86,   // stone bot-right
 
-    // House details
-    WINDOW: 50,
-    CHIMNEY: 44,
+    // Doors (wooden)
+    D1: 76,   // door left
+    D2: 77,   // door center
+    D3: 78,   // door right
+    // Big doors
+    D4: 88,   // big door left
+    D5: 89,   // big door center
+    D6: 90,   // big door right
 
-    // Big building / shop
-    SHOP_ROOF_L: 42,
-    SHOP_ROOF_R: 43,
+    // Props
+    fl: 27,   // flower
+    mu: 29,   // mushroom
+    sg: 69,   // sign post
+    sa: 70,   // sign arrow
+    we: 81,   // well
+    to: 82,   // torch
+    la: 93,   // lantern
+    ba: 95,   // barrel
+    ch: 43,   // chest
 
-    // Stone building (row 5-7)
-    STONE_TL: 60,
-    STONE_TM: 61,
-    STONE_TR: 62,
-    STONE_ML: 72,
-    STONE_MM: 73,
-    STONE_MR: 74,
-    STONE_BL: 84,
-    STONE_BM: 85,
-    STONE_BR: 86,
+    // Fence
+    fL: 96,   // fence left end
+    fM: 97,   // fence middle
+    fR: 98,   // fence right end
 
-    // Doors
-    DOOR_WOOD_L: 76,
-    DOOR_WOOD_M: 77,
-    DOOR_WOOD_R: 78,
-    DOOR_BIG_L: 88,
-    DOOR_BIG_M: 89,
-    DOOR_BIG_R: 90,
+    // Roof triangle
+    rt: 63,   // triangle roof peak
 
-    // Fences
-    FENCE_L: 96,
-    FENCE_M: 97,
-    FENCE_R: 98,
+    // characters
+    kn: 128,  // knight (player!)
 
-    // Items & props
-    BARREL: 107,
-    CHEST: 43,
-    SIGN_POST: 69,
-    SIGN_ARROW: 70,
-    TORCH: 82,
-    WELL: 81,
-    LANTERN: 93,
-    CRATE: 94,
-
-    // Characters
-    KNIGHT: 128,
-    VILLAGER: 127,
-
-    // Castle stuff
-    CASTLE_WALL: 99,
-    CASTLE_TOP: 100,
-    BANNER: 46,
+    // Decorative ground
+    p1: 30,   // path/platform
+    p2: 31,   // path variant
 };
+
+// The village map! Each row is one row of tiles.
+// Read it like a picture — trees at top, houses in middle, path at bottom
+// __ = grass (we'll replace with random grass)
+const __ = 'g';  // placeholder for random grass
+
+const villageMap = [
+    // Row 0: Tree line across the top
+    [T.Tl,T.Tr, __, T.Rl,T.Rr, __, __, T.Tl,T.Tr, __, __, __, __, __, __, __, T.Al,T.Ar, __, __, T.Tl,T.Tr, __, T.Al,T.Ar],
+    // Row 1: Tree bottoms
+    [T.tl,T.tr, __, T.rl,T.rr, __, __, T.tl,T.tr, __, __, __, __, __, __, __, T.al,T.ar, __, __, T.tl,T.tr, __, T.al,T.ar],
+    // Row 2: Open grass with some flowers
+    [  __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __],
+    // Row 3: Space above houses
+    [  __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __, __],
+    // Row 4: House roofs
+    [  __,T.Bl,T.Br, T.h1,T.h2,T.h3, __, __, T.r1,T.r2,T.r3, __, __, __, T.s1,T.s2,T.s3, __,T.Bl,T.Br, __, __, T.h1,T.h2,T.h3],
+    // Row 5: House walls
+    [  __,T.bl,T.br, T.h4,T.h5,T.h6, __, __, T.r4,T.r5,T.r4, __, __,  __, T.s4,T.D2,T.s6, __,T.bl,T.br, __, __, T.h4,T.h5,T.h6],
+    // Row 6: Space between houses and path
+    [  __, __, __, __, T.ba, __, __, __, __, __, __, __, T.we, __, __, __, __, __, __, __, __, __, __, T.ba, __],
+    // Row 7: Fence line and items
+    [  __, T.fL,T.fM,T.fM,T.fR, __, T.to, __, __, T.sg, __, __, __, __, T.fL,T.fM,T.fR, __, T.to, __, __, T.fL,T.fM,T.fM,T.fR],
+    // Row 8: Dirt path (main road through village)
+    [T.d1,T.d2,T.d1,T.d2,T.d1,T.d2,T.d1,T.d2,T.d1,T.d2,T.d1,T.d2,T.d1,T.d2,T.d1,T.d2,T.d1,T.d2,T.d1,T.d2,T.d1,T.d2,T.d1,T.d2,T.d1],
+    // Row 9: Dirt path bottom
+    [T.d2,T.d1,T.d2,T.d1,T.d2,T.d1,T.d2,T.d1,T.d2,T.d1,T.d2,T.d1,T.d2,T.kn,T.d2,T.d1,T.d2,T.d1,T.d2,T.d1,T.d2,T.d1,T.d2,T.d1,T.d2],
+    // Row 10: Below path — grass with flowers
+    [  __, __, T.fl, __, __, __, __, T.gf, __, __, __, __, __, __, __, T.fl, __, __, __, T.gf, __, __, __, __, __],
+    // Row 11: More grass, some trees
+    [  __, __, __, T.Tl,T.Tr, __, __, __, __, T.Bl,T.Br, __, __, __, __, __, __, T.Al,T.Ar, __, __, __, T.Tl,T.Tr, __],
+    // Row 12: Tree bottoms
+    [  __, __, __, T.tl,T.tr, __, __, __, __, T.bl,T.br, __, __, __, __, __, __, T.al,T.ar, __, __, __, T.tl,T.tr, __],
+    // Row 13: Bottom edge
+    [T.Rl,T.Rr, __, __, __, __, __, __, __, __, __, __, __, T.mu, __, __, __, __, __, __, __, __, __, T.Rl,T.Rr],
+];
 
 class VillagePreview extends Phaser.Scene {
     constructor() {
@@ -120,153 +150,35 @@ class VillagePreview extends Phaser.Scene {
     }
 
     create() {
-        const COLS = 25;
-        const ROWS = 14;
+        const ROWS = villageMap.length;
+        const COLS = villageMap[0].length;
         const SCALE = 3;
 
-        // Fill with grass
-        const map = [];
-        for (let r = 0; r < ROWS; r++) {
-            map[r] = [];
-            for (let c = 0; c < COLS; c++) {
-                map[r][c] = (Math.random() > 0.8) ? TILE.GRASS2 : TILE.GRASS1;
-            }
-        }
-
-        // --- Dirt path across the village ---
-        for (let c = 0; c < COLS; c++) {
-            map[10][c] = TILE.DIRT1;
-            map[11][c] = TILE.DIRT2;
-        }
-        // Vertical path to middle house
-        map[8][10] = TILE.DIRT1;
-        map[9][10] = TILE.DIRT2;
-
-        // --- House 1 (left) — brown roof ---
-        map[6][3] = TILE.ROOF1_L;
-        map[6][4] = TILE.ROOF1_M;
-        map[6][5] = TILE.ROOF1_R;
-        map[7][3] = TILE.WALL1_L;
-        map[7][4] = TILE.WALL1_M;
-        map[7][5] = TILE.WALL1_R;
-
-        // --- House 2 (middle) — red roof ---
-        map[6][9] = TILE.ROOF2_L;
-        map[6][10] = TILE.ROOF2_M;
-        map[6][11] = TILE.ROOF2_R;
-        map[7][9] = TILE.WALL2_L;
-        map[7][10] = TILE.WALL2_M;
-        map[7][11] = TILE.WALL1_R;
-
-        // --- House 3 (right) — brown roof ---
-        map[6][16] = TILE.ROOF1_L;
-        map[6][17] = TILE.ROOF1_M;
-        map[6][18] = TILE.ROOF1_R;
-        map[7][16] = TILE.WALL1_L;
-        map[7][17] = TILE.WALL1_M;
-        map[7][18] = TILE.WALL1_R;
-
-        // --- Green trees (left edge) ---
-        map[0][0] = TILE.GTREE_TL;
-        map[0][1] = TILE.GTREE_TR;
-        map[1][0] = TILE.GTREE_BL;
-        map[1][1] = TILE.GTREE_BR;
-
-        map[3][0] = TILE.GTREE_TL;
-        map[3][1] = TILE.GTREE_TR;
-        map[4][0] = TILE.GTREE_BL;
-        map[4][1] = TILE.GTREE_BR;
-
-        // --- Autumn trees (right edge) ---
-        map[0][23] = TILE.ATREE_TL;
-        map[0][24] = TILE.ATREE_TR;
-        map[1][23] = TILE.ATREE_BL;
-        map[1][24] = TILE.ATREE_BR;
-
-        map[3][23] = TILE.ATREE_TL;
-        map[3][24] = TILE.ATREE_TR;
-        map[4][23] = TILE.ATREE_BL;
-        map[4][24] = TILE.ATREE_BR;
-
-        // --- More trees along top ---
-        map[0][5] = TILE.GTREE_TL;
-        map[0][6] = TILE.GTREE_TR;
-        map[1][5] = TILE.GTREE_BL;
-        map[1][6] = TILE.GTREE_BR;
-
-        map[0][12] = TILE.GTREE_TL;
-        map[0][13] = TILE.GTREE_TR;
-        map[1][12] = TILE.GTREE_BL;
-        map[1][13] = TILE.GTREE_BR;
-
-        map[0][19] = TILE.ATREE_TL;
-        map[0][20] = TILE.ATREE_TR;
-        map[1][19] = TILE.ATREE_BL;
-        map[1][20] = TILE.ATREE_BR;
-
-        // --- Bushes ---
-        map[5][3] = TILE.BUSH_TL;
-        map[5][4] = TILE.BUSH_TR;
-        map[5][17] = TILE.BUSH_TL;
-        map[5][18] = TILE.BUSH_TR;
-
-        // --- Fences along the path ---
-        map[9][3] = TILE.FENCE_L;
-        map[9][4] = TILE.FENCE_M;
-        map[9][5] = TILE.FENCE_M;
-        map[9][6] = TILE.FENCE_R;
-
-        map[9][16] = TILE.FENCE_L;
-        map[9][17] = TILE.FENCE_M;
-        map[9][18] = TILE.FENCE_R;
-
-        // --- Props ---
-        map[9][8] = TILE.BARREL;
-        map[9][9] = TILE.BARREL;
-        map[8][14] = TILE.SIGN_POST;
-        map[9][21] = TILE.TORCH;
-        map[9][23] = TILE.TORCH;
-        map[12][15] = TILE.CHEST;
-        map[8][21] = TILE.WELL;
-
-        // --- Flowers ---
-        map[12][3] = TILE.FLOWER1;
-        map[12][4] = TILE.FLOWER2;
-        map[12][19] = TILE.FLOWER1;
-        map[4][10] = TILE.MUSHROOM;
-
-        // --- NPC knight ---
-        map[9][13] = TILE.KNIGHT;
-
-        // --- Bottom trees ---
-        map[12][0] = TILE.GTREE_TL;
-        map[12][1] = TILE.GTREE_TR;
-        map[13][0] = TILE.GTREE_BL;
-        map[13][1] = TILE.GTREE_BR;
-
-        map[12][23] = TILE.ATREE_TL;
-        map[12][24] = TILE.ATREE_TR;
-        map[13][23] = TILE.ATREE_BL;
-        map[13][24] = TILE.ATREE_BR;
-
-        // --- Draw the map! ---
+        // Center the map on screen
         const offsetX = (800 - COLS * 16 * SCALE) / 2;
         const offsetY = (450 - ROWS * 16 * SCALE) / 2;
 
         for (let r = 0; r < ROWS; r++) {
             for (let c = 0; c < COLS; c++) {
+                let tileId = villageMap[r][c];
+
+                // Replace grass placeholder with random grass
+                if (tileId === 'g') {
+                    tileId = (Math.random() > 0.8) ? T.g2 : T.g1;
+                }
+
                 const tile = this.add.image(
                     offsetX + c * 16 * SCALE + 8 * SCALE,
                     offsetY + r * 16 * SCALE + 8 * SCALE,
                     'tiles',
-                    map[r][c]
+                    tileId
                 );
                 tile.setScale(SCALE);
             }
         }
 
         // Title
-        this.add.text(400, 16, 'Mob Slayer — Village', {
+        this.add.text(400, 12, 'Mob Slayer — Village', {
             fontSize: '22px',
             fill: '#fff',
             stroke: '#000',
