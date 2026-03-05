@@ -6,15 +6,15 @@ class VillageScene extends Phaser.Scene {
     }
 
     create() {
-        // Background image (covers the whole screen)
+        // Background image
         this.add.image(400, 225, 'village-bg');
 
-        // Invisible ground for physics — matches where grass meets dirt path in background
+        // Invisible ground for physics
         this.ground = this.add.rectangle(400, 415, 800, 20);
         this.ground.setVisible(false);
         this.physics.add.existing(this.ground, true);
 
-        // Blacksmith NPC — sits on the ground
+        // Blacksmith NPC
         this.blacksmith = this.physics.add.sprite(400, 340, 'blacksmith');
         this.blacksmith.play('blacksmith_idle');
         this.blacksmith.setScale(2);
@@ -24,19 +24,20 @@ class VillageScene extends Phaser.Scene {
             fontSize: '12px', fill: '#fff'
         }).setOrigin(0.5).setVisible(false).setDepth(50);
 
+        // Player
         this.player = new Player(this, 100, 340);
         this.physics.add.collider(this.player, this.ground);
 
+        // HUD
         this.hud = new HUD(this);
+
+        // Dialogue — uses its own E key internally (like the old game)
         this.dialogue = new DialogueBox(this);
-        this.talkKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+
+        // E key for opening dialogue
+        this.eKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
         this.transitioning = false;
-
-        // Debug text — shows on screen so we can see what's happening
-        this.debugText = this.add.text(10, 60, '', {
-            fontSize: '12px', fill: '#ff0'
-        }).setDepth(999);
     }
 
     update() {
@@ -45,21 +46,15 @@ class VillageScene extends Phaser.Scene {
         }
         this.hud.update();
 
-        // Use horizontal distance only — vertical doesn't matter
+        // Dialogue handles its own E key when open (returns early if not open)
+        this.dialogue.update();
+
+        // Horizontal distance to blacksmith
         const dist = Math.abs(this.player.x - this.blacksmith.x);
         this.talkPrompt.setPosition(this.blacksmith.x, this.blacksmith.y - 50);
         this.talkPrompt.setVisible(dist < 80 && !this.dialogue.isOpen);
 
-        // Debug: show positions and distance
-        this.debugText.setText(
-            'Player: ' + Math.round(this.player.x) + ',' + Math.round(this.player.y) +
-            '\nBlacksmith: ' + Math.round(this.blacksmith.x) + ',' + Math.round(this.blacksmith.y) +
-            '\nDist: ' + Math.round(dist) +
-            '\nStory: ' + GameState.storyPhase +
-            '\nDialogue open: ' + this.dialogue.isOpen
-        );
-
-        // Exit right — walk to right edge to enter the woods
+        // Exit right
         if (!this.transitioning && this.player.x > 750) {
             this.transitioning = true;
             if (GameState.storyPhase >= 2) {
@@ -69,10 +64,8 @@ class VillageScene extends Phaser.Scene {
             }
         }
 
-        // Handle E key — advance dialogue if open, or open it if near blacksmith
-        if (Phaser.Input.Keyboard.JustDown(this.talkKey) && this.dialogue.isOpen) {
-            this.dialogue.advance();
-        } else if (Phaser.Input.Keyboard.JustDown(this.talkKey) && dist < 80 && !this.dialogue.isOpen) {
+        // Open dialogue when pressing E near blacksmith (only when dialogue is NOT open)
+        if (!this.dialogue.isOpen && Phaser.Input.Keyboard.JustDown(this.eKey) && dist < 80) {
             if (GameState.storyPhase === 0) {
                 this.dialogue.open('Blacksmith', [
                     'Hey there, adventurer!',
@@ -83,11 +76,11 @@ class VillageScene extends Phaser.Scene {
             } else if (GameState.storyPhase === 1) {
                 this.dialogue.open('Blacksmith', [
                     "What's that sword?! It's glowing!",
-                    'That\'s the legendary \u30E2\u30D6\u30B9\u30EC\u30A4\u30E4\u30FC!',
+                    "That's the legendary \u30E2\u30D6\u30B9\u30EC\u30A4\u30E4\u30FC!",
                     "I'll give you 1000 gold for it!",
                     '...',
                     'No? Fine. But something feels wrong tonight...',
-                    'The animals in the woods... they\'re changing.'
+                    "The animals in the woods... they're changing."
                 ], () => {
                     GameState.storyPhase = 2;
                 });
