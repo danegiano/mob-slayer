@@ -26,6 +26,12 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.isAttacking = false;
         this.attackHitbox = null;
         this.attackDamage = 10;
+        this.currentHitDamage = this.attackDamage;
+
+        // Combo
+        this.comboCount = 0;
+        this.comboTimer = null;
+        this.comboWindow = 400;
 
         // Dodge
         this.dodgeKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
@@ -35,18 +41,58 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
     attack() {
         if (this.isAttacking) return;
+
+        if (GameState.comboUnlocked) {
+            this.comboCount++;
+            if (this.comboCount > 3) this.comboCount = 1;
+            if (this.comboTimer) this.comboTimer.remove();
+            this.comboTimer = this.scene.time.delayedCall(this.comboWindow, () => {
+                this.comboCount = 0;
+            });
+        } else {
+            this.comboCount = 1;
+        }
+
         this.isAttacking = true;
 
-        this.setTint(0xffffff);
+        let hitDamage = this.attackDamage;
+        let hitboxWidth = 24;
+        let hitColor = 0xffffff;
+
+        if (this.comboCount === 2) {
+            hitDamage = this.attackDamage * 1.2;
+            hitboxWidth = 28;
+            hitColor = 0xffff88;
+        } else if (this.comboCount === 3) {
+            hitDamage = this.attackDamage * 2;
+            hitboxWidth = 36;
+            hitColor = 0xff4400;
+        }
+
+        this.setTint(hitColor);
+        this.currentHitDamage = hitDamage;
 
         const offsetX = this.facing === 'right' ? 50 : -50;
         this.attackHitbox = this.scene.add.rectangle(
-            this.x + offsetX, this.y, 24, 40, 0xffffff, 0.3
+            this.x + offsetX, this.y, hitboxWidth, 40, hitColor, 0.3
         );
         this.scene.physics.add.existing(this.attackHitbox, false);
         this.attackHitbox.body.setAllowGravity(false);
 
-        this.scene.time.delayedCall(150, () => {
+        if (this.comboCount === 3 && GameState.comboUnlocked) {
+            const comboText = this.scene.add.text(this.x, this.y - 40, 'COMBO!', {
+                fontSize: '16px', fill: '#ff4400'
+            }).setOrigin(0.5);
+            this.scene.tweens.add({
+                targets: comboText,
+                alpha: 0, y: this.y - 70,
+                duration: 600,
+                onComplete: () => comboText.destroy()
+            });
+        }
+
+        const attackDuration = this.comboCount === 3 ? 250 : 150;
+        this.scene.time.delayedCall(attackDuration, () => {
             if (this.attackHitbox) {
                 this.attackHitbox.destroy();
                 this.attackHitbox = null;

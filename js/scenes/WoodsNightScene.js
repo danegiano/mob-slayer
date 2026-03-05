@@ -59,7 +59,7 @@ class WoodsNightScene extends Phaser.Scene {
                 const b1 = this.player.attackHitbox.getBounds();
                 const b2 = enemy.getBounds();
                 if (Phaser.Geom.Intersects.RectangleToRectangle(b1, b2)) {
-                    enemy.takeDamage(this.player.attackDamage);
+                    enemy.takeDamage(this.player.currentHitDamage);
                     enemy.justHit = true;
                     this.time.delayedCall(300, () => { if (enemy) enemy.justHit = false; });
                 }
