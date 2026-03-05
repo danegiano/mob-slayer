@@ -8,7 +8,8 @@ const GameState = {
 
 const SPRITE_DATA = {
     player: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAwCAYAAAChS3wfAAADW0lEQVR4nO2ZK1QbQRSG//T0VIzZChBUJGJNKhKRmgowCGoqiKCmJqIYBKqWiNYgiiCiCCIwVQgQrcgKTFdQ0RVEgGBFIooA0TUraqaCJmcfM7t3Z1/hNN85iJnJnfnz586TClJwcTniANB8Xquk6UeFoy8n3FvuvG0raXiURoBlWbAsKyTmIfG4bAFUGNN8Jm9tdiLbXdchZQQ5bYIDxEEVQB378+ERWq1WqM2yLGHM1maHpIGUAYoCeJYmRI2VhkRTIA8BVEzTzKVfsgF5CSgSxrRQVha6CIoEUOkf7FWo65DrOqHPMqbx0a9bLD59knzwSWeMaZzy543x9nH7+4/ydsmYxq8H+/x6sM8557xaXZ6Wq9VlzjmflqPGDrYl2gUuTj4AAPS1bdRqKzg73AAArG4eYzT6DtvoAQCa7a5vBfa4X1HNAu/4cYjGP/t+Dl3XUXu26GtTOgjZRm/65QHg7HBj+uWlMbaNNBmQFw/mIAQAu6fjzPtMZEAeAqi4rlPpH+wBAL5+eifMpNfv+4mnFtmAvATIiFrx33SPE8fIkBpQlIAozn9eAABevmhCa+wAABb05cgYvV4HABi7NV+8jMgMKEJAFJST551tSjVR4iMNKEKAChOTJ+NPyvbVVeK+lHaBLAUE8U6j4JU3KZT4kAFFCxChNXZ8WWWfvlLqR18fxMYLM6BIASr8+NYXluPWJxFKUyBLASp4x4lagwBgadiGHahbayxxY3hTARQNyFJAUXQ7q8L6wo7CMgF5c9M4gd4AWL0OY7cG13UqxtCZtiu/CicSsD4A27iEabv/BGT361OnXd1awfZaNVSf2oC0Asom9wyYdWbyOuwMP8IZ+usa7v1FDMO9yFjXE+fbfiXZJzSgSAEigi8/zXYXLX3BV1fXl3zlK/vGVzbtsbCfIEIDihRApWcE3yKyeZsgT4G8BIiQGSU7ocrqKYYLDShSQBDZg2le/5oLGVC0gLL577fBuQFlCyibuQFlCyibmTwKe/HuPqITqqx+Ehe3G8VuVWnf+tNuh4xpXHaL7BnjyBtmzxjHjk/KgDQCsiJ49L5nLG0LHs1lkKdAXgLKZubXgAlRhqYxm2xAXgIoWPadUhsFkgF5CiibBzEFTNtVaqMw89vgnDn58hc1x+vN5+KzzwAAAABJRU5ErkJggg==',
-    goblin: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAYCAYAAAC8/X7cAAAB0klEQVR4nO1XIXPCMBh93W0mJqYGw2wN2JkZNJhZ9BQGg+EXYDAzqJkZfgGYGQxiGkzEzGYwNTW1mRhhSZN+Tdfsxu727rhLwuN7ecn3fS0RCDDGJfW9Qp5nkQ/PFbszT0jefiJIjcsQAoxxWccEY1x25slpc/uJQH/VMzjrweakfeQ6NS4oAX2T7aRlfJS4EvC9rWJsAOivepiNBGajz5izkcCu3TI4ZRqWgdACReR5FunmFaaLBNNFYo0V9hPhTCMrhY4Clgk94GksDpUChAnD7HqwMTh6SlGxnTUQUqAMeZ5F+o29vtxgnDIAwEOcY5yaXADY7d5kt3tt6JQWcSgBH7yLA+4AABkAGGMFxrgUwm4YpQZCCVTBVQ8uHGNasSsNNBUooljo8TBGss3QjpnFfU6ukC5TsjlYBkILuKAahO/hUM8i5w2EFPhpOB9k54rt09haC2rAJRASj5uDtebVhZoIuFBMTXHLQSUrlcpWx3AVMYV0mRrzui91PjwqZq2W9x2BKjDGpTokdRj6vCo2WQPqx/EwNm5CnzfZfAj8qS7kwp83ELQL1YWqsWIj0OdV71a/WsSMcXnf+/pjpNpwca2RgaYCVfF9eGd7A/8A8AF5OD9bBXRTPAAAAABJRU5ErkJggg=='
+    goblin: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAYCAYAAAC8/X7cAAAB0klEQVR4nO1XIXPCMBh93W0mJqYGw2wN2JkZNJhZ9BQGg+EXYDAzqJkZfgGYGQxiGkzEzGYwNTW1mRhhSZN+Tdfsxu727rhLwuN7ecn3fS0RCDDGJfW9Qp5nkQ/PFbszT0jefiJIjcsQAoxxWccEY1x25slpc/uJQH/VMzjrweakfeQ6NS4oAX2T7aRlfJS4EvC9rWJsAOivepiNBGajz5izkcCu3TI4ZRqWgdACReR5FunmFaaLBNNFYo0V9hPhTCMrhY4Clgk94GksDpUChAnD7HqwMTh6SlGxnTUQUqAMeZ5F+o29vtxgnDIAwEOcY5yaXADY7d5kt3tt6JQWcSgBH7yLA+4AABkAGGMFxrgUwm4YpQZCCVTBVQ8uHGNasSsNNBUooljo8TBGss3QjpnFfU6ukC5TsjlYBkILuKAahO/hUM8i5w2EFPhpOB9k54rt09haC2rAJRASj5uDtebVhZoIuFBMTXHLQSUrlcpWx3AVMYV0mRrzui91PjwqZq2W9x2BKjDGpTokdRj6vCo2WQPqx/EwNm5CnzfZfAj8qS7kwp83ELQL1YWqsWIj0OdV71a/WsSMcXnf+/pjpNpwca2RgaYCVfF9eGd7A/8A8AF5OD9bBXRTPAAAAABJRU5ErkJggg==',
+    blacksmith: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAwCAYAAAChS3wfAAADQElEQVR4nO2ZLWzbQBTHX6aVhIRUmtJJJh4IyYBRaQJKRkJCOpCCjgQ0YAUZ8EALFpCBDZh0IAEtCTFYpKmgJSUhBgsJMZilySQkxKQgA5E9xx937zm+2FLykyol9+7e++f17t6dXYCcUyyWlpuMd5xFgWV/mbUADCfVUqJx99MFtw83AaIFZM2LrAVkDWoG5IFmTQFZllB9JVmG9qevqL7oBIgSQKV9PVz7rqmtUNvPwRXaH3kGpC2Aiqa2oNK8guO3b2Cgnsa2YSHvAZragofff8CBA9DUVmybSGajzzBQT8E0LTBNa62NSqJNME0BGPSJRS6l2DGoJaBPrEKzppDOA/rEKmx6hoii90MPNz4a3sfueYPkj7wHpC1g49gRfbQvH9E+SUsAK0AU3fMGWPaC+Uf9B3DXSbFYWjrOonDbbSxlWQrt+EE0tQWSLMNRvVNwx5IURcTfZDwvPioBIgVQue02mHre93QvHkY7WVzaAgDik5TGJtrva6AoSqTNMAx2ArYh4PKyDY6zYFYM7d0BKNVDAAA4GwE8qNEn0vq1BYPm6rNUkeDobAL9vsbU51UBUQIAVj8Uw81FDZ7Np7W29vg51M+aWSh/GNbKYBYCgriJ9hjbKw1j22s67sWP/2+z4zv5CJ0Dti0AS0Uug/S6jOpbfnUIw9E9AAAYxoTZF30QEiUgiFM+CbSwyy6Puzv2+FACdi1ANA/fVpezemcIDWU1u3Vj7lUe4Q9EeAKoWH/ZSws7S13ICUhbQBLcGK6W4HcKiWZAmgKSEIyzSdxECUhTAJW0Zxg5AduY4tskV0+FP3x/TN1nvUMog1kI8HNzUQu1uZpmpg0zk77UXJ9xvy10FN62AAxu+fRj2utvneRy+O2Vbsy5vlFLQKQAP3FJivPjv0VO7Xmkze8zyg/57h4ngGJz7dg4xWJpqVTltQ1Y//XkxYizYXx7M4A1IC6IS5wt7adBItj5l6P7BGQtIGv2CchaQNbsfAJydRcI4j9HGFMTjKkZaWfZANjlWPh7AZ4AXvyoU6iLbswjT6nBPqz43BmQhoA8s/N7wM4nINebIED41km18+AmQLQAHlM7/GqOYueR6yqwZ494/gGPXM3zfBi5MgAAAABJRU5ErkJggg=='
 };
 
 class BootScene extends Phaser.Scene {
@@ -57,6 +58,17 @@ class BootScene extends Phaser.Scene {
             repeat: -1
         });
 
+        // Blacksmith: 2 frames of 32x48
+        this.textures.get('blacksmith').add(0, 0, 0, 0, 32, 48);
+        this.textures.get('blacksmith').add(1, 0, 32, 0, 32, 48);
+
+        this.anims.create({
+            key: 'blacksmith_idle',
+            frames: [{ key: 'blacksmith', frame: 0 }, { key: 'blacksmith', frame: 1 }],
+            frameRate: 2,
+            repeat: -1
+        });
+
         this.scene.start('TestScene');
     }
 }
@@ -71,7 +83,7 @@ const config = {
         default: 'arcade',
         arcade: { gravity: { y: 800 }, debug: false }
     },
-    scene: [BootScene, TestScene]
+    scene: [BootScene, VillageScene, TestScene]
 };
 
 const game = new Phaser.Game(config);
