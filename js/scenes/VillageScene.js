@@ -14,15 +14,15 @@ class VillageScene extends Phaser.Scene {
         this.ground.setVisible(false);
         this.physics.add.existing(this.ground, true);
 
-        // Blacksmith NPC
-        this.blacksmith = this.physics.add.sprite(400, 365, 'blacksmith');
+        // Blacksmith NPC — sits on the ground
+        this.blacksmith = this.physics.add.sprite(400, 340, 'blacksmith');
         this.blacksmith.play('blacksmith_idle');
-        this.blacksmith.body.setAllowGravity(false);
         this.blacksmith.setScale(2);
+        this.physics.add.collider(this.blacksmith, this.ground);
 
         this.talkPrompt = this.add.text(400, 320, 'Press E to talk', {
             fontSize: '12px', fill: '#fff'
-        }).setOrigin(0.5).setVisible(false);
+        }).setOrigin(0.5).setVisible(false).setDepth(50);
 
         this.player = new Player(this, 100, 340);
         this.physics.add.collider(this.player, this.ground);
@@ -41,11 +41,10 @@ class VillageScene extends Phaser.Scene {
         this.hud.update();
         this.dialogue.update();
 
-        const dist = Phaser.Math.Distance.Between(
-            this.player.x, this.player.y,
-            this.blacksmith.x, this.blacksmith.y
-        );
-        this.talkPrompt.setVisible(dist < 60 && !this.dialogue.isOpen);
+        // Use horizontal distance only — vertical doesn't matter
+        const dist = Math.abs(this.player.x - this.blacksmith.x);
+        this.talkPrompt.setPosition(this.blacksmith.x, this.blacksmith.y - 50);
+        this.talkPrompt.setVisible(dist < 80 && !this.dialogue.isOpen);
 
         // Exit right — walk to right edge to enter the woods
         if (!this.transitioning && this.player.x > 750) {
@@ -57,7 +56,7 @@ class VillageScene extends Phaser.Scene {
             }
         }
 
-        if (Phaser.Input.Keyboard.JustDown(this.talkKey) && dist < 60 && !this.dialogue.isOpen) {
+        if (Phaser.Input.Keyboard.JustDown(this.talkKey) && dist < 80 && !this.dialogue.isOpen) {
             if (GameState.storyPhase === 0) {
                 this.dialogue.open('Blacksmith', [
                     'Hey there, adventurer!',
