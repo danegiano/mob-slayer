@@ -12,85 +12,89 @@ class VillageScene extends Phaser.Scene {
         Background.village(this);
 
         // === GROUND — grass tiles across the bottom ===
-        // Tile 0 = grass (light green), tile 12 = grass (full)
         for (let i = 0; i < 26; i++) {
-            // Top grass row (at y=414, the "surface")
-            this.tile(16 + i * 32, 414, 0);
-            // Dirt row below (at y=446)
-            this.tile(16 + i * 32, 446, 37);
+            this.tile(16 + i * 32, 414, 0);   // grass top row
+            this.tile(16 + i * 32, 446, 24);   // dirt row below
         }
 
-        // Physics ground (invisible, same position as before)
+        // Physics ground (invisible)
         this.ground = this.add.rectangle(400, 430, 800, 40, 0x000000, 0);
         this.physics.add.existing(this.ground, true);
 
-        // === PATH — dirt tiles across middle of ground ===
+        // === PATH — dirt tiles across ground ===
         for (let i = 0; i < 26; i++) {
-            this.tile(16 + i * 32, 414, 37).setDepth(-0.5);
+            this.tile(16 + i * 32, 414, 25).setDepth(-0.5);
         }
 
-        // === TREES (decorative, behind buildings) ===
-        // Tile 4 = big green tree top, tile 16 = tree trunk/base
-        // Left trees
-        this.tile(30, 350, 4, 2.5);
-        this.tile(30, 385, 16, 2.5);
-        // Far right trees
-        this.tile(760, 350, 5, 2.5);
-        this.tile(760, 385, 17, 2.5);
-        // Background trees (smaller)
-        this.tile(450, 360, 6, 1.8);
-        this.tile(450, 385, 28, 1.8);
+        // === TREES ===
+        // Left trees (green, 2x2 block)
+        this.tile(20, 355, 3, 2.5);   // top-left
+        this.tile(52, 355, 4, 2.5);   // top-right
+        this.tile(20, 387, 15, 2.5);  // bottom-left
+        this.tile(52, 387, 16, 2.5);  // bottom-right
 
-        // === FLOWERS & MUSHROOMS (ground decorations) ===
-        this.tile(200, 398, 15, 1.5);  // flowers
-        this.tile(500, 398, 15, 1.5);  // flowers
-        this.tile(680, 398, 29, 1.5);  // mushroom
+        // Right trees (autumn)
+        this.tile(740, 355, 9, 2.5);
+        this.tile(772, 355, 10, 2.5);
+        this.tile(740, 387, 21, 2.5);
+        this.tile(772, 387, 22, 2.5);
 
-        // === HOUSE 1 (small, left side) — wooden house ===
-        // Roof: tiles 62 area (pointy brown roof)
-        this.tile(120, 338, 62, 2);  // roof left
-        this.tile(152, 338, 63, 2);  // roof right
-        // Walls: tile 72-74 (wooden walls with window/door)
-        this.tile(120, 370, 72, 2);  // wall left
-        this.tile(152, 370, 73, 2);  // wall right (with window)
-        // Door
-        this.tile(120, 398, 74, 2);  // door bottom
+        // Background bush (smaller)
+        this.tile(445, 370, 5, 1.8);
+        this.tile(465, 370, 6, 1.8);
+        this.tile(445, 388, 17, 1.8);
+        this.tile(465, 388, 18, 1.8);
 
-        // === HOUSE 2 (bigger, middle) — wooden house ===
-        this.tile(290, 338, 62, 2);  // roof left
-        this.tile(322, 338, 60, 2);  // roof middle
-        this.tile(354, 338, 63, 2);  // roof right
+        // === FLOWERS & MUSHROOMS ===
+        this.tile(200, 400, 27, 1.5);
+        this.tile(500, 400, 28, 1.5);
+        this.tile(680, 400, 29, 1.5);
+
+        // === HOUSE 1 (left side) — brown roof ===
+        // Roof
+        this.tile(104, 340, 36, 2);   // roof left
+        this.tile(136, 340, 37, 2);   // roof mid
+        this.tile(168, 340, 38, 2);   // roof right
         // Walls
-        this.tile(290, 370, 72, 2);  // wall left
-        this.tile(322, 370, 73, 2);  // wall middle (window)
-        this.tile(354, 370, 72, 2);  // wall right
-        // Door
-        this.tile(322, 398, 74, 2);  // door
+        this.tile(104, 372, 48, 2);   // wall left
+        this.tile(136, 372, 49, 2);   // wall mid (door)
+        this.tile(168, 372, 50, 2);   // wall right
 
-        // === BLACKSMITH FORGE (stone building, right side) ===
-        // Roof: stone/grey (tiles 78-79 area)
-        this.tile(570, 338, 78, 2);  // stone roof left
-        this.tile(602, 338, 76, 2);  // stone roof middle
-        this.tile(634, 338, 79, 2);  // stone roof right
-        // Walls: stone walls
-        this.tile(570, 370, 84, 2);  // stone wall left
-        this.tile(602, 370, 85, 2);  // stone wall middle
-        this.tile(634, 370, 84, 2);  // stone wall right
-        // Door
-        this.tile(602, 398, 91, 2);  // stone door
+        // === HOUSE 2 (middle) — red roof ===
+        // Roof
+        this.tile(274, 340, 39, 2);   // roof left
+        this.tile(306, 340, 40, 2);   // roof mid
+        this.tile(338, 340, 41, 2);   // roof right
+        // Walls
+        this.tile(274, 372, 51, 2);   // wall left
+        this.tile(306, 372, 52, 2);   // wall mid
+        this.tile(338, 372, 51, 2);   // wall right
+
+        // === FORGE (right side) — stone building ===
+        // Roof
+        this.tile(554, 340, 60, 2);   // stone top left
+        this.tile(586, 340, 61, 2);   // stone top mid
+        this.tile(618, 340, 62, 2);   // stone top right
+        // Walls
+        this.tile(554, 372, 72, 2);   // stone wall left
+        this.tile(586, 372, 73, 2);   // stone wall mid
+        this.tile(618, 372, 74, 2);   // stone wall right
+        // Door (wooden door in the middle)
+        this.tile(586, 396, 77, 2);
         // Forge sign
-        this.add.text(602, 318, 'Forge', { fontSize: '10px', fill: '#ff8800' }).setOrigin(0.5);
+        this.add.text(586, 318, 'Forge', { fontSize: '10px', fill: '#ff8800' }).setOrigin(0.5);
 
-        // === VILLAGE SIGN (near left edge) ===
-        // Tile 45-47: fence/sign pieces
-        this.tile(50, 388, 45, 2);
+        // === SIGN POST ===
+        this.tile(50, 390, 69, 2);
         this.add.text(50, 370, 'Village', { fontSize: '9px', fill: '#fff' }).setOrigin(0.5);
 
-        // === FENCE sections ===
-        this.tile(230, 398, 45, 2);
-        this.tile(262, 398, 46, 2);
-        this.tile(470, 398, 45, 2);
-        this.tile(502, 398, 46, 2);
+        // === FENCES ===
+        this.tile(220, 400, 96, 2);   // fence left
+        this.tile(252, 400, 97, 2);   // fence mid
+        this.tile(284, 400, 98, 2);   // fence right
+
+        this.tile(460, 400, 96, 2);
+        this.tile(492, 400, 97, 2);
 
         // Player — spawn at given X or default 100
         const spawnX = (data && data.spawnX) ? data.spawnX : 100;
@@ -108,23 +112,23 @@ class VillageScene extends Phaser.Scene {
 
         // --- Door entry zones ---
         // House 1 door
-        this.door1Zone = this.add.rectangle(120, 400, 30, 40, 0x000000, 0);
+        this.door1Zone = this.add.rectangle(136, 400, 30, 40, 0x000000, 0);
         this.physics.add.existing(this.door1Zone, true);
-        this.door1Prompt = this.add.text(120, 360, 'Press E', {
+        this.door1Prompt = this.add.text(136, 360, 'Press E', {
             fontSize: '11px', fill: '#fff', backgroundColor: '#000'
         }).setOrigin(0.5).setVisible(false).setDepth(50);
 
         // House 2 door
-        this.door2Zone = this.add.rectangle(322, 400, 30, 40, 0x000000, 0);
+        this.door2Zone = this.add.rectangle(306, 400, 30, 40, 0x000000, 0);
         this.physics.add.existing(this.door2Zone, true);
-        this.door2Prompt = this.add.text(322, 350, 'Press E', {
+        this.door2Prompt = this.add.text(306, 350, 'Press E', {
             fontSize: '11px', fill: '#fff', backgroundColor: '#000'
         }).setOrigin(0.5).setVisible(false).setDepth(50);
 
         // Forge door
-        this.door3Zone = this.add.rectangle(602, 400, 30, 40, 0x000000, 0);
+        this.door3Zone = this.add.rectangle(586, 400, 30, 40, 0x000000, 0);
         this.physics.add.existing(this.door3Zone, true);
-        this.door3Prompt = this.add.text(602, 350, 'Press E', {
+        this.door3Prompt = this.add.text(586, 350, 'Press E', {
             fontSize: '11px', fill: '#fff', backgroundColor: '#000'
         }).setOrigin(0.5).setVisible(false).setDepth(50);
 
