@@ -54,7 +54,7 @@ class ShadowKeepScene extends Phaser.Scene {
         if (!this.questsComplete) {
             this.player.update();
             this.hud.update();
-            if (this.player.x < 20) this.scene.start('HollowTree');
+            if (this.player.x < 20) this.scene.start('ForestVillage');
             return;
         }
 

@@ -54,7 +54,7 @@ class ShatteredTempleScene extends Phaser.Scene {
         if (!this.questsComplete) {
             this.player.update();
             this.hud.update();
-            if (this.player.x < 20) this.scene.start('LavaPit');
+            if (this.player.x < 20) this.scene.start('RuinsVillage');
             return;
         }
 
