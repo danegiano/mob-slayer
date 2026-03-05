@@ -4,7 +4,19 @@ const GameState = {
     weapon: 'wood',        // 'wood' or 'slayer'
     comboUnlocked: false,
     storyPhase: 0,          // 0=start, 1=found sword, 2=talked to blacksmith, 3=night
-    swordPowers: []
+    swordPowers: [],
+    gold: 0,
+    attackBonus: 0,
+    quests: {
+        tundra: { wolves: false, amulet: false, blizzard: false, miniGame: false },
+        darkforest: { mushrooms: false, villager: false, nest: false, miniGame: false },
+        ruins: { bridge: false, scroll: false, runes: false, miniGame: false }
+    },
+    shopUpgrades: {
+        tundra: { maxHp: false, attack: false },
+        darkforest: { maxHp: false, attack: false },
+        ruins: { maxHp: false, attack: false }
+    }
 };
 
 const SPRITE_DATA = {

@@ -19,6 +19,10 @@ class HUD {
         this.kanjiText = scene.add.text(20, 54, '', {
             fontSize: '16px', fill: '#ff44ff'
         }).setScrollFactor(0).setDepth(101);
+
+        this.goldText = scene.add.text(680, 12, '', {
+            fontSize: '14px', fill: '#ffdd00'
+        }).setScrollFactor(0).setDepth(101);
     }
 
     update() {
@@ -35,5 +39,7 @@ class HUD {
         const kanjiMap = { ice: '氷', shadow: '影', power: '力' };
         const kanji = GameState.swordPowers.map(p => kanjiMap[p]).join(' ');
         this.kanjiText.setText(kanji);
+
+        this.goldText.setText(GameState.gold + 'g');
     }
 }
