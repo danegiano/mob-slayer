@@ -325,6 +325,220 @@ def make_rune_guardian():
     return img
 
 
+def draw_village_npc_frame(draw, ox, oy, hat_color, bob):
+    """Draw a simple village NPC humanoid with colored hat."""
+    skin   = (220, 180, 140, 255)
+    brown  = (120,  80,  40, 255)
+    dark_b = ( 80,  50,  20, 255)
+    black  = (  0,   0,   0, 255)
+
+    y = oy + bob
+
+    # Legs
+    draw.rectangle([ox+11, y+36, ox+14, y+46], fill=dark_b)
+    draw.rectangle([ox+17, y+36, ox+20, y+46], fill=dark_b)
+
+    # Body (brown tunic)
+    draw.rectangle([ox+9, y+20, ox+22, y+37], fill=brown)
+
+    # Arms (skin)
+    draw.rectangle([ox+5,  y+22, ox+9,  y+34], fill=skin)
+    draw.rectangle([ox+22, y+22, ox+26, y+34], fill=skin)
+
+    # Head (skin)
+    draw.rectangle([ox+10, y+8, ox+21, y+20], fill=skin)
+
+    # Eyes
+    draw.point([ox+13, y+13], fill=black)
+    draw.point([ox+18, y+13], fill=black)
+
+    # Hat (colored)
+    hat = (hat_color[0], hat_color[1], hat_color[2], 255)
+    draw.rectangle([ox+8,  y+4, ox+23, y+9], fill=hat)
+    draw.rectangle([ox+10, y+1, ox+21, y+5], fill=hat)
+
+
+def make_village_npc(hat_color):
+    img = Image.new('RGBA', (64, 48), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    draw_village_npc_frame(draw, 0,  0, hat_color, 0)
+    draw_village_npc_frame(draw, 32, 0, hat_color, 1)  # frame 2: 1px bob
+    return img
+
+
+def draw_shopkeeper_frame(draw, ox, oy, bob):
+    """Shopkeeper: brown body with white apron, gold headband, smile."""
+    skin   = (220, 180, 140, 255)
+    brown  = (120,  80,  40, 255)
+    dark_b = ( 80,  50,  20, 255)
+    white  = (240, 240, 240, 255)
+    gold   = (255, 200,   0, 255)
+    black  = (  0,   0,   0, 255)
+
+    y = oy + bob
+
+    # Legs
+    draw.rectangle([ox+11, y+36, ox+14, y+46], fill=dark_b)
+    draw.rectangle([ox+17, y+36, ox+20, y+46], fill=dark_b)
+
+    # Body (brown)
+    draw.rectangle([ox+9, y+20, ox+22, y+37], fill=brown)
+
+    # White apron over body
+    draw.rectangle([ox+11, y+24, ox+20, y+37], fill=white)
+
+    # Arms (skin)
+    draw.rectangle([ox+5,  y+22, ox+9,  y+34], fill=skin)
+    draw.rectangle([ox+22, y+22, ox+26, y+34], fill=skin)
+
+    # Head (skin)
+    draw.rectangle([ox+10, y+8, ox+21, y+20], fill=skin)
+
+    # Eyes
+    draw.point([ox+13, y+13], fill=black)
+    draw.point([ox+18, y+13], fill=black)
+
+    # Smile
+    draw.line([ox+13, y+16, ox+18, y+16], fill=black)
+    draw.point([ox+12, y+15], fill=black)
+    draw.point([ox+19, y+15], fill=black)
+
+    # Gold headband
+    draw.rectangle([ox+9, y+7, ox+22, y+9], fill=gold)
+
+
+def make_shopkeeper():
+    img = Image.new('RGBA', (64, 48), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    draw_shopkeeper_frame(draw, 0,  0, 0)
+    draw_shopkeeper_frame(draw, 32, 0, 1)  # frame 2: 1px bob
+    return img
+
+
+def draw_collectible_frame(draw, ox, oy, sparkle_offset):
+    """Glowing golden orb with sparkle."""
+    gold     = (255, 200,  50, 255)
+    bright   = (255, 255, 150, 255)
+    glow     = (255, 230, 100, 120)
+
+    # Outer glow
+    draw.ellipse([ox+2, oy+2, ox+13, oy+13], fill=glow)
+    # Main orb
+    draw.ellipse([ox+4, oy+4, ox+11, oy+11], fill=gold)
+    # Highlight
+    draw.ellipse([ox+5, oy+5, ox+7, oy+7], fill=bright)
+
+    # Sparkle (alternates position)
+    sx = ox + 1 + sparkle_offset * 10
+    sy = oy + 1 + sparkle_offset * 2
+    draw.point([sx, sy], fill=bright)
+    draw.point([sx+1, sy], fill=bright)
+    draw.point([sx, sy+1], fill=bright)
+
+
+def make_collectible():
+    img = Image.new('RGBA', (32, 16), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    draw_collectible_frame(draw, 0,  0, 0)
+    draw_collectible_frame(draw, 16, 0, 1)  # frame 2: sparkle moves
+    return img
+
+
+def draw_gold_coin_frame(draw, ox, oy, highlight_offset):
+    """Tiny gold coin with moving highlight."""
+    gold   = (255, 200,  50, 255)
+    bright = (255, 255, 150, 255)
+    dark   = (180, 140,  20, 255)
+
+    # Coin body
+    draw.ellipse([ox+1, oy+1, ox+6, oy+6], fill=gold)
+    # Edge shading
+    draw.point([ox+1, oy+1], fill=dark)
+    draw.point([ox+6, oy+6], fill=dark)
+    # Moving highlight
+    hx = ox + 2 + highlight_offset
+    draw.point([hx, oy+2], fill=bright)
+    draw.point([hx, oy+3], fill=bright)
+
+
+def make_gold_coin():
+    img = Image.new('RGBA', (16, 8), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    draw_gold_coin_frame(draw, 0, 0, 0)
+    draw_gold_coin_frame(draw, 8, 0, 2)  # frame 2: highlight shifts
+    return img
+
+
+def draw_target_frame(draw, ox, oy, frame):
+    """Red/white bullseye target."""
+    red   = (220,  40,  40, 255)
+    white = (240, 240, 240, 255)
+
+    # Outer circle (red)
+    draw.ellipse([ox+1, oy+1, ox+14, oy+14], fill=red)
+    # Middle ring (white)
+    draw.ellipse([ox+3, oy+3, ox+12, oy+12], fill=white)
+    # Inner circle (red)
+    draw.ellipse([ox+5, oy+5, ox+10, oy+10], fill=red)
+    # Bullseye center (white)
+    draw.ellipse([ox+7, oy+7, ox+8, oy+8], fill=white)
+
+    # Slight pulse: frame 1 has extra outer ring pixel
+    if frame == 1:
+        draw.point([ox+0, oy+7], fill=red)
+        draw.point([ox+15, oy+7], fill=red)
+        draw.point([ox+7, oy+0], fill=red)
+        draw.point([ox+7, oy+15], fill=red)
+
+
+def make_target():
+    img = Image.new('RGBA', (32, 16), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    draw_target_frame(draw, 0,  0, 0)
+    draw_target_frame(draw, 16, 0, 1)  # frame 2: slight pulse
+    return img
+
+
+def draw_lost_child_frame(draw, ox, oy, bob):
+    """Small humanoid child, blue shirt, brown hair."""
+    skin   = (220, 180, 140, 255)
+    blue   = ( 60, 100, 200, 255)
+    hair   = (100,  60,  30, 255)
+    dark_b = ( 80,  50,  20, 255)
+    black  = (  0,   0,   0, 255)
+
+    y = oy + bob
+
+    # Legs
+    draw.rectangle([ox+5, y+17, ox+7, y+22], fill=dark_b)
+    draw.rectangle([ox+9, y+17, ox+11, y+22], fill=dark_b)
+
+    # Body (blue shirt)
+    draw.rectangle([ox+4, y+10, ox+12, y+18], fill=blue)
+
+    # Arms (skin)
+    draw.rectangle([ox+2,  y+11, ox+4,  y+16], fill=skin)
+    draw.rectangle([ox+12, y+11, ox+14, y+16], fill=skin)
+
+    # Head (skin)
+    draw.rectangle([ox+5, y+3, ox+11, y+10], fill=skin)
+
+    # Hair (brown, on top)
+    draw.rectangle([ox+4, y+1, ox+12, y+5], fill=hair)
+
+    # Eyes
+    draw.point([ox+6, y+6], fill=black)
+    draw.point([ox+10, y+6], fill=black)
+
+
+def make_lost_child():
+    img = Image.new('RGBA', (32, 24), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    draw_lost_child_frame(draw, 0,  0, 0)
+    draw_lost_child_frame(draw, 16, 0, 1)  # frame 2: 1px bob
+    return img
+
+
 if __name__ == '__main__':
     sprites = {
         'ice_wolf':      make_ice_wolf(),
@@ -333,6 +547,14 @@ if __name__ == '__main__':
         'frost_giant':   make_frost_giant(),
         'shadow_lord':   make_shadow_lord(),
         'rune_guardian': make_rune_guardian(),
+        'village_npc_1': make_village_npc((60, 80, 200)),
+        'village_npc_2': make_village_npc((40, 160, 60)),
+        'village_npc_3': make_village_npc((200, 50, 50)),
+        'shopkeeper':    make_shopkeeper(),
+        'collectible':   make_collectible(),
+        'gold_coin':     make_gold_coin(),
+        'target':        make_target(),
+        'lost_child':    make_lost_child(),
     }
 
     print("// Paste these into SPRITE_DATA in js/main.js\n")
