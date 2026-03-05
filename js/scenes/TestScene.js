@@ -11,9 +11,13 @@ class TestScene extends Phaser.Scene {
 
         // Player stands on the ground
         this.physics.add.collider(this.player, this.ground);
+
+        // HUD
+        this.hud = new HUD(this);
     }
 
     update() {
         this.player.update();
+        this.hud.update();
     }
 }

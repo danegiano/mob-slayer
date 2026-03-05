@@ -2,35 +2,30 @@ class HUD {
     constructor(scene) {
         this.scene = scene;
 
-        // Health bar background (dark red)
-        this.healthBarBg = scene.add.rectangle(120, 30, 200, 20, 0x660000);
-        this.healthBarBg.setScrollFactor(0);
-        this.healthBarBg.setDepth(100);
+        this.healthBg = scene.add.rectangle(120, 20, 200, 16, 0x333333)
+            .setOrigin(0, 0.5).setScrollFactor(0).setDepth(100);
 
-        // Health bar fill (green)
-        this.healthBarFill = scene.add.rectangle(120, 30, 200, 20, 0x00cc00);
-        this.healthBarFill.setScrollFactor(0);
-        this.healthBarFill.setDepth(101);
+        this.healthBar = scene.add.rectangle(120, 20, 200, 16, 0x00cc00)
+            .setOrigin(0, 0.5).setScrollFactor(0).setDepth(101);
 
-        // Health text
-        this.healthText = scene.add.text(120, 30, '100/100', {
-            fontSize: '12px', fill: '#fff'
-        }).setOrigin(0.5).setScrollFactor(0).setDepth(102);
+        this.healthText = scene.add.text(20, 12, 'HP', {
+            fontSize: '14px', fill: '#fff'
+        }).setScrollFactor(0).setDepth(101);
 
-        // Weapon label
-        this.weaponText = scene.add.text(16, 50, 'Weapon: Wood Sword', {
-            fontSize: '14px', fill: '#333'
-        }).setScrollFactor(0).setDepth(100);
+        this.weaponText = scene.add.text(20, 36, '', {
+            fontSize: '12px', fill: '#ffcc00'
+        }).setScrollFactor(0).setDepth(101);
     }
 
     update() {
-        const pct = GameState.health / GameState.maxHealth;
-        this.healthBarFill.setScale(pct, 1);
-        this.healthBarFill.setX(120 - (1 - pct) * 100);
-        this.healthText.setText(`${GameState.health}/${GameState.maxHealth}`);
+        const ratio = GameState.health / GameState.maxHealth;
+        this.healthBar.width = 200 * ratio;
 
-        if (GameState.weapon === 'slayer') {
-            this.weaponText.setText('Weapon: モブスレイヤー');
-        }
+        if (ratio > 0.5) this.healthBar.setFillStyle(0x00cc00);
+        else if (ratio > 0.25) this.healthBar.setFillStyle(0xcccc00);
+        else this.healthBar.setFillStyle(0xcc0000);
+
+        const weaponName = GameState.weapon === 'slayer' ? 'モブスレイヤー' : 'Wood Sword';
+        this.weaponText.setText(weaponName);
     }
 }
