@@ -47,7 +47,7 @@ class FrostGiantArenaScene extends Phaser.Scene {
         if (this.boss && this.boss.isDead && !this.bossDefeated) {
             this.bossDefeated = true;
             GameState.swordPowers.push('ice');
-            this.showPowerUnlock('氷', 'Ice Slash', 'DarkForest');
+            this.showPowerUnlock('氷', 'Ice Slash', 'ForestVillage');
         }
 
         // Boss attacks hitting player

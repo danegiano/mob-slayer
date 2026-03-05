@@ -13,21 +13,34 @@ class ShatteredTempleScene extends Phaser.Scene {
         this.physics.add.existing(this.ground, true);
 
         this.player = new Player(this, 50, 340);
-        this.player.attackDamage = 25;
+        this.player.attackDamage = 25 + GameState.attackBonus;
         this.physics.add.collider(this.player, this.ground);
 
         this.hud = new HUD(this);
 
+        // Quest gate check
+        const q = GameState.quests.ruins;
+        this.questsComplete = q.bridge && q.scroll && q.runes && q.miniGame;
+
         this.enemies = this.physics.add.group();
         this.physics.add.collider(this.enemies, this.ground);
 
-        for (let i = 0; i < 4; i++) {
-            const x = 250 + i * 130;
-            const enemy = new Enemy(this, x, 340, 'stone_golem', 60);
-            enemy.speed = 45;
-            enemy.aggroRange = 200;
-            enemy.damage = 22;
-            this.enemies.add(enemy);
+        if (this.questsComplete) {
+            for (let i = 0; i < 4; i++) {
+                const x = 250 + i * 130;
+                const enemy = new Enemy(this, x, 340, 'stone_golem', 60);
+                enemy.speed = 45;
+                enemy.aggroRange = 200;
+                enemy.damage = 22;
+                this.enemies.add(enemy);
+            }
+        } else {
+            this.add.text(400, 200, 'The gate is sealed...', {
+                fontSize: '18px', fill: '#ff4444'
+            }).setOrigin(0.5);
+            this.add.text(400, 230, 'Complete all village quests first!', {
+                fontSize: '12px', fill: '#aaa'
+            }).setOrigin(0.5);
         }
 
         this.transitioning = false;
@@ -38,6 +51,13 @@ class ShatteredTempleScene extends Phaser.Scene {
     }
 
     update() {
+        if (!this.questsComplete) {
+            this.player.update();
+            this.hud.update();
+            if (this.player.x < 20) this.scene.start('LavaPit');
+            return;
+        }
+
         this.player.update();
         this.hud.update();
 

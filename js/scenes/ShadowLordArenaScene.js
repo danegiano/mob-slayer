@@ -65,7 +65,7 @@ class ShadowLordArenaScene extends Phaser.Scene {
         if (this.boss && this.boss.isDead && !this.bossDefeated) {
             this.bossDefeated = true;
             GameState.swordPowers.push('shadow');
-            this.showPowerUnlock('影', 'Shadow Strike', 'Ruins');
+            this.showPowerUnlock('影', 'Shadow Strike', 'RuinsVillage');
         }
 
         if (this.boss && this.boss.isAttacking && !this.player.isDodging) {
