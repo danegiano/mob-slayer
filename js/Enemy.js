@@ -16,6 +16,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.attackRange = 40;
         this.attackCooldown = false;
         this.isDead = false;
+        this.goldValue = 5;
     }
 
     takeDamage(amount) {
@@ -31,6 +32,20 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     die() {
         this.isDead = true;
+        GameState.gold += this.goldValue;
+
+        // Floating gold text
+        const goldText = this.scene.add.text(this.x, this.y - 20, '+' + this.goldValue + 'g', {
+            fontSize: '12px', fill: '#ffdd00', fontStyle: 'bold'
+        }).setOrigin(0.5).setDepth(50);
+        this.scene.tweens.add({
+            targets: goldText,
+            y: goldText.y - 30,
+            alpha: 0,
+            duration: 800,
+            onComplete: () => goldText.destroy()
+        });
+
         this.scene.tweens.add({
             targets: this,
             alpha: 0,

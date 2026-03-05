@@ -81,7 +81,7 @@ class VictoryScene extends Phaser.Scene {
         this.time.delayedCall(2500, () => {
             this.cameras.main.flash(500, 255, 255, 255);
             this.time.delayedCall(600, () => {
-                this.scene.start('Tundra');
+                this.scene.start('TundraVillage');
             });
         });
     }
