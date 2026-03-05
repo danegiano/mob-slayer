@@ -9,11 +9,12 @@ class WoodsNightScene extends Phaser.Scene {
         // Background image (covers the whole screen)
         this.add.image(400, 225, 'woods-night-bg');
 
-        this.ground = this.add.rectangle(400, 430, 800, 40);
+        // Invisible ground for physics — matches ground in background
+        this.ground = this.add.rectangle(400, 420, 800, 20);
         this.ground.setVisible(false);
         this.physics.add.existing(this.ground, true);
 
-        this.player = new Player(this, 30, 350);
+        this.player = new Player(this, 50, 340);
         this.player.attackDamage = 25; // player has slayer sword by this point
         this.physics.add.collider(this.player, this.ground);
 
@@ -25,12 +26,12 @@ class WoodsNightScene extends Phaser.Scene {
         // Spawn 4 night goblins
         for (let i = 0; i < 4; i++) {
             const x = 300 + i * 120;
-            const enemy = new Enemy(this, x, 350, 'night_goblin', 20);
+            const enemy = new Enemy(this, x, 340, 'night_goblin', 20);
             this.enemies.add(enemy);
         }
 
         // Exit right -> boss (only after killing all enemies)
-        this.exitRight = this.add.zone(790, 225, 20, 450);
+        this.exitRight = this.add.zone(770, 225, 60, 450);
         this.physics.add.existing(this.exitRight, true);
         this.physics.add.overlap(this.player, this.exitRight, () => {
             if (this.enemies.countActive() === 0) {

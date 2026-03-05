@@ -9,21 +9,22 @@ class VillageScene extends Phaser.Scene {
         // Background image (covers the whole screen)
         this.add.image(400, 225, 'village-bg');
 
-        this.ground = this.add.rectangle(400, 430, 800, 40);
+        // Invisible ground for physics — matches where grass meets dirt path in background
+        this.ground = this.add.rectangle(400, 415, 800, 20);
         this.ground.setVisible(false);
         this.physics.add.existing(this.ground, true);
 
         // Blacksmith NPC
-        this.blacksmith = this.physics.add.sprite(400, 380, 'blacksmith');
+        this.blacksmith = this.physics.add.sprite(400, 365, 'blacksmith');
         this.blacksmith.play('blacksmith_idle');
         this.blacksmith.body.setAllowGravity(false);
         this.blacksmith.setScale(2);
 
-        this.talkPrompt = this.add.text(400, 340, 'Press E to talk', {
+        this.talkPrompt = this.add.text(400, 320, 'Press E to talk', {
             fontSize: '12px', fill: '#fff'
         }).setOrigin(0.5).setVisible(false);
 
-        this.player = new Player(this, 100, 350);
+        this.player = new Player(this, 100, 340);
         this.physics.add.collider(this.player, this.ground);
 
         this.hud = new HUD(this);
@@ -31,7 +32,7 @@ class VillageScene extends Phaser.Scene {
         this.talkKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
         // Exit right — goes to woods day or woods night depending on story phase
-        this.exitZone = this.add.zone(790, 225, 20, 450);
+        this.exitZone = this.add.zone(770, 225, 60, 450);
         this.physics.add.existing(this.exitZone, true);
         this.physics.add.overlap(this.player, this.exitZone, () => {
             if (GameState.storyPhase >= 2) {
