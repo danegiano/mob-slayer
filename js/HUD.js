@@ -15,6 +15,10 @@ class HUD {
         this.weaponText = scene.add.text(20, 36, '', {
             fontSize: '12px', fill: '#ffcc00'
         }).setScrollFactor(0).setDepth(101);
+
+        this.kanjiText = scene.add.text(20, 54, '', {
+            fontSize: '16px', fill: '#ff44ff'
+        }).setScrollFactor(0).setDepth(101);
     }
 
     update() {
@@ -27,5 +31,9 @@ class HUD {
 
         const weaponName = GameState.weapon === 'slayer' ? 'モブスレイヤー' : 'Wood Sword';
         this.weaponText.setText(weaponName);
+
+        const kanjiMap = { ice: '氷', shadow: '影', power: '力' };
+        const kanji = GameState.swordPowers.map(p => kanjiMap[p]).join(' ');
+        this.kanjiText.setText(kanji);
     }
 }
