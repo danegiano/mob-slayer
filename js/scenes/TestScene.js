@@ -1,9 +1,19 @@
-// Placeholder — Task 2 will fill this in
 class TestScene extends Phaser.Scene {
     constructor() { super('TestScene'); }
+
     create() {
-        this.add.text(400, 225, 'TestScene — coming soon!', {
-            fontSize: '24px', fill: '#fff'
-        }).setOrigin(0.5);
+        // Simple ground — a green rectangle
+        this.ground = this.add.rectangle(400, 430, 800, 40, 0x4a7a2e);
+        this.physics.add.existing(this.ground, true); // true = static
+
+        // Create the player
+        this.player = new Player(this, 100, 350);
+
+        // Player stands on the ground
+        this.physics.add.collider(this.player, this.ground);
+    }
+
+    update() {
+        this.player.update();
     }
 }
