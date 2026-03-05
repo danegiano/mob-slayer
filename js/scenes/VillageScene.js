@@ -62,17 +62,17 @@ class VillageScene extends Phaser.Scene {
         this.tile(136, 372, 49, 2);   // wall mid (door)
         this.tile(168, 372, 50, 2);   // wall right
 
-        // === HOUSE 2 (middle) — red/orange roof ===
+        // === HOUSE 2 (middle) — different colored roof ===
         // Peaked roof top
         this.tile(306, 312, 63, 2);   // triangle peak
         // Roof body
-        this.tile(274, 340, 53, 2);   // red roof left
-        this.tile(306, 340, 54, 2);   // red roof mid
-        this.tile(338, 340, 55, 2);   // red roof right
-        // Walls
-        this.tile(274, 372, 48, 2);   // wall left
+        this.tile(274, 340, 39, 2);   // roof left
+        this.tile(306, 340, 40, 2);   // roof mid
+        this.tile(338, 340, 41, 2);   // roof right
+        // Walls (red/brown walls to look different from House 1)
+        this.tile(274, 372, 51, 2);   // wall left
         this.tile(306, 372, 49, 2);   // wall mid (door)
-        this.tile(338, 372, 50, 2);   // wall right
+        this.tile(338, 372, 52, 2);   // wall right
 
         // === FORGE (right side) — stone building ===
         // Peaked roof
