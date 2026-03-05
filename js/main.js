@@ -166,7 +166,15 @@ const config = {
         default: 'arcade',
         arcade: { gravity: { y: 800 }, debug: false }
     },
-    scene: [BootScene, VillageScene, WoodsDayScene, WoodsNightScene, BossArenaScene, VictoryScene]
+    scene: [
+        BootScene,
+        VillageScene, WoodsDayScene, WoodsNightScene,
+        BossArenaScene, VictoryScene,
+        TundraScene, IceFortressScene, FrostGiantArenaScene,
+        DarkForestScene, ShadowKeepScene, ShadowLordArenaScene,
+        RuinsScene, ShatteredTempleScene, RuneGuardianArenaScene,
+        FinalVictoryScene
+    ]
 };
 
 const game = new Phaser.Game(config);
