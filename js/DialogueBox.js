@@ -18,7 +18,6 @@ class DialogueBox {
             fontSize: '12px', fill: '#aaaaaa'
         }).setDepth(201).setVisible(false);
 
-        this.talkKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
     }
 
     open(speakerName, lines, onClose) {
@@ -53,8 +52,8 @@ class DialogueBox {
         if (this.onCloseCallback) this.onCloseCallback();
     }
 
-    update() {
-        if (Phaser.Input.Keyboard.JustDown(this.talkKey) && this.isOpen) {
+    update(talkKey) {
+        if (Phaser.Input.Keyboard.JustDown(talkKey) && this.isOpen) {
             this.advance();
         }
     }

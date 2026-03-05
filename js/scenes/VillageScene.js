@@ -32,6 +32,11 @@ class VillageScene extends Phaser.Scene {
         this.talkKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
         this.transitioning = false;
+
+        // Debug text — shows on screen so we can see what's happening
+        this.debugText = this.add.text(10, 60, '', {
+            fontSize: '12px', fill: '#ff0'
+        }).setDepth(999);
     }
 
     update() {
@@ -39,12 +44,20 @@ class VillageScene extends Phaser.Scene {
             this.player.update();
         }
         this.hud.update();
-        this.dialogue.update();
 
         // Use horizontal distance only — vertical doesn't matter
         const dist = Math.abs(this.player.x - this.blacksmith.x);
         this.talkPrompt.setPosition(this.blacksmith.x, this.blacksmith.y - 50);
         this.talkPrompt.setVisible(dist < 80 && !this.dialogue.isOpen);
+
+        // Debug: show positions and distance
+        this.debugText.setText(
+            'Player: ' + Math.round(this.player.x) + ',' + Math.round(this.player.y) +
+            '\nBlacksmith: ' + Math.round(this.blacksmith.x) + ',' + Math.round(this.blacksmith.y) +
+            '\nDist: ' + Math.round(dist) +
+            '\nStory: ' + GameState.storyPhase +
+            '\nDialogue open: ' + this.dialogue.isOpen
+        );
 
         // Exit right — walk to right edge to enter the woods
         if (!this.transitioning && this.player.x > 750) {
@@ -56,7 +69,10 @@ class VillageScene extends Phaser.Scene {
             }
         }
 
-        if (Phaser.Input.Keyboard.JustDown(this.talkKey) && dist < 80 && !this.dialogue.isOpen) {
+        // Handle E key — advance dialogue if open, or open it if near blacksmith
+        if (Phaser.Input.Keyboard.JustDown(this.talkKey) && this.dialogue.isOpen) {
+            this.dialogue.advance();
+        } else if (Phaser.Input.Keyboard.JustDown(this.talkKey) && dist < 80 && !this.dialogue.isOpen) {
             if (GameState.storyPhase === 0) {
                 this.dialogue.open('Blacksmith', [
                     'Hey there, adventurer!',
