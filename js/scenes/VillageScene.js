@@ -50,41 +50,37 @@ class VillageScene extends Phaser.Scene {
         this.tile(500, 400, 28, 1.5);
         this.tile(680, 400, 29, 1.5);
 
-        // === HOUSE 1 (left side) — brown roof ===
-        // Peaked roof top
+        // === HOUSE 1 (left side) ===
         this.tile(136, 312, 63, 2);   // triangle peak
-        // Roof body
-        this.tile(104, 340, 36, 2);   // roof left
-        this.tile(136, 340, 37, 2);   // roof mid
-        this.tile(168, 340, 38, 2);   // roof right
-        // Walls (wooden)
-        this.tile(104, 372, 72, 2);   // wall left
-        this.tile(136, 372, 73, 2);   // wall mid (window)
-        this.tile(168, 372, 74, 2);   // wall right
+        this.tile(104, 340, 48, 2);   // roof left
+        this.tile(136, 340, 49, 2);   // roof mid
+        this.tile(168, 340, 50, 2);   // roof right
+        // Walls
+        this.tile(104, 372, 36, 2);   // wall left
+        this.tile(136, 372, 37, 2);   // wall mid
+        this.tile(168, 372, 38, 2);   // wall right
 
-        // === HOUSE 2 (middle) — different colored roof ===
-        // Peaked roof top
+        // === HOUSE 2 (middle) ===
         this.tile(306, 312, 63, 2);   // triangle peak
-        // Roof body
-        this.tile(274, 340, 39, 2);   // roof left
-        this.tile(306, 340, 40, 2);   // roof mid
-        this.tile(338, 340, 41, 2);   // roof right
-        // Walls (wooden)
-        this.tile(274, 372, 72, 2);   // wall left
-        this.tile(306, 372, 73, 2);   // wall mid (window)
-        this.tile(338, 372, 74, 2);   // wall right
+        this.tile(274, 340, 48, 2);   // roof left
+        this.tile(306, 340, 49, 2);   // roof mid
+        this.tile(338, 340, 50, 2);   // roof right
+        // Walls
+        this.tile(274, 372, 39, 2);   // wall left
+        this.tile(306, 372, 40, 2);   // wall mid
+        this.tile(338, 372, 41, 2);   // wall right
 
         // === FORGE (right side) — stone building ===
         // Peaked roof
         this.tile(586, 312, 64, 2);   // stone triangle peak
         // Roof
-        this.tile(554, 340, 60, 2);   // stone top left
-        this.tile(586, 340, 61, 2);   // stone top mid
-        this.tile(618, 340, 62, 2);   // stone top right
-        // Walls
-        this.tile(554, 372, 72, 2);   // stone wall left
-        this.tile(586, 372, 73, 2);   // stone wall mid
-        this.tile(618, 372, 74, 2);   // stone wall right
+        this.tile(554, 340, 60, 2);   // roof left
+        this.tile(586, 340, 61, 2);   // roof mid
+        this.tile(618, 340, 62, 2);   // roof right
+        // Stone walls
+        this.tile(554, 372, 84, 2);   // stone wall left
+        this.tile(586, 372, 85, 2);   // stone wall mid
+        this.tile(618, 372, 86, 2);   // stone wall right
         // Door
         this.tile(586, 396, 77, 2);
         // Forge sign
