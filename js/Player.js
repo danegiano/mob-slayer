@@ -20,6 +20,35 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.moveSpeed = 200;
         this.jumpSpeed = -450;
         this.facing = 'right';
+
+        // Attack
+        this.attackKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        this.isAttacking = false;
+        this.attackHitbox = null;
+        this.attackDamage = 10;
+    }
+
+    attack() {
+        if (this.isAttacking) return;
+        this.isAttacking = true;
+
+        this.setTint(0xffffff);
+
+        const offsetX = this.facing === 'right' ? 50 : -50;
+        this.attackHitbox = this.scene.add.rectangle(
+            this.x + offsetX, this.y, 24, 40, 0xffffff, 0.3
+        );
+        this.scene.physics.add.existing(this.attackHitbox, false);
+        this.attackHitbox.body.setAllowGravity(false);
+
+        this.scene.time.delayedCall(150, () => {
+            if (this.attackHitbox) {
+                this.attackHitbox.destroy();
+                this.attackHitbox = null;
+            }
+            this.clearTint();
+            this.isAttacking = false;
+        });
     }
 
     update() {
@@ -41,6 +70,10 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
         if (jump && this.body.onFloor()) {
             this.setVelocityY(this.jumpSpeed);
+        }
+
+        if (Phaser.Input.Keyboard.JustDown(this.attackKey)) {
+            this.attack();
         }
     }
 }
