@@ -262,8 +262,14 @@ const config = {
         BootScene,
         VillageScene, WoodsDayScene, WoodsNightScene,
         BossArenaScene, VictoryScene,
+        TundraVillageScene, FrozenLakeScene, SnowCaveScene, BlizzardPassScene,
+        TundraTargetPracticeScene,
         TundraScene, IceFortressScene, FrostGiantArenaScene,
+        ForestVillageScene, MushroomGroveScene, CursedSwampScene, HollowTreeScene,
+        ForestObstacleCourseScene,
         DarkForestScene, ShadowKeepScene, ShadowLordArenaScene,
+        RuinsVillageScene, CrumblingBridgeScene, BuriedLibraryScene, LavaPitScene,
+        RuinsMemoryPuzzleScene,
         RuinsScene, ShatteredTempleScene, RuneGuardianArenaScene,
         FinalVictoryScene
     ]
