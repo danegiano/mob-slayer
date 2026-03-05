@@ -1147,6 +1147,1048 @@ def generate_rune_guardian_arena():
 
 
 # ---------------------------------------------------------------------------
+# 14. Tundra Village Background
+# ---------------------------------------------------------------------------
+
+def generate_tundra_village():
+    print("Generating tundra-village-bg.png ...")
+    img = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    # --- Light blue sky gradient ---
+    fill_gradient(draw, 0, 280, (0xB0, 0xD4, 0xF1), (0xD8, 0xEC, 0xFA))
+
+    # --- Distant snowy mountains ---
+    draw.polygon([(0, 280), (120, 180), (250, 280)], fill=(0xCC, 0xDD, 0xEE))
+    draw.polygon([(200, 280), (380, 160), (560, 280)], fill=(0xBB, 0xCC, 0xDD))
+    draw.polygon([(500, 280), (680, 190), (800, 280)], fill=(0xCC, 0xDD, 0xEE))
+
+    # --- Snowy ground ---
+    draw.rectangle([0, 280, WIDTH, HEIGHT], fill=(0xE8, 0xEE, 0xF4))
+    # Snow texture
+    for x in range(0, WIDTH, 4):
+        jitter = random.randint(-3, 3)
+        draw.rectangle([x, 278 + jitter, x + 3, 285], fill=(0xF0, 0xF5, 0xFA))
+
+    # --- Pine trees in background ---
+    pine_positions = [(60, 250), (180, 240), (350, 255), (580, 245), (720, 250)]
+    for px, py in pine_positions:
+        # Trunk
+        draw_rect(draw, px - 2, py, 5, 30, (0x4A, 0x2E, 0x1A))
+        # Triangular layers of pine
+        for i in range(3):
+            yoff = py - 5 - i * 12
+            half_w = 14 - i * 3
+            draw_triangle(draw, px - half_w, yoff + 14, px + half_w, yoff + 14,
+                          px, yoff, (0x1A, 0x4A, 0x2A))
+
+    # --- Small wooden cabins ---
+    cabin_data = [(120, 310), (320, 305), (530, 312), (690, 308)]
+    for cx, cy in cabin_data:
+        # Cabin body (brown wood)
+        draw_rect(draw, cx, cy, 50, 35, (0x6A, 0x3E, 0x1E))
+        # Darker wood planks
+        for py in range(cy + 5, cy + 35, 7):
+            draw.line([(cx, py), (cx + 49, py)], fill=(0x55, 0x30, 0x18), width=1)
+        # Snowy roof
+        draw_triangle(draw, cx - 5, cy, cx + 55, cy, cx + 25, cy - 20,
+                      (0xE0, 0xE8, 0xF0))
+        # Snow on top edge
+        draw_rect(draw, cx - 5, cy - 3, 60, 5, (0xF0, 0xF5, 0xFA))
+        # Warm orange window
+        draw_rect(draw, cx + 10, cy + 10, 10, 10, (0xFF, 0xAA, 0x44))
+        draw_rect(draw, cx + 30, cy + 10, 10, 10, (0xFF, 0xAA, 0x44))
+        # Door
+        draw_rect(draw, cx + 20, cy + 18, 8, 17, (0x44, 0x22, 0x0A))
+        # Chimney
+        draw_rect(draw, cx + 38, cy - 18, 6, 15, (0x88, 0x55, 0x33))
+        # Smoke wisps
+        for s in range(4):
+            sx = cx + 40 + random.randint(-5, 5)
+            sy = cy - 22 - s * 10 + random.randint(-3, 3)
+            draw.ellipse([sx - 4, sy - 3, sx + 4, sy + 3],
+                         fill=(0xCC, 0xCC, 0xCC, 80 - s * 15))
+
+    # --- Snowflakes ---
+    for _ in range(30):
+        sx = random.randint(0, WIDTH)
+        sy = random.randint(0, HEIGHT - 50)
+        size = random.choice([1, 2, 2])
+        draw.rectangle([sx, sy, sx + size, sy + size],
+                       fill=(255, 255, 255, 180))
+
+    img.save(os.path.join(OUT_DIR, "tundra-village-bg.png"))
+    print("  -> tundra-village-bg.png saved!")
+
+
+# ---------------------------------------------------------------------------
+# 15. Forest Village Background
+# ---------------------------------------------------------------------------
+
+def generate_forest_village():
+    print("Generating forest-village-bg.png ...")
+    img = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    # --- Dark green canopy above ---
+    draw.rectangle([0, 0, WIDTH, HEIGHT], fill=(0x0A, 0x1A, 0x0A))
+    fill_gradient(draw, 0, 120, (0x0A, 0x2A, 0x0A), (0x15, 0x40, 0x15))
+    # Leaf blobs along top
+    for lx in range(0, WIDTH, 30):
+        ly = random.randint(0, 60)
+        blob(draw, lx, ly, 25, (0x10, 0x35, 0x10), chunks=5)
+    for lx in range(15, WIDTH, 35):
+        ly = random.randint(30, 90)
+        blob(draw, lx, ly, 20, (0x18, 0x45, 0x18), chunks=4)
+
+    # --- Mossy tree trunks on sides ---
+    trunk_xs = [30, 80, 680, 740, 770]
+    for tx in trunk_xs:
+        tw = random.randint(14, 22)
+        draw_rect(draw, tx, 50, tw, HEIGHT - 50, (0x2A, 0x1A, 0x0A))
+        # Moss patches
+        for my in range(80, HEIGHT, random.randint(30, 50)):
+            draw_rect(draw, tx - 2, my, tw + 4, 6, (0x2A, 0x5A, 0x2A))
+
+    # --- Background foliage ---
+    fill_gradient(draw, 350, HEIGHT, (0x12, 0x30, 0x12), (0x0A, 0x20, 0x0A))
+
+    # --- Elevated wooden platforms / treehouses ---
+    platform_data = [(150, 220, 120), (380, 180, 100), (560, 240, 110)]
+    for px, py, pw in platform_data:
+        # Support ropes / posts
+        draw.line([(px + 20, py), (px + 10, py + 100)],
+                  fill=(0x5A, 0x3A, 0x1A), width=2)
+        draw.line([(px + pw - 20, py), (px + pw - 10, py + 100)],
+                  fill=(0x5A, 0x3A, 0x1A), width=2)
+        # Platform
+        draw_rect(draw, px, py, pw, 8, (0x6A, 0x4A, 0x2A))
+        # Railing
+        draw_rect(draw, px, py - 20, 3, 20, (0x5A, 0x3A, 0x1A))
+        draw_rect(draw, px + pw - 3, py - 20, 3, 20, (0x5A, 0x3A, 0x1A))
+        draw.line([(px, py - 18), (px + pw, py - 18)],
+                  fill=(0x5A, 0x3A, 0x1A), width=2)
+        # Small hut on platform
+        hut_x = px + 15
+        hut_y = py - 35
+        draw_rect(draw, hut_x, hut_y + 5, 40, 30, (0x5A, 0x3A, 0x1A))
+        draw_triangle(draw, hut_x - 3, hut_y + 7, hut_x + 43, hut_y + 7,
+                      hut_x + 20, hut_y - 10, (0x3A, 0x5A, 0x2A))
+        # Window (warm glow)
+        draw_rect(draw, hut_x + 14, hut_y + 14, 8, 8, (0xFF, 0xBB, 0x44))
+
+    # --- Lantern lights ---
+    lantern_spots = [(200, 160), (350, 250), (440, 170), (600, 220),
+                     (180, 300), (500, 310), (650, 280)]
+    for lx, ly in lantern_spots:
+        # Glow
+        draw.ellipse([lx - 6, ly - 6, lx + 6, ly + 6],
+                     fill=(0xFF, 0xCC, 0x44, 50))
+        # Bright center
+        draw.ellipse([lx - 3, ly - 3, lx + 3, ly + 3],
+                     fill=(0xFF, 0xAA, 0x22))
+
+    # --- Ground moss ---
+    for x in range(0, WIDTH, 5):
+        gy = random.randint(395, 410)
+        draw.rectangle([x, gy, x + 4, gy + 4],
+                       fill=(0x1A, 0x40, 0x1A))
+
+    img.save(os.path.join(OUT_DIR, "forest-village-bg.png"))
+    print("  -> forest-village-bg.png saved!")
+
+
+# ---------------------------------------------------------------------------
+# 16. Ruins Village Background
+# ---------------------------------------------------------------------------
+
+def generate_ruins_village():
+    print("Generating ruins-village-bg.png ...")
+    img = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    # --- Desert sunset sky ---
+    fill_gradient(draw, 0, 260, (0xE8, 0x80, 0x40), (0xF0, 0xC0, 0x70))
+
+    # --- Sun near horizon ---
+    draw.ellipse([620, 180, 680, 240], fill=(0xFF, 0xDD, 0x66))
+
+    # --- Sandy ground ---
+    draw.rectangle([0, 260, WIDTH, HEIGHT], fill=(0xD4, 0xB8, 0x8A))
+    # Ground texture
+    for x in range(0, WIDTH, 6):
+        jitter = random.randint(-3, 3)
+        shade = random.choice([(0xCC, 0xAA, 0x77), (0xDD, 0xBB, 0x88)])
+        draw.rectangle([x, 258 + jitter, x + 5, 265], fill=shade)
+
+    # --- Partially restored stone buildings ---
+    buildings = [(80, 220, 90, 80), (260, 200, 100, 100), (480, 210, 80, 90),
+                 (650, 225, 85, 75)]
+    awning_colors = [(0xCC, 0x44, 0x22), (0x44, 0x66, 0xAA),
+                     (0xCC, 0x88, 0x22), (0x88, 0x33, 0x33)]
+    for i, (bx, by, bw, bh) in enumerate(buildings):
+        # Stone walls
+        draw_rect(draw, bx, by, bw, bh, (0x99, 0x88, 0x77))
+        # Stone block lines
+        for sy in range(by + 8, by + bh, 10):
+            draw.line([(bx, sy), (bx + bw, sy)],
+                      fill=(0x88, 0x77, 0x66), width=1)
+        for sx in range(bx + 10, bx + bw, 14):
+            offset = 5 if (sx // 14) % 2 else 0
+            for sy in range(by + offset, by + bh, 20):
+                draw.line([(sx, sy), (sx, sy + 10)],
+                          fill=(0x88, 0x77, 0x66), width=1)
+        # Some blocks missing at top (irregular top edge)
+        for mx in range(bx, bx + bw, 12):
+            if random.random() < 0.3:
+                gap_h = random.randint(5, 15)
+                draw_rect(draw, mx, by, 12, gap_h, (0xD4, 0xB8, 0x8A))
+        # Cloth awning
+        aw_color = awning_colors[i % len(awning_colors)]
+        aw_y = by + 25
+        draw.polygon([(bx - 8, aw_y), (bx + bw + 8, aw_y),
+                      (bx + bw + 5, aw_y + 12), (bx - 5, aw_y + 12)],
+                     fill=aw_color)
+        # Awning stripes
+        for sx in range(bx - 5, bx + bw + 5, 10):
+            draw_rect(draw, sx, aw_y, 5, 12,
+                      (aw_color[0] - 30, aw_color[1] - 30, aw_color[2] - 30))
+        # Door
+        draw_rect(draw, bx + bw // 2 - 6, by + bh - 22, 12, 22,
+                  (0x55, 0x33, 0x11))
+        # Window
+        draw_rect(draw, bx + 10, by + 35, 8, 8, (0x44, 0x33, 0x22))
+
+    # --- Small desert plants ---
+    for _ in range(8):
+        px = random.randint(20, WIDTH - 20)
+        py = random.randint(300, HEIGHT - 30)
+        for j in range(3):
+            lx = px + random.randint(-4, 4)
+            draw.line([(lx, py), (lx + random.randint(-3, 3), py - 8)],
+                      fill=(0x6A, 0x8A, 0x3A), width=2)
+
+    img.save(os.path.join(OUT_DIR, "ruins-village-bg.png"))
+    print("  -> ruins-village-bg.png saved!")
+
+
+# ---------------------------------------------------------------------------
+# 17. Frozen Lake Background
+# ---------------------------------------------------------------------------
+
+def generate_frozen_lake():
+    print("Generating frozen-lake-bg.png ...")
+    img = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    # --- Light blue sky ---
+    fill_gradient(draw, 0, 200, (0xAA, 0xCC, 0xEE), (0xCC, 0xDD, 0xF0))
+
+    # --- Snowy banks (far side) ---
+    draw.rectangle([0, 200, WIDTH, 250], fill=(0xE0, 0xE8, 0xF0))
+    for x in range(0, WIDTH, 5):
+        jitter = random.randint(-4, 4)
+        draw.rectangle([x, 198 + jitter, x + 4, 210],
+                       fill=(0xF0, 0xF5, 0xFA))
+
+    # --- Frozen lake (ice-blue flat) ---
+    fill_gradient(draw, 250, 380, (0x88, 0xBB, 0xDD), (0x99, 0xCC, 0xEE))
+    # Ice cracks
+    crack_starts = [(100, 280), (300, 300), (500, 270), (650, 310)]
+    for csx, csy in crack_starts:
+        cx, cy = csx, csy
+        for _ in range(random.randint(3, 6)):
+            nx = cx + random.randint(-20, 20)
+            ny = cy + random.randint(5, 15)
+            draw.line([(cx, cy), (nx, ny)],
+                      fill=(0xAA, 0xDD, 0xFF, 180), width=1)
+            cx, cy = nx, ny
+
+    # --- Snowy bank (near side) ---
+    draw.rectangle([0, 380, WIDTH, HEIGHT], fill=(0xE0, 0xE8, 0xF0))
+    for x in range(0, WIDTH, 4):
+        jitter = random.randint(-3, 3)
+        draw.rectangle([x, 377 + jitter, x + 3, 385],
+                       fill=(0xF0, 0xF5, 0xFA))
+
+    # --- Dead trees ---
+    dead_trees = [(80, 180), (350, 175), (600, 185), (750, 190)]
+    for tx, ty in dead_trees:
+        draw_rect(draw, tx - 3, ty, 6, 60, (0x55, 0x44, 0x33))
+        # Bare branches
+        draw.line([(tx, ty + 5), (tx - 15, ty - 10)],
+                  fill=(0x55, 0x44, 0x33), width=2)
+        draw.line([(tx, ty + 5), (tx + 12, ty - 8)],
+                  fill=(0x55, 0x44, 0x33), width=2)
+        draw.line([(tx, ty + 18), (tx - 10, ty + 8)],
+                  fill=(0x55, 0x44, 0x33), width=2)
+
+    # --- Snowflakes ---
+    for _ in range(20):
+        sx = random.randint(0, WIDTH)
+        sy = random.randint(0, 370)
+        draw.rectangle([sx, sy, sx + 2, sy + 2], fill=(255, 255, 255, 200))
+
+    img.save(os.path.join(OUT_DIR, "frozen-lake-bg.png"))
+    print("  -> frozen-lake-bg.png saved!")
+
+
+# ---------------------------------------------------------------------------
+# 18. Snow Cave Background
+# ---------------------------------------------------------------------------
+
+def generate_snow_cave():
+    print("Generating snow-cave-bg.png ...")
+    img = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    # --- Dark cave interior ---
+    draw.rectangle([0, 0, WIDTH, HEIGHT], fill=(0x1A, 0x22, 0x33))
+
+    # --- Cave ceiling (arched) ---
+    for x in range(0, WIDTH, 3):
+        # Arch shape — higher in the middle
+        t = abs(x - WIDTH // 2) / (WIDTH // 2)
+        ceiling_y = int(40 + t * 80)
+        draw.rectangle([x, 0, x + 3, ceiling_y],
+                       fill=(0x2A, 0x2A, 0x3A))
+
+    # --- Dim entrance light on left ---
+    light = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    l_draw = ImageDraw.Draw(light)
+    for i in range(8):
+        alpha = 30 - i * 3
+        x_end = 80 + i * 40
+        l_draw.polygon([(0, 50), (0, HEIGHT - 50), (x_end, HEIGHT // 2)],
+                       fill=(0xAA, 0xCC, 0xFF, max(alpha, 5)))
+    img = Image.alpha_composite(img, light)
+    draw = ImageDraw.Draw(img)
+
+    # --- Icy blue floor ---
+    fill_gradient(draw, 370, HEIGHT, (0x44, 0x66, 0x88), (0x33, 0x55, 0x77))
+
+    # --- Ice formations (stalactites) ---
+    stalactite_xs = [100, 200, 340, 450, 580, 700]
+    for sx in stalactite_xs:
+        t = abs(sx - WIDTH // 2) / (WIDTH // 2)
+        base_y = int(40 + t * 80)
+        length = random.randint(25, 55)
+        w = random.randint(4, 10)
+        draw_triangle(draw, sx - w, base_y, sx + w, base_y,
+                      sx, base_y + length, (0x77, 0xBB, 0xEE))
+        # Shine highlight
+        draw.line([(sx - 1, base_y + 3), (sx - 1, base_y + length - 5)],
+                  fill=(0xAA, 0xDD, 0xFF), width=1)
+
+    # --- Ice formations (stalagmites on floor) ---
+    stalagmite_xs = [150, 300, 500, 650, 750]
+    for sx in stalagmite_xs:
+        length = random.randint(20, 45)
+        w = random.randint(5, 10)
+        draw_triangle(draw, sx - w, 370, sx + w, 370,
+                      sx, 370 - length, (0x66, 0xAA, 0xDD))
+
+    # --- Glowing ice crystals ---
+    for _ in range(12):
+        cx = random.randint(60, WIDTH - 60)
+        cy = random.randint(100, 360)
+        draw.ellipse([cx - 3, cy - 3, cx + 3, cy + 3],
+                     fill=(0x88, 0xDD, 0xFF, 150))
+        draw.ellipse([cx - 1, cy - 1, cx + 1, cy + 1],
+                     fill=(0xBB, 0xEE, 0xFF))
+
+    img.save(os.path.join(OUT_DIR, "snow-cave-bg.png"))
+    print("  -> snow-cave-bg.png saved!")
+
+
+# ---------------------------------------------------------------------------
+# 19. Blizzard Pass Background
+# ---------------------------------------------------------------------------
+
+def generate_blizzard_pass():
+    print("Generating blizzard-pass-bg.png ...")
+    img = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    # --- White/light gray blizzard sky ---
+    fill_gradient(draw, 0, HEIGHT, (0xCC, 0xCC, 0xDD), (0xAA, 0xAA, 0xBB))
+
+    # --- Rocky cliff walls on sides ---
+    # Left cliff
+    for y in range(0, HEIGHT, 6):
+        w = random.randint(60, 100)
+        shade = random.choice([(0x66, 0x66, 0x77), (0x55, 0x55, 0x66)])
+        draw.rectangle([0, y, w, y + 6], fill=shade)
+    # Right cliff
+    for y in range(0, HEIGHT, 6):
+        w = random.randint(60, 100)
+        shade = random.choice([(0x66, 0x66, 0x77), (0x55, 0x55, 0x66)])
+        draw.rectangle([WIDTH - w, y, WIDTH, y + 6], fill=shade)
+
+    # --- Narrow rocky path ---
+    draw.polygon([(200, HEIGHT), (350, 250), (450, 250), (600, HEIGHT)],
+                 fill=(0x77, 0x77, 0x88))
+    # Path texture
+    for _ in range(20):
+        px = random.randint(280, 520)
+        py = random.randint(280, HEIGHT - 20)
+        draw.rectangle([px, py, px + 5, py + 3],
+                       fill=(0x66, 0x66, 0x77))
+
+    # --- Snow buildup on rocks ---
+    for x in range(0, 120, 8):
+        sy = random.randint(0, HEIGHT)
+        draw.rectangle([x, sy, x + 8, sy + 3], fill=(0xDD, 0xDD, 0xEE))
+    for x in range(680, WIDTH, 8):
+        sy = random.randint(0, HEIGHT)
+        draw.rectangle([x, sy, x + 8, sy + 3], fill=(0xDD, 0xDD, 0xEE))
+
+    # --- Wind streaks ---
+    wind = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    w_draw = ImageDraw.Draw(wind)
+    for _ in range(35):
+        wx = random.randint(-100, WIDTH)
+        wy = random.randint(0, HEIGHT)
+        wlen = random.randint(40, 120)
+        w_draw.line([(wx, wy), (wx + wlen, wy - random.randint(5, 20))],
+                    fill=(255, 255, 255, random.randint(60, 120)), width=1)
+    img = Image.alpha_composite(img, wind)
+    draw = ImageDraw.Draw(img)
+
+    # --- Heavy snowflakes ---
+    for _ in range(60):
+        sx = random.randint(0, WIDTH)
+        sy = random.randint(0, HEIGHT)
+        size = random.choice([2, 3, 3, 4])
+        alpha = random.randint(150, 240)
+        draw.ellipse([sx, sy, sx + size, sy + size],
+                     fill=(255, 255, 255, alpha))
+
+    img.save(os.path.join(OUT_DIR, "blizzard-pass-bg.png"))
+    print("  -> blizzard-pass-bg.png saved!")
+
+
+# ---------------------------------------------------------------------------
+# 20. Mushroom Grove Background
+# ---------------------------------------------------------------------------
+
+def generate_mushroom_grove():
+    print("Generating mushroom-grove-bg.png ...")
+    img = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    # --- Very dark ground and sky ---
+    draw.rectangle([0, 0, WIDTH, HEIGHT], fill=(0x08, 0x08, 0x12))
+    fill_gradient(draw, 350, HEIGHT, (0x0A, 0x0A, 0x08), (0x0E, 0x0E, 0x0A))
+
+    # --- Dark tree silhouettes ---
+    tree_xs = [40, 160, 320, 500, 640, 760]
+    for tx in tree_xs:
+        tw = random.randint(10, 18)
+        draw_rect(draw, tx - tw // 2, 80, tw, HEIGHT - 80,
+                  (0x0A, 0x0A, 0x06))
+        blob(draw, tx, 70, 30, (0x08, 0x0E, 0x06), chunks=5)
+
+    # --- Giant glowing mushrooms ---
+    mush_data = [
+        (130, 280, 50, (0x22, 0x66, 0xFF)),    # blue
+        (310, 300, 40, (0x22, 0xCC, 0x66)),     # green
+        (480, 270, 55, (0x88, 0x33, 0xCC)),     # purple
+        (650, 310, 45, (0x22, 0x88, 0xFF)),     # blue
+        (220, 340, 30, (0x44, 0xCC, 0x88)),     # green
+        (560, 330, 35, (0xAA, 0x44, 0xDD)),     # purple
+    ]
+    for mx, my, msize, mcolor in mush_data:
+        # Stem
+        sw = msize // 4
+        draw_rect(draw, mx - sw // 2, my, sw, HEIGHT - my,
+                  (mcolor[0] // 3, mcolor[1] // 3, mcolor[2] // 3))
+        # Cap (ellipse)
+        draw.ellipse([mx - msize, my - msize // 2, mx + msize, my + msize // 4],
+                     fill=mcolor)
+        # Glow around cap
+        glow = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+        g_draw = ImageDraw.Draw(glow)
+        g_draw.ellipse([mx - msize - 15, my - msize // 2 - 15,
+                        mx + msize + 15, my + msize // 4 + 15],
+                       fill=(mcolor[0], mcolor[1], mcolor[2], 30))
+        img = Image.alpha_composite(img, glow)
+        draw = ImageDraw.Draw(img)
+        # Spots on cap
+        for _ in range(3):
+            sx = mx + random.randint(-msize + 5, msize - 5)
+            sy = my - random.randint(0, msize // 3)
+            draw.ellipse([sx - 3, sy - 2, sx + 3, sy + 2],
+                         fill=(mcolor[0] + 40, mcolor[1] + 40,
+                               min(255, mcolor[2] + 40), 200))
+
+    # --- Floating spores ---
+    for _ in range(40):
+        sx = random.randint(0, WIDTH)
+        sy = random.randint(50, HEIGHT - 30)
+        sc = random.choice([(0x44, 0xFF, 0x88, 80), (0x44, 0x88, 0xFF, 80),
+                            (0xCC, 0x66, 0xFF, 80)])
+        size = random.choice([1, 2, 2, 3])
+        draw.ellipse([sx, sy, sx + size, sy + size], fill=sc)
+
+    img.save(os.path.join(OUT_DIR, "mushroom-grove-bg.png"))
+    print("  -> mushroom-grove-bg.png saved!")
+
+
+# ---------------------------------------------------------------------------
+# 21. Cursed Swamp Background
+# ---------------------------------------------------------------------------
+
+def generate_cursed_swamp():
+    print("Generating cursed-swamp-bg.png ...")
+    img = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    # --- Dark purple sky ---
+    fill_gradient(draw, 0, 250, (0x1A, 0x0A, 0x2A), (0x33, 0x15, 0x44))
+
+    # --- Murky ground ---
+    draw.rectangle([0, 250, WIDTH, HEIGHT], fill=(0x2A, 0x2A, 0x1A))
+
+    # --- Green/brown water patches ---
+    water_patches = [(50, 320, 120, 30), (250, 350, 100, 25),
+                     (450, 310, 140, 35), (650, 340, 110, 30)]
+    for wx, wy, ww, wh in water_patches:
+        draw.ellipse([wx, wy, wx + ww, wy + wh], fill=(0x2A, 0x4A, 0x1A))
+        # Murky shimmer
+        for i in range(3):
+            sx = wx + random.randint(10, ww - 10)
+            sy = wy + random.randint(5, wh - 5)
+            draw.line([(sx, sy), (sx + random.randint(5, 15), sy)],
+                      fill=(0x3A, 0x5A, 0x2A, 150), width=1)
+
+    # --- Dead trees ---
+    dead_trees = [(100, 180), (280, 200), (500, 190), (700, 210), (400, 220)]
+    for tx, ty in dead_trees:
+        draw_rect(draw, tx - 4, ty, 8, HEIGHT - ty,
+                  (0x2A, 0x1A, 0x0A))
+        # Gnarled branches
+        draw.line([(tx, ty + 10), (tx - 20, ty - 15)],
+                  fill=(0x2A, 0x1A, 0x0A), width=2)
+        draw.line([(tx, ty + 10), (tx + 18, ty - 10)],
+                  fill=(0x2A, 0x1A, 0x0A), width=2)
+        draw.line([(tx, ty + 30), (tx - 15, ty + 15)],
+                  fill=(0x2A, 0x1A, 0x0A), width=2)
+
+    # --- Green fog ---
+    fog = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    f_draw = ImageDraw.Draw(fog)
+    for fy in range(240, 380, 12):
+        alpha = random.randint(15, 30)
+        f_draw.rectangle([0, fy, WIDTH, fy + 8],
+                         fill=(0x44, 0xFF, 0x44, alpha))
+    img = Image.alpha_composite(img, fog)
+    draw = ImageDraw.Draw(img)
+
+    # --- Bubbles in water ---
+    for _ in range(10):
+        bx = random.randint(50, WIDTH - 50)
+        by = random.randint(310, 370)
+        draw.ellipse([bx, by, bx + 4, by + 4],
+                     fill=(0x4A, 0x6A, 0x2A, 180))
+
+    img.save(os.path.join(OUT_DIR, "cursed-swamp-bg.png"))
+    print("  -> cursed-swamp-bg.png saved!")
+
+
+# ---------------------------------------------------------------------------
+# 22. Hollow Tree Background
+# ---------------------------------------------------------------------------
+
+def generate_hollow_tree():
+    print("Generating hollow-tree-bg.png ...")
+    img = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    # --- Dark interior ---
+    draw.rectangle([0, 0, WIDTH, HEIGHT], fill=(0x1A, 0x10, 0x08))
+
+    # --- Curved wood walls ---
+    # Left wall curves in
+    for y in range(0, HEIGHT, 3):
+        t = y / HEIGHT
+        # Curve: wider at bottom, narrower at top
+        wall_w = int(80 + 40 * (1 - abs(t - 0.5) * 2))
+        shade = random.choice([(0x3A, 0x22, 0x10), (0x44, 0x28, 0x14)])
+        draw.rectangle([0, y, wall_w, y + 3], fill=shade)
+    # Right wall curves in
+    for y in range(0, HEIGHT, 3):
+        t = y / HEIGHT
+        wall_w = int(80 + 40 * (1 - abs(t - 0.5) * 2))
+        shade = random.choice([(0x3A, 0x22, 0x10), (0x44, 0x28, 0x14)])
+        draw.rectangle([WIDTH - wall_w, y, WIDTH, y + 3], fill=shade)
+
+    # --- Wood grain / ring patterns ---
+    for _ in range(8):
+        cx = random.choice([random.randint(20, 80), random.randint(WIDTH - 80, WIDTH - 20)])
+        cy = random.randint(50, HEIGHT - 50)
+        for r in range(10, 40, 6):
+            draw.ellipse([cx - r, cy - r, cx + r, cy + r],
+                         outline=(0x55, 0x33, 0x1A, 100), width=1)
+
+    # --- Root patterns on floor ---
+    draw.rectangle([0, 390, WIDTH, HEIGHT], fill=(0x2A, 0x18, 0x0A))
+    root_starts = [50, 150, 300, 450, 600, 720]
+    for rx in root_starts:
+        x, y = rx, 390
+        for _ in range(random.randint(4, 8)):
+            nx = x + random.randint(-15, 15)
+            ny = y + random.randint(5, 15)
+            draw.line([(x, y), (nx, ny)],
+                      fill=(0x44, 0x28, 0x14), width=random.randint(2, 4))
+            x, y = nx, min(ny, HEIGHT - 5)
+
+    # --- Small light holes ---
+    light_holes = [(200, 80), (450, 120), (600, 60), (350, 200)]
+    for hx, hy in light_holes:
+        # Glow
+        glow = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+        g_draw = ImageDraw.Draw(glow)
+        g_draw.ellipse([hx - 20, hy - 20, hx + 20, hy + 20],
+                       fill=(0xFF, 0xEE, 0xAA, 20))
+        g_draw.ellipse([hx - 8, hy - 8, hx + 8, hy + 8],
+                       fill=(0xFF, 0xEE, 0xAA, 50))
+        img = Image.alpha_composite(img, glow)
+        draw = ImageDraw.Draw(img)
+        # Bright center
+        draw.ellipse([hx - 3, hy - 3, hx + 3, hy + 3],
+                     fill=(0xFF, 0xEE, 0xCC, 180))
+
+    img.save(os.path.join(OUT_DIR, "hollow-tree-bg.png"))
+    print("  -> hollow-tree-bg.png saved!")
+
+
+# ---------------------------------------------------------------------------
+# 23. Crumbling Bridge Background
+# ---------------------------------------------------------------------------
+
+def generate_crumbling_bridge():
+    print("Generating crumbling-bridge-bg.png ...")
+    img = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    # --- Blue sky ---
+    fill_gradient(draw, 0, 200, (0x55, 0x99, 0xDD), (0x88, 0xBB, 0xEE))
+
+    # --- Sandy canyon walls ---
+    # Left canyon wall
+    draw.polygon([(0, 0), (0, HEIGHT), (180, HEIGHT), (120, 0)],
+                 fill=(0xCC, 0x99, 0x66))
+    # Right canyon wall
+    draw.polygon([(WIDTH, 0), (WIDTH, HEIGHT), (620, HEIGHT), (680, 0)],
+                 fill=(0xCC, 0x99, 0x66))
+    # Layer striping on canyon walls
+    for y in range(0, HEIGHT, 15):
+        shade = random.choice([(0xBB, 0x88, 0x55), (0xDD, 0xAA, 0x77)])
+        draw.rectangle([0, y, 150, y + 5], fill=shade)
+        draw.rectangle([650, y, WIDTH, y + 5], fill=shade)
+
+    # --- Canyon floor far below ---
+    fill_gradient(draw, 380, HEIGHT, (0xAA, 0x77, 0x44), (0x88, 0x55, 0x33))
+
+    # --- Broken stone bridge ---
+    bridge_y = 280
+    # Left section
+    draw_rect(draw, 120, bridge_y, 180, 20, (0x88, 0x77, 0x66))
+    # Broken edge
+    for bx in range(280, 310, 6):
+        bh = random.randint(5, 18)
+        draw_rect(draw, bx, bridge_y, 6, bh, (0x88, 0x77, 0x66))
+    # Right section
+    draw_rect(draw, 480, bridge_y, 180, 20, (0x88, 0x77, 0x66))
+    # Broken edge on right side
+    for bx in range(460, 480, 6):
+        bh = random.randint(5, 18)
+        draw_rect(draw, bx, bridge_y, 6, bh, (0x88, 0x77, 0x66))
+
+    # --- Stone pillars ---
+    pillars = [(140, bridge_y + 20, 20, 130), (620, bridge_y + 20, 20, 130)]
+    for px, py, pw, ph in pillars:
+        draw_rect(draw, px, py, pw, ph, (0x77, 0x66, 0x55))
+        # Top decoration
+        draw_rect(draw, px - 3, py - 5, pw + 6, 8, (0x88, 0x77, 0x66))
+
+    # --- Falling stone chunks ---
+    for _ in range(8):
+        fx = random.randint(300, 480)
+        fy = random.randint(310, HEIGHT - 20)
+        fw = random.randint(5, 12)
+        fh = random.randint(4, 10)
+        draw.polygon([
+            (fx, fy + random.randint(-2, 2)),
+            (fx + fw, fy),
+            (fx + fw, fy + fh),
+            (fx, fy + fh)
+        ], fill=(0x88, 0x77, 0x66))
+
+    # --- Floating dust particles ---
+    for _ in range(25):
+        dx = random.randint(130, WIDTH - 130)
+        dy = random.randint(200, HEIGHT - 20)
+        draw.rectangle([dx, dy, dx + 1, dy + 1],
+                       fill=(0xDD, 0xCC, 0xAA, 150))
+
+    img.save(os.path.join(OUT_DIR, "crumbling-bridge-bg.png"))
+    print("  -> crumbling-bridge-bg.png saved!")
+
+
+# ---------------------------------------------------------------------------
+# 24. Buried Library Background
+# ---------------------------------------------------------------------------
+
+def generate_buried_library():
+    print("Generating buried-library-bg.png ...")
+    img = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    # --- Dark stone interior ---
+    draw.rectangle([0, 0, WIDTH, HEIGHT], fill=(0x1A, 0x18, 0x22))
+
+    # --- Stone walls ---
+    for y in range(0, HEIGHT, 10):
+        for x in range(0, WIDTH, 16):
+            shade = random.choice([(0x22, 0x20, 0x2A), (0x1E, 0x1C, 0x26)])
+            draw.rectangle([x, y, x + 15, y + 9], fill=shade)
+            draw.rectangle([x, y, x + 15, y], fill=(0x15, 0x13, 0x1D))
+
+    # --- Stone floor ---
+    draw.rectangle([0, 390, WIDTH, HEIGHT], fill=(0x28, 0x25, 0x30))
+
+    # --- Tall bookshelves ---
+    shelf_xs = [40, 180, 350, 520, 660]
+    for sx in shelf_xs:
+        sw = 80
+        # Shelf frame
+        draw_rect(draw, sx, 50, sw, 340, (0x44, 0x2A, 0x14))
+        # Individual shelves
+        for sy in range(60, 380, 45):
+            draw_rect(draw, sx + 2, sy, sw - 4, 3, (0x55, 0x33, 0x1A))
+            # Books on shelf (colored spines)
+            bx = sx + 5
+            while bx < sx + sw - 8:
+                bw = random.randint(3, 8)
+                bh = random.randint(28, 38)
+                bc = random.choice([
+                    (0x88, 0x22, 0x22), (0x22, 0x44, 0x88),
+                    (0x44, 0x88, 0x22), (0x88, 0x66, 0x22),
+                    (0x66, 0x22, 0x66), (0x77, 0x55, 0x33),
+                ])
+                draw_rect(draw, bx, sy - bh, bw, bh, bc)
+                bx += bw + 1
+
+    # --- Scattered scrolls on floor ---
+    for _ in range(6):
+        sx = random.randint(50, WIDTH - 50)
+        sy = random.randint(395, HEIGHT - 15)
+        sw = random.randint(15, 25)
+        draw.ellipse([sx, sy, sx + 6, sy + 6], fill=(0xDD, 0xCC, 0x99))
+        draw.line([(sx + 3, sy + 3), (sx + sw, sy + 2)],
+                  fill=(0xDD, 0xCC, 0x99), width=2)
+
+    # --- Faint golden rune light ---
+    rune_glow = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    r_draw = ImageDraw.Draw(rune_glow)
+    rune_spots = [(120, 200), (400, 150), (600, 250), (300, 350)]
+    for rx, ry in rune_spots:
+        r_draw.ellipse([rx - 25, ry - 25, rx + 25, ry + 25],
+                       fill=(0xFF, 0xCC, 0x44, 15))
+        r_draw.ellipse([rx - 8, ry - 8, rx + 8, ry + 8],
+                       fill=(0xFF, 0xCC, 0x44, 35))
+    img = Image.alpha_composite(img, rune_glow)
+    draw = ImageDraw.Draw(img)
+
+    # --- Rune symbols on walls ---
+    for rx, ry in rune_spots:
+        draw.rectangle([rx - 2, ry - 4, rx + 2, ry + 4],
+                       fill=(0xFF, 0xCC, 0x44, 120))
+        draw.rectangle([rx - 4, ry - 2, rx + 4, ry + 2],
+                       fill=(0xFF, 0xCC, 0x44, 120))
+
+    img.save(os.path.join(OUT_DIR, "buried-library-bg.png"))
+    print("  -> buried-library-bg.png saved!")
+
+
+# ---------------------------------------------------------------------------
+# 25. Lava Pit Background
+# ---------------------------------------------------------------------------
+
+def generate_lava_pit():
+    print("Generating lava-pit-bg.png ...")
+    img = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    # --- Dark smoky sky ---
+    fill_gradient(draw, 0, 200, (0x1A, 0x0A, 0x0A), (0x33, 0x11, 0x0A))
+
+    # --- Red/orange glow from below ---
+    glow = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    g_draw = ImageDraw.Draw(glow)
+    fill_gradient(g_draw, 300, HEIGHT, (0xFF, 0x44, 0x00), (0xFF, 0x88, 0x00))
+    # Make the glow semi-transparent
+    glow_alpha = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    ga_draw = ImageDraw.Draw(glow_alpha)
+    for y in range(300, HEIGHT):
+        alpha = int(40 + (y - 300) / (HEIGHT - 300) * 80)
+        ga_draw.line([(0, y), (WIDTH, y)],
+                     fill=(0xFF, 0x66, 0x00, alpha))
+    img = Image.alpha_composite(img, glow_alpha)
+    draw = ImageDraw.Draw(img)
+
+    # --- Cracked dark ground ---
+    draw.rectangle([0, 200, WIDTH, 350], fill=(0x22, 0x11, 0x0A))
+    # Cracks with lava glow
+    crack_data = [(100, 220), (250, 240), (400, 210), (550, 250), (700, 230)]
+    for cx, cy in crack_data:
+        x, y = cx, cy
+        for _ in range(random.randint(4, 8)):
+            nx = x + random.randint(-15, 15)
+            ny = y + random.randint(8, 18)
+            draw.line([(x, y), (nx, ny)],
+                      fill=(0xFF, 0x66, 0x00), width=2)
+            # Glow around crack
+            draw.line([(x - 1, y), (nx - 1, ny)],
+                      fill=(0xFF, 0x44, 0x00, 80), width=1)
+            x, y = nx, min(ny, 340)
+
+    # --- Lava streams ---
+    lava_streams = [(150, 350, 80), (380, 350, 100), (600, 350, 70)]
+    for lx, ly, lw in lava_streams:
+        draw.ellipse([lx, ly, lx + lw, ly + 40],
+                     fill=(0xFF, 0x88, 0x00))
+        draw.ellipse([lx + 10, ly + 5, lx + lw - 10, ly + 35],
+                     fill=(0xFF, 0xAA, 0x22))
+        # Bright center
+        draw.ellipse([lx + 20, ly + 12, lx + lw - 20, ly + 28],
+                     fill=(0xFF, 0xCC, 0x44))
+
+    # --- Dark rock platforms ---
+    platforms = [(50, 300, 100, 25), (300, 280, 80, 20),
+                 (520, 310, 90, 22), (700, 290, 80, 20)]
+    for px, py, pw, ph in platforms:
+        draw_rect(draw, px, py, pw, ph, (0x2A, 0x1A, 0x0A))
+        draw_rect(draw, px, py, pw, 4, (0x33, 0x22, 0x11))
+
+    # --- Ember particles ---
+    for _ in range(35):
+        ex = random.randint(0, WIDTH)
+        ey = random.randint(100, HEIGHT - 20)
+        ec = random.choice([(0xFF, 0x66, 0x00, 200), (0xFF, 0xAA, 0x22, 180),
+                            (0xFF, 0x44, 0x00, 160)])
+        size = random.choice([1, 2, 2])
+        draw.ellipse([ex, ey, ex + size, ey + size], fill=ec)
+
+    img.save(os.path.join(OUT_DIR, "lava-pit-bg.png"))
+    print("  -> lava-pit-bg.png saved!")
+
+
+# ---------------------------------------------------------------------------
+# 26. Target Practice Background
+# ---------------------------------------------------------------------------
+
+def generate_target_practice():
+    print("Generating target-practice-bg.png ...")
+    img = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    # --- Clear sky ---
+    fill_gradient(draw, 0, 260, (0xAA, 0xCC, 0xEE), (0xCC, 0xDD, 0xF0))
+
+    # --- Snowy ground ---
+    draw.rectangle([0, 260, WIDTH, HEIGHT], fill=(0xE8, 0xEE, 0xF4))
+    for x in range(0, WIDTH, 4):
+        jitter = random.randint(-3, 3)
+        draw.rectangle([x, 258 + jitter, x + 3, 265],
+                       fill=(0xF0, 0xF5, 0xFA))
+
+    # --- Distant treeline ---
+    for tx in range(0, WIDTH, 25):
+        ty = 240 + random.randint(-10, 10)
+        blob(draw, tx, ty, 15, (0x1A, 0x4A, 0x2A), chunks=4)
+
+    # --- Hay bales ---
+    hay_positions = [(100, 330), (350, 340), (600, 325)]
+    for hx, hy in hay_positions:
+        draw.ellipse([hx, hy, hx + 35, hy + 25], fill=(0xCC, 0xAA, 0x55))
+        draw.ellipse([hx + 5, hy + 3, hx + 30, hy + 22],
+                     fill=(0xDD, 0xBB, 0x66))
+        # Straw texture
+        for _ in range(5):
+            sx = hx + random.randint(5, 30)
+            sy = hy + random.randint(3, 20)
+            draw.line([(sx, sy), (sx + random.randint(-3, 3), sy + 5)],
+                      fill=(0xBB, 0x99, 0x44), width=1)
+
+    # --- Wooden target stands ---
+    target_data = [(200, 280), (420, 290), (650, 275)]
+    for tx, ty in target_data:
+        # Stand posts
+        draw_rect(draw, tx - 2, ty, 4, HEIGHT - ty, (0x6A, 0x3E, 0x1E))
+        draw_rect(draw, tx + 20, ty + 10, 4, HEIGHT - ty - 10,
+                  (0x6A, 0x3E, 0x1E))
+        # Cross bar
+        draw_rect(draw, tx - 5, ty, 32, 4, (0x6A, 0x3E, 0x1E))
+        # Target (concentric circles)
+        tcx, tcy = tx + 11, ty - 20
+        draw.ellipse([tcx - 18, tcy - 18, tcx + 18, tcy + 18],
+                     fill=(0xDD, 0xDD, 0xBB))  # outer - tan
+        draw.ellipse([tcx - 13, tcy - 13, tcx + 13, tcy + 13],
+                     fill=(0xCC, 0x22, 0x22))  # red ring
+        draw.ellipse([tcx - 8, tcy - 8, tcx + 8, tcy + 8],
+                     fill=(0xDD, 0xDD, 0xBB))  # inner tan
+        draw.ellipse([tcx - 4, tcy - 4, tcx + 4, tcy + 4],
+                     fill=(0xCC, 0x22, 0x22))  # bullseye
+
+    img.save(os.path.join(OUT_DIR, "target-practice-bg.png"))
+    print("  -> target-practice-bg.png saved!")
+
+
+# ---------------------------------------------------------------------------
+# 27. Obstacle Course Background
+# ---------------------------------------------------------------------------
+
+def generate_obstacle_course():
+    print("Generating obstacle-course-bg.png ...")
+    img = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    # --- Dark forest sky ---
+    draw.rectangle([0, 0, WIDTH, HEIGHT], fill=(0x0A, 0x0A, 0x1A))
+    fill_gradient(draw, 0, 150, (0x0A, 0x12, 0x0A), (0x0A, 0x0A, 0x1A))
+
+    # --- Tree canopy above ---
+    for lx in range(0, WIDTH, 25):
+        ly = random.randint(0, 40)
+        blob(draw, lx, ly, 20, (0x0A, 0x22, 0x0A), chunks=4)
+
+    # --- Dark forest ground ---
+    draw.rectangle([0, 370, WIDTH, HEIGHT], fill=(0x1A, 0x1A, 0x0A))
+
+    # --- Wooden platforms ---
+    plat_data = [(80, 320, 70), (220, 280, 60), (380, 300, 80),
+                 (530, 260, 65), (680, 290, 75)]
+    for px, py, pw in plat_data:
+        draw_rect(draw, px, py, pw, 8, (0x6A, 0x4A, 0x2A))
+        # Support posts
+        draw_rect(draw, px + 5, py + 8, 5, HEIGHT - py - 8,
+                  (0x55, 0x33, 0x1A))
+        draw_rect(draw, px + pw - 10, py + 8, 5, HEIGHT - py - 8,
+                  (0x55, 0x33, 0x1A))
+
+    # --- Torch-lit path ---
+    torch_xs = [50, 170, 310, 460, 610, 750]
+    for tx in torch_xs:
+        ty = 365
+        # Torch post
+        draw_rect(draw, tx - 2, ty - 30, 4, 30, (0x55, 0x33, 0x1A))
+        # Flame
+        draw.ellipse([tx - 4, ty - 38, tx + 4, ty - 28],
+                     fill=(0xFF, 0xAA, 0x22))
+        draw.ellipse([tx - 2, ty - 40, tx + 2, ty - 32],
+                     fill=(0xFF, 0xDD, 0x44))
+        # Glow on ground
+        glow = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+        g_draw = ImageDraw.Draw(glow)
+        g_draw.ellipse([tx - 25, ty - 10, tx + 25, ty + 15],
+                       fill=(0xFF, 0xAA, 0x22, 20))
+        img = Image.alpha_composite(img, glow)
+        draw = ImageDraw.Draw(img)
+
+    # --- Finish line on right ---
+    # Two checkered posts
+    for fx in [740, 760]:
+        draw_rect(draw, fx, 330, 6, 40, (0xDD, 0xDD, 0xDD))
+        for fy in range(330, 370, 8):
+            c = (0x11, 0x11, 0x11) if ((fy - 330) // 8) % 2 == 0 else (0xDD, 0xDD, 0xDD)
+            draw_rect(draw, fx, fy, 6, 4, c)
+    # Banner between posts
+    draw_rect(draw, 740, 332, 26, 4, (0xCC, 0x22, 0x22))
+
+    img.save(os.path.join(OUT_DIR, "obstacle-course-bg.png"))
+    print("  -> obstacle-course-bg.png saved!")
+
+
+# ---------------------------------------------------------------------------
+# 28. Memory Puzzle Background
+# ---------------------------------------------------------------------------
+
+def generate_memory_puzzle():
+    print("Generating memory-puzzle-bg.png ...")
+    img = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    # --- Ancient stone room ---
+    draw.rectangle([0, 0, WIDTH, HEIGHT], fill=(0x22, 0x20, 0x2A))
+
+    # Stone block walls
+    for y in range(0, HEIGHT, 12):
+        for x in range(0, WIDTH, 18):
+            shade = random.choice([(0x28, 0x26, 0x30), (0x24, 0x22, 0x2C)])
+            draw.rectangle([x, y, x + 17, y + 11], fill=shade)
+            draw.rectangle([x, y, x + 17, y], fill=(0x1A, 0x18, 0x22))
+            draw.rectangle([x, y, x, y + 11], fill=(0x1A, 0x18, 0x22))
+
+    # --- Stone floor ---
+    draw.rectangle([0, 380, WIDTH, HEIGHT], fill=(0x2A, 0x28, 0x33))
+    # Floor tiles
+    for x in range(0, WIDTH, 24):
+        draw.line([(x, 380), (x, HEIGHT)], fill=(0x22, 0x20, 0x2A), width=1)
+    for y in range(380, HEIGHT, 16):
+        draw.line([(0, y), (WIDTH, y)], fill=(0x22, 0x20, 0x2A), width=1)
+
+    # --- 4 rune pedestals in a row ---
+    pedestal_xs = [160, 300, 440, 580]
+    rune_colors = [(0x44, 0x88, 0xFF), (0xFF, 0x44, 0x88),
+                   (0x44, 0xFF, 0x88), (0xFF, 0xCC, 0x44)]
+    for i, px in enumerate(pedestal_xs):
+        py = 330
+        # Pedestal base
+        draw_rect(draw, px - 20, py, 40, 50, (0x44, 0x3A, 0x4A))
+        draw_rect(draw, px - 25, py + 45, 50, 8, (0x55, 0x4A, 0x5A))
+        draw_rect(draw, px - 22, py - 5, 44, 8, (0x55, 0x4A, 0x5A))
+
+        # Rune glow on pedestal
+        rc = rune_colors[i]
+        glow = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+        g_draw = ImageDraw.Draw(glow)
+        g_draw.ellipse([px - 30, py - 30, px + 30, py + 10],
+                       fill=(rc[0], rc[1], rc[2], 20))
+        g_draw.ellipse([px - 15, py - 20, px + 15, py],
+                       fill=(rc[0], rc[1], rc[2], 50))
+        img = Image.alpha_composite(img, glow)
+        draw = ImageDraw.Draw(img)
+
+        # Rune symbol (simple cross + diamond)
+        ry = py - 12
+        draw.rectangle([px - 2, ry - 8, px + 2, ry + 8], fill=rc)
+        draw.rectangle([px - 8, ry - 2, px + 8, ry + 2], fill=rc)
+        draw.polygon([(px, ry - 10), (px + 6, ry), (px, ry + 10), (px - 6, ry)],
+                     fill=rc)
+
+    # --- Mystical ambient glow across room ---
+    ambient = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    a_draw = ImageDraw.Draw(ambient)
+    a_draw.ellipse([200, 200, 600, 420],
+                   fill=(0x88, 0x66, 0xCC, 10))
+    img = Image.alpha_composite(img, ambient)
+    draw = ImageDraw.Draw(img)
+
+    # --- Dust motes ---
+    for _ in range(15):
+        dx = random.randint(100, WIDTH - 100)
+        dy = random.randint(50, 370)
+        draw.rectangle([dx, dy, dx + 1, dy + 1],
+                       fill=(0xCC, 0xBB, 0xAA, 120))
+
+    img.save(os.path.join(OUT_DIR, "memory-puzzle-bg.png"))
+    print("  -> memory-puzzle-bg.png saved!")
+
+
+# ---------------------------------------------------------------------------
 # Run everything
 # ---------------------------------------------------------------------------
 
@@ -1166,4 +2208,20 @@ if __name__ == "__main__":
     generate_ruins()
     generate_shattered_temple()
     generate_rune_guardian_arena()
-    print("\nAll 13 backgrounds generated!")
+    # --- New backgrounds (15) ---
+    generate_tundra_village()
+    generate_forest_village()
+    generate_ruins_village()
+    generate_frozen_lake()
+    generate_snow_cave()
+    generate_blizzard_pass()
+    generate_mushroom_grove()
+    generate_cursed_swamp()
+    generate_hollow_tree()
+    generate_crumbling_bridge()
+    generate_buried_library()
+    generate_lava_pit()
+    generate_target_practice()
+    generate_obstacle_course()
+    generate_memory_puzzle()
+    print("\nAll 28 backgrounds generated!")
