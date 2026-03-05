@@ -1,18 +1,17 @@
 class WoodsDayScene extends Phaser.Scene {
     constructor() { super('WoodsDay'); }
 
+    preload() {
+        this.load.image('woods-day-bg', 'assets/backgrounds/woods-day-bg.png');
+    }
+
     create() {
-        this.cameras.main.setBackgroundColor('#2d5a1e');
+        // Background image (covers the whole screen)
+        this.add.image(400, 225, 'woods-day-bg');
 
-        this.ground = this.add.rectangle(400, 430, 800, 40, 0x3a2a1a);
+        this.ground = this.add.rectangle(400, 430, 800, 40);
+        this.ground.setVisible(false);
         this.physics.add.existing(this.ground, true);
-
-        // Trees
-        for (let i = 0; i < 5; i++) {
-            const tx = 100 + i * 170;
-            this.add.rectangle(tx, 350, 20, 80, 0x5a3a1a);
-            this.add.circle(tx, 300, 35, 0x1a6a1a);
-        }
 
         this.player = new Player(this, 30, 350);
         this.physics.add.collider(this.player, this.ground);

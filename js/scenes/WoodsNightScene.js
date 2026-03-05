@@ -1,18 +1,17 @@
 class WoodsNightScene extends Phaser.Scene {
     constructor() { super('WoodsNight'); }
 
+    preload() {
+        this.load.image('woods-night-bg', 'assets/backgrounds/woods-night-bg.png');
+    }
+
     create() {
-        this.cameras.main.setBackgroundColor('#0a0a2a');
+        // Background image (covers the whole screen)
+        this.add.image(400, 225, 'woods-night-bg');
 
-        this.ground = this.add.rectangle(400, 430, 800, 40, 0x1a1a1a);
+        this.ground = this.add.rectangle(400, 430, 800, 40);
+        this.ground.setVisible(false);
         this.physics.add.existing(this.ground, true);
-
-        // Dark trees
-        for (let i = 0; i < 5; i++) {
-            const tx = 100 + i * 170;
-            this.add.rectangle(tx, 350, 20, 80, 0x2a1a0a);
-            this.add.circle(tx, 300, 35, 0x0a2a0a);
-        }
 
         this.player = new Player(this, 30, 350);
         this.player.attackDamage = 25; // player has slayer sword by this point

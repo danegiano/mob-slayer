@@ -1,10 +1,16 @@
 class BossArenaScene extends Phaser.Scene {
     constructor() { super('BossArena'); }
 
-    create() {
-        this.cameras.main.setBackgroundColor('#1a0a0a');
+    preload() {
+        this.load.image('boss-arena-bg', 'assets/backgrounds/boss-arena-bg.png');
+    }
 
-        this.ground = this.add.rectangle(400, 430, 800, 40, 0x2a1a1a);
+    create() {
+        // Background image (covers the whole screen)
+        this.add.image(400, 225, 'boss-arena-bg');
+
+        this.ground = this.add.rectangle(400, 430, 800, 40);
+        this.ground.setVisible(false);
         this.physics.add.existing(this.ground, true);
 
         this.player = new Player(this, 100, 350);

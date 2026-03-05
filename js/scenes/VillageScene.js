@@ -1,17 +1,17 @@
 class VillageScene extends Phaser.Scene {
     constructor() { super('Village'); }
 
+    preload() {
+        this.load.image('village-bg', 'assets/backgrounds/village-bg.png');
+    }
+
     create() {
-        this.cameras.main.setBackgroundColor('#87CEEB');
+        // Background image (covers the whole screen)
+        this.add.image(400, 225, 'village-bg');
 
-        this.ground = this.add.rectangle(400, 430, 800, 40, 0x4a7a2e);
+        this.ground = this.add.rectangle(400, 430, 800, 40);
+        this.ground.setVisible(false);
         this.physics.add.existing(this.ground, true);
-
-        // Houses
-        this.add.rectangle(200, 380, 80, 60, 0x8B4513);
-        this.add.rectangle(200, 345, 80, 10, 0xCC0000);
-        this.add.rectangle(500, 380, 80, 60, 0x8B4513);
-        this.add.rectangle(500, 345, 80, 10, 0xCC0000);
 
         // Blacksmith NPC
         this.blacksmith = this.physics.add.sprite(400, 380, 'blacksmith');
