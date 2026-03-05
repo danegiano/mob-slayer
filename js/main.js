@@ -91,7 +91,7 @@ class BootScene extends Phaser.Scene {
             frameRate: 2, repeat: -1
         });
 
-        this.scene.start('TestScene');
+        this.scene.start('Village');
     }
 }
 
@@ -105,7 +105,7 @@ const config = {
         default: 'arcade',
         arcade: { gravity: { y: 800 }, debug: false }
     },
-    scene: [BootScene, VillageScene, WoodsDayScene, WoodsNightScene, BossArenaScene, VictoryScene, TestScene]
+    scene: [BootScene, VillageScene, WoodsDayScene, WoodsNightScene, BossArenaScene, VictoryScene]
 };
 
 const game = new Phaser.Game(config);
