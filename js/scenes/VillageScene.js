@@ -51,7 +51,9 @@ class VillageScene extends Phaser.Scene {
         this.tile(680, 400, 29, 1.5);
 
         // === HOUSE 1 (left side) — brown roof ===
-        // Roof
+        // Peaked roof top
+        this.tile(136, 312, 63, 2);   // triangle peak
+        // Roof body
         this.tile(104, 340, 36, 2);   // roof left
         this.tile(136, 340, 37, 2);   // roof mid
         this.tile(168, 340, 38, 2);   // roof right
@@ -60,17 +62,21 @@ class VillageScene extends Phaser.Scene {
         this.tile(136, 372, 49, 2);   // wall mid (door)
         this.tile(168, 372, 50, 2);   // wall right
 
-        // === HOUSE 2 (middle) — red roof ===
-        // Roof
-        this.tile(274, 340, 39, 2);   // roof left
-        this.tile(306, 340, 40, 2);   // roof mid
-        this.tile(338, 340, 41, 2);   // roof right
+        // === HOUSE 2 (middle) — red/orange roof ===
+        // Peaked roof top
+        this.tile(306, 312, 63, 2);   // triangle peak
+        // Roof body
+        this.tile(274, 340, 53, 2);   // red roof left
+        this.tile(306, 340, 54, 2);   // red roof mid
+        this.tile(338, 340, 55, 2);   // red roof right
         // Walls
-        this.tile(274, 372, 51, 2);   // wall left
-        this.tile(306, 372, 52, 2);   // wall mid
-        this.tile(338, 372, 51, 2);   // wall right
+        this.tile(274, 372, 48, 2);   // wall left
+        this.tile(306, 372, 49, 2);   // wall mid (door)
+        this.tile(338, 372, 50, 2);   // wall right
 
         // === FORGE (right side) — stone building ===
+        // Peaked roof
+        this.tile(586, 312, 64, 2);   // stone triangle peak
         // Roof
         this.tile(554, 340, 60, 2);   // stone top left
         this.tile(586, 340, 61, 2);   // stone top mid
@@ -79,7 +85,7 @@ class VillageScene extends Phaser.Scene {
         this.tile(554, 372, 72, 2);   // stone wall left
         this.tile(586, 372, 73, 2);   // stone wall mid
         this.tile(618, 372, 74, 2);   // stone wall right
-        // Door (wooden door in the middle)
+        // Door
         this.tile(586, 396, 77, 2);
         // Forge sign
         this.add.text(586, 318, 'Forge', { fontSize: '10px', fill: '#ff8800' }).setOrigin(0.5);
