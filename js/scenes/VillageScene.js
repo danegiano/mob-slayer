@@ -31,16 +31,7 @@ class VillageScene extends Phaser.Scene {
         this.dialogue = new DialogueBox(this);
         this.talkKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
-        // Exit right — goes to woods day or woods night depending on story phase
-        this.exitZone = this.add.zone(770, 225, 60, 450);
-        this.physics.add.existing(this.exitZone, true);
-        this.physics.add.overlap(this.player, this.exitZone, () => {
-            if (GameState.storyPhase >= 2) {
-                this.scene.start('WoodsNight');
-            } else {
-                this.scene.start('WoodsDay');
-            }
-        });
+        this.transitioning = false;
     }
 
     update() {
@@ -55,6 +46,16 @@ class VillageScene extends Phaser.Scene {
             this.blacksmith.x, this.blacksmith.y
         );
         this.talkPrompt.setVisible(dist < 60 && !this.dialogue.isOpen);
+
+        // Exit right — walk to right edge to enter the woods
+        if (!this.transitioning && this.player.x > 750) {
+            this.transitioning = true;
+            if (GameState.storyPhase >= 2) {
+                this.scene.start('WoodsNight');
+            } else {
+                this.scene.start('WoodsDay');
+            }
+        }
 
         if (Phaser.Input.Keyboard.JustDown(this.talkKey) && dist < 60 && !this.dialogue.isOpen) {
             if (GameState.storyPhase === 0) {

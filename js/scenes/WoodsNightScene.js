@@ -30,14 +30,7 @@ class WoodsNightScene extends Phaser.Scene {
             this.enemies.add(enemy);
         }
 
-        // Exit right -> boss (only after killing all enemies)
-        this.exitRight = this.add.zone(770, 225, 60, 450);
-        this.physics.add.existing(this.exitRight, true);
-        this.physics.add.overlap(this.player, this.exitRight, () => {
-            if (this.enemies.countActive() === 0) {
-                this.scene.start('BossArena');
-            }
-        });
+        this.transitioning = false;
 
         this.add.text(400, 50, 'The woods are cursed...', {
             fontSize: '20px', fill: '#ff4444'
@@ -64,6 +57,12 @@ class WoodsNightScene extends Phaser.Scene {
                     this.time.delayedCall(300, () => { if (enemy) enemy.justHit = false; });
                 }
             });
+        }
+
+        // Exit right — walk to right edge after killing all enemies
+        if (!this.transitioning && this.player.x > 750 && this.enemies.countActive() === 0) {
+            this.transitioning = true;
+            this.scene.start('BossArena');
         }
 
         if (GameState.health <= 0) {

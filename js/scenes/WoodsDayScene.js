@@ -31,14 +31,8 @@ class WoodsDayScene extends Phaser.Scene {
             });
         }
 
-        // Exit left -> village
-        this.exitLeft = this.add.zone(30, 225, 60, 450);
-        this.physics.add.existing(this.exitLeft, true);
-        this.physics.add.overlap(this.player, this.exitLeft, () => {
-            this.scene.start('Village');
-        });
-
         this.swordPickedUp = false;
+        this.transitioning = false;
     }
 
     pickUpSword() {
@@ -67,5 +61,11 @@ class WoodsDayScene extends Phaser.Scene {
     update() {
         this.player.update();
         this.hud.update();
+
+        // Exit left — walk to left edge to go back to village
+        if (!this.transitioning && this.player.x < 50) {
+            this.transitioning = true;
+            this.scene.start('Village');
+        }
     }
 }
