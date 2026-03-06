@@ -6,25 +6,21 @@ class DialogueBox {
         this.currentLine = 0;
         this.onComplete = null;
 
-        // With 2x zoom, visible area is 400x225
-        // Dark semi-transparent background box at bottom of screen
-        this.bg = scene.add.rectangle(200, 200, 380, 40, 0x000000, 0.85);
-        this.bg.setDepth(200).setVisible(false).setScrollFactor(0);
+        // Create elements — we'll reposition them every frame based on camera
+        this.bg = scene.add.rectangle(0, 0, 360, 50, 0x000000, 0.9)
+            .setDepth(200).setVisible(false);
 
-        // Speaker name
-        this.nameText = scene.add.text(20, 183, '', {
-            fontSize: '7px', fill: '#ffcc00'
-        }).setDepth(201).setVisible(false).setScrollFactor(0);
+        this.nameText = scene.add.text(0, 0, '', {
+            fontSize: '10px', fill: '#ffcc00', fontStyle: 'bold'
+        }).setDepth(201).setVisible(false);
 
-        // Dialogue text
-        this.text = scene.add.text(20, 193, '', {
-            fontSize: '7px', fill: '#fff', wordWrap: { width: 360 }
-        }).setDepth(201).setVisible(false).setScrollFactor(0);
+        this.text = scene.add.text(0, 0, '', {
+            fontSize: '9px', fill: '#fff', wordWrap: { width: 340 }
+        }).setDepth(201).setVisible(false);
 
-        // "Press E" hint
-        this.hint = scene.add.text(360, 208, '[E]', {
-            fontSize: '6px', fill: '#aaa'
-        }).setDepth(201).setVisible(false).setScrollFactor(0);
+        this.hint = scene.add.text(0, 0, '[E]', {
+            fontSize: '8px', fill: '#aaa'
+        }).setDepth(201).setVisible(false);
 
         // E key
         this.eKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
@@ -44,6 +40,18 @@ class DialogueBox {
     }
 
     update() {
+        // Reposition to bottom of camera view every frame
+        if (this.isOpen) {
+            const cam = this.scene.cameras.main;
+            const cx = cam.scrollX + cam.width / (2 * cam.zoom);
+            const cy = cam.scrollY + cam.height / cam.zoom - 35;
+
+            this.bg.setPosition(cx, cy);
+            this.nameText.setPosition(cx - 170, cy - 18);
+            this.text.setPosition(cx - 170, cy - 6);
+            this.hint.setPosition(cx + 155, cy + 12);
+        }
+
         if (!this.isOpen) return;
 
         if (Phaser.Input.Keyboard.JustDown(this.eKey)) {
