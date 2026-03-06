@@ -9,24 +9,18 @@ class VillageScene extends Phaser.Scene {
         // Background image
         this.add.image(400, 225, 'village-bg');
 
-        // Invisible ground for physics
-        this.ground = this.add.rectangle(400, 415, 800, 20);
-        this.ground.setVisible(false);
-        this.physics.add.existing(this.ground, true);
-
         // Blacksmith NPC
-        this.blacksmith = this.physics.add.sprite(400, 340, 'blacksmith');
+        this.blacksmith = this.physics.add.sprite(400, 200, 'blacksmith');
         this.blacksmith.play('blacksmith_idle');
         this.blacksmith.setScale(2);
-        this.physics.add.collider(this.blacksmith, this.ground);
+        this.blacksmith.body.setImmovable(true);
 
-        this.talkPrompt = this.add.text(400, 320, 'Press E to talk', {
+        this.talkPrompt = this.add.text(400, 170, 'Press E to talk', {
             fontSize: '12px', fill: '#fff'
         }).setOrigin(0.5).setVisible(false).setDepth(50);
 
         // Player
-        this.player = new Player(this, 100, 340);
-        this.physics.add.collider(this.player, this.ground);
+        this.player = new Player(this, 200, 225);
 
         // HUD
         this.hud = new HUD(this);
@@ -50,12 +44,12 @@ class VillageScene extends Phaser.Scene {
         this.dialogue.update();
 
         // Horizontal distance to blacksmith
-        const dist = Math.abs(this.player.x - this.blacksmith.x);
+        const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.blacksmith.x, this.blacksmith.y);
         this.talkPrompt.setPosition(this.blacksmith.x, this.blacksmith.y - 50);
         this.talkPrompt.setVisible(dist < 80 && !this.dialogue.isOpen);
 
         // Exit right
-        if (!this.transitioning && this.player.x > 750) {
+        if (!this.transitioning && this.player.x > 770) {
             this.transitioning = true;
             if (GameState.storyPhase >= 2) {
                 this.scene.start('WoodsNight');
