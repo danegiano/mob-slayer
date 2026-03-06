@@ -36,12 +36,14 @@ class TrollBoss extends Phaser.Physics.Arcade.Sprite {
         const attacks = ['slam', 'swing', 'charge'];
         this.currentAttack = Phaser.Utils.Array.GetRandom(attacks);
         this.isAttacking = true;
+        this.playerHitThisAttack = false;
 
         if (this.currentAttack === 'slam') {
             this.setTint(0xff8800);
             this.scene.time.delayedCall(500, () => {
                 if (this.isDead) return;
-                const wave = this.scene.add.rectangle(this.x, 430, 200, 20, 0xff4400, 0.5);
+                // Circular slam around the boss
+                const wave = this.scene.add.circle(this.x, this.y, 100, 0xff4400, 0.3);
                 this.scene.time.delayedCall(300, () => wave.destroy());
                 this.clearTint();
                 this.isAttacking = false;
@@ -51,8 +53,12 @@ class TrollBoss extends Phaser.Physics.Arcade.Sprite {
             this.setTint(0xffff00);
             this.scene.time.delayedCall(400, () => {
                 if (this.isDead) return;
-                const swingX = this.flipX ? this.x + 80 : this.x - 80;
-                const swing = this.scene.add.rectangle(swingX, this.y, 60, 40, 0xffff00, 0.4);
+                // Swing toward the player's direction
+                const player = this.scene.player;
+                const angle = Phaser.Math.Angle.Between(this.x, this.y, player.x, player.y);
+                const swingX = this.x + Math.cos(angle) * 80;
+                const swingY = this.y + Math.sin(angle) * 80;
+                const swing = this.scene.add.circle(swingX, swingY, 30, 0xffff00, 0.4);
                 this.scene.time.delayedCall(200, () => swing.destroy());
                 this.clearTint();
                 this.isAttacking = false;
@@ -61,11 +67,13 @@ class TrollBoss extends Phaser.Physics.Arcade.Sprite {
         } else if (this.currentAttack === 'charge') {
             this.setTint(0xff0000);
             const player = this.scene.player;
-            const dir = player.x > this.x ? 1 : -1;
-            this.setVelocityX(dir * 350);
+            const angle = Phaser.Math.Angle.Between(this.x, this.y, player.x, player.y);
+            this.setVelocityX(Math.cos(angle) * 350);
+            this.setVelocityY(Math.sin(angle) * 350);
             this.scene.time.delayedCall(800, () => {
                 if (this.isDead) return;
                 this.setVelocityX(0);
+                this.setVelocityY(0);
                 this.clearTint();
                 this.isAttacking = false;
                 this.scheduleAttack();
