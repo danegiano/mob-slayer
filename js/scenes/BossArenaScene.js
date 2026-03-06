@@ -17,6 +17,12 @@ class BossArenaScene extends Phaser.Scene {
         this.boss = new TrollBoss(this, 600, 225);
 
         this.bossDefeated = false;
+
+        // Camera: zoom in and follow player
+        this.cameras.main.setZoom(2);
+        this.cameras.main.startFollow(this.player, true);
+        this.cameras.main.setBounds(0, 0, 800, 450);
+        this.physics.world.setBounds(0, 0, 800, 450);
     }
 
     update() {

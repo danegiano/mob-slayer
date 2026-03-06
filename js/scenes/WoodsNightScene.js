@@ -28,6 +28,12 @@ class WoodsNightScene extends Phaser.Scene {
 
         this.transitioning = false;
 
+        // Camera: zoom in and follow player
+        this.cameras.main.setZoom(2);
+        this.cameras.main.startFollow(this.player, true);
+        this.cameras.main.setBounds(0, 0, 800, 450);
+        this.physics.world.setBounds(0, 0, 800, 450);
+
         this.add.text(400, 30, 'The woods are cursed...', {
             fontSize: '20px', fill: '#ff4444'
         }).setOrigin(0.5);
