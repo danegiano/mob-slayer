@@ -4,22 +4,22 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         scene.add.existing(this);
         scene.physics.add.existing(this);
 
-        this.play('player_idle');
+        this.play('player_idle_down');
         this.setCollideWorldBounds(true);
-        this.body.setSize(20, 44);
+        this.body.setSize(20, 20);
         this.setScale(2);
 
         // Input
         this.cursors = scene.input.keyboard.createCursorKeys();
         this.wasd = scene.input.keyboard.addKeys({
             up: Phaser.Input.Keyboard.KeyCodes.W,
+            down: Phaser.Input.Keyboard.KeyCodes.S,
             left: Phaser.Input.Keyboard.KeyCodes.A,
             right: Phaser.Input.Keyboard.KeyCodes.D
         });
 
         this.moveSpeed = 200;
-        this.jumpSpeed = -450;
-        this.facing = 'right';
+        this.facing = 'down';
 
         // Attack
         this.attackKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
@@ -56,25 +56,32 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.isAttacking = true;
 
         let hitDamage = this.attackDamage;
-        let hitboxWidth = 24;
+        let hitboxSize = 24;
         let hitColor = 0xffffff;
 
         if (this.comboCount === 2) {
             hitDamage = this.attackDamage * 1.2;
-            hitboxWidth = 28;
+            hitboxSize = 28;
             hitColor = 0xffff88;
         } else if (this.comboCount === 3) {
             hitDamage = this.attackDamage * 2;
-            hitboxWidth = 36;
+            hitboxSize = 36;
             hitColor = 0xff4400;
         }
 
         this.setTint(hitColor);
         this.currentHitDamage = hitDamage;
 
-        const offsetX = this.facing === 'right' ? 50 : -50;
+        // Spawn hitbox in facing direction
+        let offsetX = 0, offsetY = 0;
+        let hbW = hitboxSize, hbH = hitboxSize;
+        if (this.facing === 'right') { offsetX = 50; hbH = 40; }
+        else if (this.facing === 'left') { offsetX = -50; hbH = 40; }
+        else if (this.facing === 'down') { offsetY = 50; hbW = 40; }
+        else if (this.facing === 'up') { offsetY = -50; hbW = 40; }
+
         this.attackHitbox = this.scene.add.rectangle(
-            this.x + offsetX, this.y, hitboxWidth, 40, hitColor, 0.3
+            this.x + offsetX, this.y + offsetY, hbW, hbH, hitColor, 0.3
         );
         this.scene.physics.add.existing(this.attackHitbox, false);
         this.attackHitbox.body.setAllowGravity(false);
@@ -107,8 +114,29 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.isDodging = true;
         this.dodgeCooldown = true;
 
-        const dashSpeed = this.facing === 'right' ? 400 : -400;
-        this.setVelocityX(dashSpeed);
+        // Dash in the direction currently moving (or facing if standing still)
+        const dashSpeed = 400;
+        const left = this.cursors.left.isDown || this.wasd.left.isDown;
+        const right = this.cursors.right.isDown || this.wasd.right.isDown;
+        const up = this.cursors.up.isDown || this.wasd.up.isDown;
+        const down = this.cursors.down.isDown || this.wasd.down.isDown;
+
+        let dx = 0, dy = 0;
+        if (left) dx = -1;
+        else if (right) dx = 1;
+        if (up) dy = -1;
+        else if (down) dy = 1;
+
+        // If not moving, dash in facing direction
+        if (dx === 0 && dy === 0) {
+            if (this.facing === 'left') dx = -1;
+            else if (this.facing === 'right') dx = 1;
+            else if (this.facing === 'up') dy = -1;
+            else if (this.facing === 'down') dy = 1;
+        }
+
+        this.setVelocityX(dx * dashSpeed);
+        this.setVelocityY(dy * dashSpeed);
         this.setAlpha(0.4);
 
         this.scene.time.delayedCall(200, () => {
@@ -125,22 +153,24 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         if (!this.isDodging) {
             const left = this.cursors.left.isDown || this.wasd.left.isDown;
             const right = this.cursors.right.isDown || this.wasd.right.isDown;
-            const jump = this.cursors.up.isDown || this.wasd.up.isDown;
+            const up = this.cursors.up.isDown || this.wasd.up.isDown;
+            const down = this.cursors.down.isDown || this.wasd.down.isDown;
 
-            if (left) {
-                this.setVelocityX(-this.moveSpeed);
-                this.setFlipX(true);
-                this.facing = 'left';
-            } else if (right) {
-                this.setVelocityX(this.moveSpeed);
-                this.setFlipX(false);
-                this.facing = 'right';
-            } else {
-                this.setVelocityX(0);
-            }
+            let vx = 0, vy = 0;
 
-            if (jump && this.body.onFloor()) {
-                this.setVelocityY(this.jumpSpeed);
+            if (left) { vx = -this.moveSpeed; this.facing = 'left'; }
+            else if (right) { vx = this.moveSpeed; this.facing = 'right'; }
+            if (up) { vy = -this.moveSpeed; this.facing = 'up'; }
+            else if (down) { vy = this.moveSpeed; this.facing = 'down'; }
+
+            this.setVelocityX(vx);
+            this.setVelocityY(vy);
+
+            // Play walk or idle animation based on movement
+            const moving = vx !== 0 || vy !== 0;
+            const animKey = (moving ? 'player_walk_' : 'player_idle_') + this.facing;
+            if (this.anims.currentAnim?.key !== animKey) {
+                this.play(animKey);
             }
         }
 
