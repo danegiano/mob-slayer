@@ -20,7 +20,7 @@ const GameState = {
 };
 
 const SPRITE_DATA = {
-    player: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAwCAYAAAChS3wfAAADW0lEQVR4nO2ZK1QbQRSG//T0VIzZChBUJGJNKhKRmgowCGoqiKCmJqIYBKqWiNYgiiCiCCIwVQgQrcgKTFdQ0RVEgGBFIooA0TUraqaCJmcfM7t3Z1/hNN85iJnJnfnz586TClJwcTniANB8Xquk6UeFoy8n3FvuvG0raXiURoBlWbAsKyTmIfG4bAFUGNN8Jm9tdiLbXdchZQQ5bYIDxEEVQB378+ERWq1WqM2yLGHM1maHpIGUAYoCeJYmRI2VhkRTIA8BVEzTzKVfsgF5CSgSxrRQVha6CIoEUOkf7FWo65DrOqHPMqbx0a9bLD59knzwSWeMaZzy543x9nH7+4/ydsmYxq8H+/x6sM8557xaXZ6Wq9VlzjmflqPGDrYl2gUuTj4AAPS1bdRqKzg73AAArG4eYzT6DtvoAQCa7a5vBfa4X1HNAu/4cYjGP/t+Dl3XUXu26GtTOgjZRm/65QHg7HBj+uWlMbaNNBmQFw/mIAQAu6fjzPtMZEAeAqi4rlPpH+wBAL5+eifMpNfv+4mnFtmAvATIiFrx33SPE8fIkBpQlIAozn9eAABevmhCa+wAABb05cgYvV4HABi7NV+8jMgMKEJAFJST551tSjVR4iMNKEKAChOTJ+NPyvbVVeK+lHaBLAUE8U6j4JU3KZT4kAFFCxChNXZ8WWWfvlLqR18fxMYLM6BIASr8+NYXluPWJxFKUyBLASp4x4lagwBgadiGHahbayxxY3hTARQNyFJAUXQ7q8L6wo7CMgF5c9M4gd4AWL0OY7cG13UqxtCZtiu/CicSsD4A27iEabv/BGT361OnXd1awfZaNVSf2oC0Asom9wyYdWbyOuwMP8IZ+usa7v1FDMO9yFjXE+fbfiXZJzSgSAEigi8/zXYXLX3BV1fXl3zlK/vGVzbtsbCfIEIDihRApWcE3yKyeZsgT4G8BIiQGSU7ocrqKYYLDShSQBDZg2le/5oLGVC0gLL577fBuQFlCyibuQFlCyibmTwKe/HuPqITqqx+Ehe3G8VuVWnf+tNuh4xpXHaL7BnjyBtmzxjHjk/KgDQCsiJ49L5nLG0LHs1lkKdAXgLKZubXgAlRhqYxm2xAXgIoWPadUhsFkgF5CiibBzEFTNtVaqMw89vgnDn58hc1x+vN5+KzzwAAAABJRU5ErkJggg==',
+    player: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAAgCAYAAAD9qabkAAACT0lEQVR4nO3bMU/CQBQH8MM4OctK4lcoiTLoZOLiwuQgg5N8hmIcOhDsZ4DJQWe/ABMMaGJnNxNXnF3rVANY6F171/fu7v+bGgP837XXx7VUIQAAAMA/DdU33J4fpUWvmUw/lT/XlXyT2RzyOdRAmc99/qnm71UrBwBshgagmUyHtjnf9fH5Bg0AwGNoAAAe21d9wygaFL5mMu2XKoZ7/nI23rr8vIsejGRyyt+07ViMIpE2z/rGb0ZS57sAKwAASbsacJnXccgv3QDavaFo94b/tutClU8xVk75u1DXZjpfdlVhavVhIl/5EiDz/nSfu10XqnyKsXLK34W6Nup8G5VuAEII8fr49rd9cnNcuRjb8gFsV6kBUJ901PmrRtHA2NKPU372lJmp61zu+a7BTUAAjyl9YwThQrrrJnFH+7cRdb5sDaaykU+bTz3/TORLrQCCcJGqLrmWs3GqUrDObBMo6+CyD2TpOvZcanB5/jt7CcBhEgJQkZ3/zjYAACiGBgDgMTQAAI9Veg4A6pHEnUYzpq7CLvhnIDlSDSCbgGG3JX1TrRl/aTkAq5P/4uNK/o2Xeh8LVdkHidbkdTL7gDpf17Evm697/C7Pf+UiT0/DtZ0wn8eNvL+pfq4t+Xk11JldlF9HDZTj5zZ22+c/7gFYpugE8B32jxo0AACPoQEAeAy/Ajjg8OeZuoTabI71++CaqRI3KDeAvMlW1wTsBq1USOR3g1b6kpi7E015wnE42TnUkKm7FtfmPy4BADyGBuAYkysfDlwfHwAAAIB5vyPBbAFurAN+AAAAAElFTkSuQmCC',
     goblin: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAYCAYAAAC8/X7cAAAB0klEQVR4nO1XIXPCMBh93W0mJqYGw2wN2JkZNJhZ9BQGg+EXYDAzqJkZfgGYGQxiGkzEzGYwNTW1mRhhSZN+Tdfsxu727rhLwuN7ecn3fS0RCDDGJfW9Qp5nkQ/PFbszT0jefiJIjcsQAoxxWccEY1x25slpc/uJQH/VMzjrweakfeQ6NS4oAX2T7aRlfJS4EvC9rWJsAOivepiNBGajz5izkcCu3TI4ZRqWgdACReR5FunmFaaLBNNFYo0V9hPhTCMrhY4Clgk94GksDpUChAnD7HqwMTh6SlGxnTUQUqAMeZ5F+o29vtxgnDIAwEOcY5yaXADY7d5kt3tt6JQWcSgBH7yLA+4AABkAGGMFxrgUwm4YpQZCCVTBVQ8uHGNasSsNNBUooljo8TBGss3QjpnFfU6ukC5TsjlYBkILuKAahO/hUM8i5w2EFPhpOB9k54rt09haC2rAJRASj5uDtebVhZoIuFBMTXHLQSUrlcpWx3AVMYV0mRrzui91PjwqZq2W9x2BKjDGpTokdRj6vCo2WQPqx/EwNm5CnzfZfAj8qS7kwp83ELQL1YWqsWIj0OdV71a/WsSMcXnf+/pjpNpwca2RgaYCVfF9eGd7A/8A8AF5OD9bBXRTPAAAAABJRU5ErkJggg==',
     blacksmith: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAwCAYAAAChS3wfAAADQElEQVR4nO2ZLWzbQBTHX6aVhIRUmtJJJh4IyYBRaQJKRkJCOpCCjgQ0YAUZ8EALFpCBDZh0IAEtCTFYpKmgJSUhBgsJMZilySQkxKQgA5E9xx937zm+2FLykyol9+7e++f17t6dXYCcUyyWlpuMd5xFgWV/mbUADCfVUqJx99MFtw83AaIFZM2LrAVkDWoG5IFmTQFZllB9JVmG9qevqL7oBIgSQKV9PVz7rqmtUNvPwRXaH3kGpC2Aiqa2oNK8guO3b2Cgnsa2YSHvAZragofff8CBA9DUVmybSGajzzBQT8E0LTBNa62NSqJNME0BGPSJRS6l2DGoJaBPrEKzppDOA/rEKmx6hoii90MPNz4a3sfueYPkj7wHpC1g49gRfbQvH9E+SUsAK0AU3fMGWPaC+Uf9B3DXSbFYWjrOonDbbSxlWQrt+EE0tQWSLMNRvVNwx5IURcTfZDwvPioBIgVQue02mHre93QvHkY7WVzaAgDik5TGJtrva6AoSqTNMAx2ArYh4PKyDY6zYFYM7d0BKNVDAAA4GwE8qNEn0vq1BYPm6rNUkeDobAL9vsbU51UBUQIAVj8Uw81FDZ7Np7W29vg51M+aWSh/GNbKYBYCgriJ9hjbKw1j22s67sWP/2+z4zv5CJ0Dti0AS0Uug/S6jOpbfnUIw9E9AAAYxoTZF30QEiUgiFM+CbSwyy6Puzv2+FACdi1ANA/fVpezemcIDWU1u3Vj7lUe4Q9EeAKoWH/ZSws7S13ICUhbQBLcGK6W4HcKiWZAmgKSEIyzSdxECUhTAJW0Zxg5AduY4tskV0+FP3x/TN1nvUMog1kI8HNzUQu1uZpmpg0zk77UXJ9xvy10FN62AAxu+fRj2utvneRy+O2Vbsy5vlFLQKQAP3FJivPjv0VO7Xmkze8zyg/57h4ngGJz7dg4xWJpqVTltQ1Y//XkxYizYXx7M4A1IC6IS5wt7adBItj5l6P7BGQtIGv2CchaQNbsfAJydRcI4j9HGFMTjKkZaWfZANjlWPh7AZ4AXvyoU6iLbswjT6nBPqz43BmQhoA8s/N7wM4nINebIED41km18+AmQLQAHlM7/GqOYueR6yqwZ494/gGPXM3zfBi5MgAAAABJRU5ErkJggg==',
     night_goblin: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAYCAYAAAC8/X7cAAAB5UlEQVR4nO1WIXDCMBR93W0mJmYGU4PB1NRQMTMzhcCgsPjaqenZ+llUDQKFGAbBDAZTU1ODmamJmejECGuaNE3X7AZ3e3fckeT3v7z8/Nc60IAQWujWORjLHZM4Ve7exNXGHeJMy3Ftg4AQWrQRQQgtehP3tLnh2kM6S4WY/ksfb/d78D0c4kzJcaUj4BiuPdz2ifAbrr3Tem/iGlermhsA0lmK7W6LaBEBAKJFhLk/F2LqOCQBtgmqYCx3+MmXEfgBwnEIAAjHIQI/ENYPcaa8RtIVOhJIIgI/AHycCL6UNRNoRAhi98+JEOM9DoxyK3vAJkEdGMudcsVelx7CzQcAILq7Of3nsQCwXG6L0SgQeGqb2BaBCd5ThmmpmtNUjiGEFkmSSIZRK8AWQRNU/aDCMaeUu1FAV4Iqqo1OfIpB4sIlsl2v3A3YLteagyTANoEK3CBMD0f3LlJWwCbBb0P5IjtXbOInac6qABWBTaz2uTRn5EJdCFSoXs1kkCFB/XXVXWXJMVRNrAPbiZtu+1FnEqfL2cryfkLQBEJowQ+JH0Z53JRb2wP8YeJToRLlcZfN28BFuZAKFy/Aqgu1Be8xyQhK46Zvqz9tYkJo8eB99xa34epcJwFdCZrym8SdbQX+AeATVatCb5qONgIAAAAASUVORK5CYII=',
@@ -65,15 +65,50 @@ class BootScene extends Phaser.Scene {
     }
 
     onSpritesLoaded() {
-        // Player: 2 frames of 32x48
-        this.textures.get('player').add(0, 0, 0, 0, 32, 48);
-        this.textures.get('player').add(1, 0, 32, 0, 32, 48);
+        // Player: 8 frames of 32x32 (down x2, left x2, right x2, up x2)
+        for (let i = 0; i < 8; i++) {
+            this.textures.get('player').add(i, 0, i * 32, 0, 32, 32);
+        }
 
         this.anims.create({
-            key: 'player_idle',
+            key: 'player_idle_down',
+            frames: [{ key: 'player', frame: 0 }],
+            frameRate: 1, repeat: -1
+        });
+        this.anims.create({
+            key: 'player_walk_down',
             frames: [{ key: 'player', frame: 0 }, { key: 'player', frame: 1 }],
-            frameRate: 3,
-            repeat: -1
+            frameRate: 6, repeat: -1
+        });
+        this.anims.create({
+            key: 'player_idle_left',
+            frames: [{ key: 'player', frame: 2 }],
+            frameRate: 1, repeat: -1
+        });
+        this.anims.create({
+            key: 'player_walk_left',
+            frames: [{ key: 'player', frame: 2 }, { key: 'player', frame: 3 }],
+            frameRate: 6, repeat: -1
+        });
+        this.anims.create({
+            key: 'player_idle_right',
+            frames: [{ key: 'player', frame: 4 }],
+            frameRate: 1, repeat: -1
+        });
+        this.anims.create({
+            key: 'player_walk_right',
+            frames: [{ key: 'player', frame: 4 }, { key: 'player', frame: 5 }],
+            frameRate: 6, repeat: -1
+        });
+        this.anims.create({
+            key: 'player_idle_up',
+            frames: [{ key: 'player', frame: 6 }],
+            frameRate: 1, repeat: -1
+        });
+        this.anims.create({
+            key: 'player_walk_up',
+            frames: [{ key: 'player', frame: 6 }, { key: 'player', frame: 7 }],
+            frameRate: 6, repeat: -1
         });
 
         // Goblin: 2 frames of 24x24
