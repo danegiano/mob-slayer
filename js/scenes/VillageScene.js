@@ -2,7 +2,7 @@ class VillageScene extends Phaser.Scene {
     constructor() { super('Village'); }
 
     preload() {
-        this.load.image('village-bg', 'assets/backgrounds/village-bg.png?v=3');
+        this.load.image('village-bg', 'assets/backgrounds/village-bg.png?v=4');
     }
 
     create() {
@@ -16,11 +16,36 @@ class VillageScene extends Phaser.Scene {
         this.blacksmith.body.setImmovable(true);
 
         this.talkPrompt = this.add.text(400, 170, 'Press E to talk', {
-            fontSize: '12px', fill: '#fff'
+            fontSize: '8px', fill: '#fff'
         }).setOrigin(0.5).setVisible(false).setDepth(50);
+
+        // Obstacles (trees, houses, well) — can't walk through these
+        this.obstacles = this.physics.add.staticGroup();
+
+        // Houses
+        this.obstacles.add(this.add.sprite(120, 100, 'house', 0));
+        this.obstacles.add(this.add.sprite(280, 100, 'house', 0));
+        this.obstacles.add(this.add.sprite(550, 100, 'house', 0));
+        this.obstacles.add(this.add.sprite(680, 100, 'house', 0));
+        this.obstacles.add(this.add.sprite(120, 350, 'house', 0));
+        this.obstacles.add(this.add.sprite(680, 350, 'house', 0));
+
+        // Trees
+        this.obstacles.add(this.add.sprite(50, 50, 'tree', 0));
+        this.obstacles.add(this.add.sprite(750, 50, 'tree', 0));
+        this.obstacles.add(this.add.sprite(50, 400, 'tree', 0));
+        this.obstacles.add(this.add.sprite(750, 400, 'tree', 0));
+        this.obstacles.add(this.add.sprite(350, 350, 'tree', 0));
+        this.obstacles.add(this.add.sprite(500, 350, 'tree', 0));
+
+        // Well
+        this.obstacles.add(this.add.sprite(400, 280, 'well', 0));
 
         // Player
         this.player = new Player(this, 200, 225);
+
+        this.physics.add.collider(this.player, this.obstacles);
+        this.physics.add.collider(this.player, this.blacksmith);
 
         // HUD
         this.hud = new HUD(this);

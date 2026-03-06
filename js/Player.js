@@ -81,10 +81,18 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         else if (this.facing === 'up') { offsetY = -25; hbW = 20; }
 
         this.attackHitbox = this.scene.add.rectangle(
-            this.x + offsetX, this.y + offsetY, hbW, hbH, hitColor, 0.3
+            this.x + offsetX, this.y + offsetY, hbW, hbH, hitColor, 0.0
         );
         this.scene.physics.add.existing(this.attackHitbox, false);
         this.attackHitbox.body.setAllowGravity(false);
+
+        // Sword slash visual
+        this.slashSprite = this.scene.add.sprite(this.x + offsetX, this.y + offsetY, 'sword_slash', 0);
+        this.slashSprite.setDepth(50);
+        if (this.facing === 'left') this.slashSprite.setAngle(90);
+        else if (this.facing === 'right') this.slashSprite.setAngle(-90);
+        else if (this.facing === 'up') this.slashSprite.setAngle(180);
+        else this.slashSprite.setAngle(0);
 
         if (this.comboCount === 3 && GameState.comboUnlocked) {
             const comboText = this.scene.add.text(this.x, this.y - 40, 'COMBO!', {
@@ -103,6 +111,10 @@ class Player extends Phaser.Physics.Arcade.Sprite {
             if (this.attackHitbox) {
                 this.attackHitbox.destroy();
                 this.attackHitbox = null;
+            }
+            if (this.slashSprite) {
+                this.slashSprite.destroy();
+                this.slashSprite = null;
             }
             this.clearTint();
             this.isAttacking = false;

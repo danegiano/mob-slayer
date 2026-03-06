@@ -2,32 +2,34 @@ class HUD {
     constructor(scene) {
         this.scene = scene;
 
-        this.healthBg = scene.add.rectangle(120, 20, 200, 16, 0x333333)
+        // With 2x camera zoom, visible area is 400x225
+        // Positions are in world coords but scrollFactor(0) keeps them on screen
+        this.healthBg = scene.add.rectangle(60, 10, 100, 8, 0x333333)
             .setOrigin(0, 0.5).setScrollFactor(0).setDepth(100);
 
-        this.healthBar = scene.add.rectangle(120, 20, 200, 16, 0x00cc00)
+        this.healthBar = scene.add.rectangle(60, 10, 100, 8, 0x00cc00)
             .setOrigin(0, 0.5).setScrollFactor(0).setDepth(101);
 
-        this.healthText = scene.add.text(20, 12, 'HP', {
-            fontSize: '14px', fill: '#fff'
+        this.healthText = scene.add.text(10, 6, 'HP', {
+            fontSize: '7px', fill: '#fff'
         }).setScrollFactor(0).setDepth(101);
 
-        this.weaponText = scene.add.text(20, 36, '', {
-            fontSize: '12px', fill: '#ffcc00'
+        this.weaponText = scene.add.text(10, 18, '', {
+            fontSize: '6px', fill: '#ffcc00'
         }).setScrollFactor(0).setDepth(101);
 
-        this.kanjiText = scene.add.text(20, 54, '', {
-            fontSize: '16px', fill: '#ff44ff'
+        this.kanjiText = scene.add.text(10, 27, '', {
+            fontSize: '8px', fill: '#ff44ff'
         }).setScrollFactor(0).setDepth(101);
 
-        this.goldText = scene.add.text(680, 12, '', {
-            fontSize: '14px', fill: '#ffdd00'
+        this.goldText = scene.add.text(340, 6, '', {
+            fontSize: '7px', fill: '#ffdd00'
         }).setScrollFactor(0).setDepth(101);
     }
 
     update() {
         const ratio = GameState.health / GameState.maxHealth;
-        this.healthBar.width = 200 * ratio;
+        this.healthBar.width = 100 * ratio;
 
         if (ratio > 0.5) this.healthBar.setFillStyle(0x00cc00);
         else if (ratio > 0.25) this.healthBar.setFillStyle(0xcccc00);

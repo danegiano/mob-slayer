@@ -38,7 +38,12 @@ const SPRITE_DATA = {
     collectible: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAQCAYAAAB3AH1ZAAAAvUlEQVR4nGNgGAzg//9p////n/Z/IOxmgTEYGbMYkSX+P0upQOYzSs3pIMVgYvUzoguga8TQQMAhePVLGrUzMKB6lgVZHkXzo3PtKJrljCphanA5ghj9DM/PVSILM2F16aNz7QzmKZhixAJc+tEsR3EA3PXImnE4Alswk6sfewicnINKkwpI0I/dAZRYTqJ+3A6gE4A7AJ6yYakVG4DKYcsF5OrHHgLYDMFnMAX66VsQYdGP4QBcBtGqKB4FAOE7b4tfCJnGAAAAAElFTkSuQmCC',
     gold_coin: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAICAYAAADwdn+XAAAAYUlEQVR4nGNgoAbY0iPyn4GBgeH/CaP//08Y/SdVnoGBgYHh//9p/2EKsCmCy0HVwcSZYJLYNGBjo4sxwUVOzsHnSwRAU8fEwMDAwGhxjhFdHbIYIXkUZ8GcBgs4UuTJAgAvE0zTgKjhUAAAAABJRU5ErkJggg==',
     target: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAQCAYAAAB3AH1ZAAAAtUlEQVR4nM2VwQ3EIAwEc64hJdyDEuj/RQl5pIT0kHsRLRsnNlhI5xdYO2YNApZlYuwpnZbm44W/2/aojfC3pOXaMtLLNxOE11Ia8MjZNDHCiwfmnNblKC9vwiPnxrlWOMoLOmJYG1cNdhHhbzuAwFrKBWARDO04vPye0qka6Ine68msagBdYzfe6OGlOqkAF+Fx1WDnEf4qYl0jXoC3fpQXTrDQs3iE/6+n+K3QrM9oani+4x9g2LBtfwUl8QAAAABJRU5ErkJggg==',
-    lost_child: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAYCAYAAACbU/80AAAA8UlEQVR4nGNgGGDAiC6QYiP3n5CmOUceYegjF7BQyyAYINUDTNR2AKlg1AEYaWDOkUeMd7b0/FfxKWG4s6UHLg7jq/iUUC0BMjBgyQUMDAwMd7b04ExIxDiAFA/QLAqQLcfGp7kDiAUYDrBJOYE3HxOSJxXA4wM53hM22ODUsCDgCJyNLT3YpJz4j6wGHSRssGE4MscCro9qJSHCA0cIeyAAolbFp4Rx8KWBUQfQG8ATISxFE8pm6KmYUoA1GxHShM8BpOrHyIZH5lgwBhiJwA3ZcO4NBp+QBaQAqreISPXAgCfCAXcA1ihADyZqxzsyAABdCmla5dhFEAAAAABJRU5ErkJggg=='
+    lost_child: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAYCAYAAACbU/80AAAA8UlEQVR4nGNgGGDAiC6QYiP3n5CmOUceYegjF7BQyyAYINUDTNR2AKlg1AEYaWDOkUeMd7b0/FfxKWG4s6UHLg7jq/iUUC0BMjBgyQUMDAwMd7b04ExIxDiAFA/QLAqQLcfGp7kDiAUYDrBJOYE3HxOSJxXA4wM53hM22ODUsCDgCJyNLT3YpJz4j6wGHSRssGE4MscCro9qJSHCA0cIeyAAolbFp4Rx8KWBUQfQG8ATISxFE8pm6KmYUoA1GxHShM8BpOrHyIZH5lgwBhiJwA3ZcO4NBp+QBaQAqreISPXAgCfCAXcA1ihADyZqxzsyAABdCmla5dhFEAAAAABJRU5ErkJggg==',
+    tree: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAn0lEQVR4nK2TzQ2AIAyFn8YTXokDOAAbuYcjuIcbOQADGK5y1VNNgZaQ6Lv1530BWoCP6rTCvM43j/3mxd4imRtz5aAk4ObRjonxCpcI6WtmYw2MNQWQ974AyUySIAmAiJJZg5CnOAGX20+4/ay1yIAYYlMOAAaNHEPEsUxVM8DGmL+DJhonjbK4Ap93S+0F8OWQGrVF+neVayDtM33WAwnxRu6+sV/rAAAAAElFTkSuQmCC',
+    house: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAqElEQVR4nGNgGOmAEcZIMeL6T0+L55z7xsjAwMDAgiyoLsxJF8tvvv0OZ7OgS4ryStHU8tefn6HwmWhqGxFg1AGjDhh1wKgDMEpC9JKK7g6QF2CjqYUPP/xC4Q++KHjzjZfGVr5F4Q14CIw6YNQBA+4AjGxIDFh2+QlW8ShdGZLNGvAQGB4O6FmlQbZejDTw9ddbbOrwgpKwG2TrRXEAco+FHECp/pEJALqvJBqR4bsaAAAAAElFTkSuQmCC',
+    well: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAoElEQVR4nK2TQRGEMAxFCxoiAhERsWIiI2IQERGIiAf29DtpSAdm2X9qU95rpi2tvcwyW1DVM85FpPz2UgRIREPd3UvRMFHVM4M57j5I+iDDZjaAzFxK1moXwLtR241KIbLm3SOMZAkR9bMqOwBAG19qZQez+FG3fSv4sD+qdYGILLhnnHYEMMba7S1ESYZz/veQoqS1H59yJUJmP9PrfAHZPV0WswjjaQAAAABJRU5ErkJggg==',
+    sword_pickup: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAgCAYAAAAbifjMAAAAlElEQVR4nGNgGNTgv8v///9d/v/Hp4YJp+Zp/wOwsYkyAK6hALuBRLlg66St67GxiTaAWIBhAD7/YpOjvgtGDaCCAYxZjBtwKcYmNwi9wMCA5NQJWMSo7QJGZM7/Mwz/GQSM8Ov4cI6B0QShj2IXsGCzgWrg/xmG/ycWMJBXJhILRg1AS0jI4P8Z1NBHTjxUdcHAAwDYpDHEZfeBfwAAAABJRU5ErkJggg==',
+    sword_slash: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAArElEQVR4nO2TwQ3CMAxF/Vml2QEGYghG6BAMBDu0s3wujWRS2yGVONXv0kOdvOdKFTk7GD3wWviI3t8K5r8E9MRHQ7oBlvg6yd2afa/yHA0JA7Tck3romCjCDejIJ+fYOhphBgRyT+yG9CJ2AZYcQCHJH+WynQHJpRdx8S6w5ABQnxZ6hiQBFH2XxVdA9KttG7EKjs60DvcLACh1g3a7iHZW35MkSZIkSZIkFh+Gzk3aLac5SQAAAABJRU5ErkJggg=='
 };
 
 class BootScene extends Phaser.Scene {
@@ -78,7 +83,7 @@ class BootScene extends Phaser.Scene {
         this.anims.create({
             key: 'player_walk_down',
             frames: [{ key: 'player', frame: 0 }, { key: 'player', frame: 1 }],
-            frameRate: 6, repeat: -1
+            frameRate: 8, repeat: -1
         });
         this.anims.create({
             key: 'player_idle_left',
@@ -88,7 +93,7 @@ class BootScene extends Phaser.Scene {
         this.anims.create({
             key: 'player_walk_left',
             frames: [{ key: 'player', frame: 2 }, { key: 'player', frame: 3 }],
-            frameRate: 6, repeat: -1
+            frameRate: 8, repeat: -1
         });
         this.anims.create({
             key: 'player_idle_right',
@@ -98,7 +103,7 @@ class BootScene extends Phaser.Scene {
         this.anims.create({
             key: 'player_walk_right',
             frames: [{ key: 'player', frame: 4 }, { key: 'player', frame: 5 }],
-            frameRate: 6, repeat: -1
+            frameRate: 8, repeat: -1
         });
         this.anims.create({
             key: 'player_idle_up',
@@ -108,7 +113,7 @@ class BootScene extends Phaser.Scene {
         this.anims.create({
             key: 'player_walk_up',
             frames: [{ key: 'player', frame: 6 }, { key: 'player', frame: 7 }],
-            frameRate: 6, repeat: -1
+            frameRate: 8, repeat: -1
         });
 
         // Goblin: 2 frames of 24x24
@@ -278,6 +283,21 @@ class BootScene extends Phaser.Scene {
             frames: [{ key: 'lost_child', frame: 0 }, { key: 'lost_child', frame: 1 }],
             frameRate: 2, repeat: -1
         });
+
+        // Tree: 1 frame of 16x16 (static)
+        this.textures.get('tree').add(0, 0, 0, 0, 16, 16);
+
+        // House: 1 frame of 32x32 (static)
+        this.textures.get('house').add(0, 0, 0, 0, 32, 32);
+
+        // Well: 1 frame of 16x16 (static)
+        this.textures.get('well').add(0, 0, 0, 0, 16, 16);
+
+        // Sword Pickup: 1 frame of 16x32
+        this.textures.get('sword_pickup').add(0, 0, 0, 0, 16, 32);
+
+        // Sword Slash: 1 frame of 32x32
+        this.textures.get('sword_slash').add(0, 0, 0, 0, 32, 32);
 
         this.scene.start('Village');
     }

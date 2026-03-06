@@ -6,24 +6,25 @@ class DialogueBox {
         this.currentLine = 0;
         this.onComplete = null;
 
-        // Dark semi-transparent background box
-        this.bg = scene.add.rectangle(400, 400, 760, 80, 0x000000, 0.85);
-        this.bg.setDepth(200).setVisible(false);
+        // With 2x zoom, visible area is 400x225
+        // Dark semi-transparent background box at bottom of screen
+        this.bg = scene.add.rectangle(200, 200, 380, 40, 0x000000, 0.85);
+        this.bg.setDepth(200).setVisible(false).setScrollFactor(0);
 
         // Speaker name
-        this.nameText = scene.add.text(40, 370, '', {
-            fontSize: '14px', fill: '#ffcc00'
-        }).setDepth(201).setVisible(false);
+        this.nameText = scene.add.text(20, 183, '', {
+            fontSize: '7px', fill: '#ffcc00'
+        }).setDepth(201).setVisible(false).setScrollFactor(0);
 
         // Dialogue text
-        this.text = scene.add.text(40, 390, '', {
-            fontSize: '14px', fill: '#fff', wordWrap: { width: 720 }
-        }).setDepth(201).setVisible(false);
+        this.text = scene.add.text(20, 193, '', {
+            fontSize: '7px', fill: '#fff', wordWrap: { width: 360 }
+        }).setDepth(201).setVisible(false).setScrollFactor(0);
 
         // "Press E" hint
-        this.hint = scene.add.text(720, 420, '[E]', {
-            fontSize: '12px', fill: '#aaa'
-        }).setDepth(201).setVisible(false);
+        this.hint = scene.add.text(360, 208, '[E]', {
+            fontSize: '6px', fill: '#aaa'
+        }).setDepth(201).setVisible(false).setScrollFactor(0);
 
         // E key
         this.eKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
