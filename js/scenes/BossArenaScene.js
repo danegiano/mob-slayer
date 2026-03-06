@@ -9,19 +9,12 @@ class BossArenaScene extends Phaser.Scene {
         // Background image (covers the whole screen)
         this.add.image(400, 225, 'boss-arena-bg');
 
-        // Invisible ground for physics — matches stone floor in background
-        this.ground = this.add.rectangle(400, 415, 800, 20);
-        this.ground.setVisible(false);
-        this.physics.add.existing(this.ground, true);
-
-        this.player = new Player(this, 100, 340);
+        this.player = new Player(this, 150, 225);
         this.player.attackDamage = 25; // has slayer sword
-        this.physics.add.collider(this.player, this.ground);
 
         this.hud = new HUD(this);
 
-        this.boss = new TrollBoss(this, 600, 280);
-        this.physics.add.collider(this.boss, this.ground);
+        this.boss = new TrollBoss(this, 600, 225);
 
         this.bossDefeated = false;
     }
