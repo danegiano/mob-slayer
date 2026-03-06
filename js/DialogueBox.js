@@ -43,13 +43,15 @@ class DialogueBox {
         // Reposition to bottom of camera view every frame
         if (this.isOpen) {
             const cam = this.scene.cameras.main;
-            const cx = cam.scrollX + cam.width / (2 * cam.zoom);
-            const cy = cam.scrollY + cam.height / cam.zoom - 35;
+            const viewW = cam.width / cam.zoom;
+            const viewH = cam.height / cam.zoom;
+            const cx = cam.scrollX + viewW / 2;
+            const cy = cam.scrollY + viewH - 30;
 
             this.bg.setPosition(cx, cy);
-            this.nameText.setPosition(cx - 170, cy - 18);
-            this.text.setPosition(cx - 170, cy - 6);
-            this.hint.setPosition(cx + 155, cy + 12);
+            this.nameText.setPosition(cx - 175, cy - 20);
+            this.text.setPosition(cx - 175, cy - 8);
+            this.hint.setPosition(cx + 160, cy + 14);
         }
 
         if (!this.isOpen) return;
