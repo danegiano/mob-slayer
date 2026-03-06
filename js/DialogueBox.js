@@ -10,15 +10,15 @@ class DialogueBox {
             .setDepth(200).setVisible(false);
 
         this.nameText = scene.add.text(0, 0, '', {
-            fontSize: '6px', fill: '#ffcc00', fontStyle: 'bold'
+            fontSize: '10px', fill: '#ffcc00', fontStyle: 'bold'
         }).setDepth(201).setVisible(false);
 
         this.text = scene.add.text(0, 0, '', {
-            fontSize: '5px', fill: '#fff', wordWrap: { width: 170 }
+            fontSize: '9px', fill: '#fff', wordWrap: { width: 170 }
         }).setDepth(201).setVisible(false);
 
         this.hint = scene.add.text(0, 0, '[E]', {
-            fontSize: '5px', fill: '#aaa'
+            fontSize: '8px', fill: '#aaa'
         }).setDepth(201).setVisible(false);
 
         this.eKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
