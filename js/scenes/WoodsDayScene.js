@@ -9,18 +9,12 @@ class WoodsDayScene extends Phaser.Scene {
         // Background image (covers the whole screen)
         this.add.image(400, 225, 'woods-day-bg');
 
-        // Invisible ground for physics — matches dirt path in background
-        this.ground = this.add.rectangle(400, 420, 800, 20);
-        this.ground.setVisible(false);
-        this.physics.add.existing(this.ground, true);
-
-        this.player = new Player(this, 50, 340);
-        this.physics.add.collider(this.player, this.ground);
+        this.player = new Player(this, 50, 225);
         this.hud = new HUD(this);
 
         // Glowing sword pickup
         if (GameState.storyPhase === 0) {
-            this.sword = this.add.rectangle(700, 390, 8, 30, 0xff44ff);
+            this.sword = this.add.rectangle(600, 225, 8, 30, 0xff44ff);
             this.physics.add.existing(this.sword, true);
             this.tweens.add({
                 targets: this.sword,
@@ -63,7 +57,7 @@ class WoodsDayScene extends Phaser.Scene {
         this.hud.update();
 
         // Exit left — walk to left edge to go back to village
-        if (!this.transitioning && this.player.x < 50) {
+        if (!this.transitioning && this.player.x < 30) {
             this.transitioning = true;
             this.scene.start('Village');
         }
