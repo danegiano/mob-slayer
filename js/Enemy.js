@@ -60,19 +60,20 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         const dist = Phaser.Math.Distance.Between(this.x, this.y, player.x, player.y);
 
         if (dist < this.aggroRange) {
-            if (this.x < player.x) {
-                this.setVelocityX(this.speed);
-                this.setFlipX(false);
-            } else {
-                this.setVelocityX(-this.speed);
-                this.setFlipX(true);
-            }
+            // Chase on both axes
+            const angle = Phaser.Math.Angle.Between(this.x, this.y, player.x, player.y);
+            this.setVelocityX(Math.cos(angle) * this.speed);
+            this.setVelocityY(Math.sin(angle) * this.speed);
+
+            // Flip sprite based on horizontal direction
+            this.setFlipX(player.x < this.x);
 
             if (dist < this.attackRange && !this.attackCooldown) {
                 this.attackPlayer(player);
             }
         } else {
             this.setVelocityX(0);
+            this.setVelocityY(0);
         }
     }
 
@@ -83,9 +84,10 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         GameState.health -= this.damage;
         if (GameState.health < 0) GameState.health = 0;
 
-        const knockDir = player.x > this.x ? 200 : -200;
-        player.setVelocityX(knockDir);
-        player.setVelocityY(-150);
+        // Knockback away from enemy in any direction
+        const angle = Phaser.Math.Angle.Between(this.x, this.y, player.x, player.y);
+        player.setVelocityX(Math.cos(angle) * 250);
+        player.setVelocityY(Math.sin(angle) * 250);
         player.setTint(0xff0000);
         player.scene.time.delayedCall(200, () => player.clearTint());
 
