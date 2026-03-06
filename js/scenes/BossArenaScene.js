@@ -2,7 +2,7 @@ class BossArenaScene extends Phaser.Scene {
     constructor() { super('BossArena'); }
 
     preload() {
-        this.load.image('boss-arena-bg', 'assets/backgrounds/boss-arena-bg.png');
+        this.load.image('boss-arena-bg', 'assets/backgrounds/boss-arena-bg.png?v=3');
     }
 
     create() {

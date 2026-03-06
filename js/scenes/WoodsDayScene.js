@@ -2,7 +2,7 @@ class WoodsDayScene extends Phaser.Scene {
     constructor() { super('WoodsDay'); }
 
     preload() {
-        this.load.image('woods-day-bg', 'assets/backgrounds/woods-day-bg.png');
+        this.load.image('woods-day-bg', 'assets/backgrounds/woods-day-bg.png?v=3');
     }
 
     create() {

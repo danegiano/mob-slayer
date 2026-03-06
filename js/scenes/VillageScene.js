@@ -2,7 +2,7 @@ class VillageScene extends Phaser.Scene {
     constructor() { super('Village'); }
 
     preload() {
-        this.load.image('village-bg', 'assets/backgrounds/village-bg.png');
+        this.load.image('village-bg', 'assets/backgrounds/village-bg.png?v=3');
     }
 
     create() {

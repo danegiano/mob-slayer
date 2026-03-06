@@ -2,7 +2,7 @@ class WoodsNightScene extends Phaser.Scene {
     constructor() { super('WoodsNight'); }
 
     preload() {
-        this.load.image('woods-night-bg', 'assets/backgrounds/woods-night-bg.png');
+        this.load.image('woods-night-bg', 'assets/backgrounds/woods-night-bg.png?v=3');
     }
 
     create() {
