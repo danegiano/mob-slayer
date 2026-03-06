@@ -22,24 +22,24 @@ class VillageScene extends Phaser.Scene {
         // Obstacles (trees, houses, well) — can't walk through these
         this.obstacles = this.physics.add.staticGroup();
 
-        // Houses
-        this.obstacles.add(this.add.sprite(120, 100, 'house', 0));
-        this.obstacles.add(this.add.sprite(280, 100, 'house', 0));
-        this.obstacles.add(this.add.sprite(550, 100, 'house', 0));
-        this.obstacles.add(this.add.sprite(680, 100, 'house', 0));
-        this.obstacles.add(this.add.sprite(120, 350, 'house', 0));
-        this.obstacles.add(this.add.sprite(680, 350, 'house', 0));
+        // Houses (3x scale — bigger than the player)
+        [{x:120,y:100},{x:300,y:80},{x:570,y:100},{x:700,y:80},{x:120,y:350},{x:680,y:360}].forEach(p => {
+            const h = this.physics.add.sprite(p.x, p.y, 'house', 0).setScale(3).setImmovable(true);
+            h.body.setSize(32, 32);
+            this.obstacles.add(h);
+        });
 
-        // Trees
-        this.obstacles.add(this.add.sprite(50, 50, 'tree', 0));
-        this.obstacles.add(this.add.sprite(750, 50, 'tree', 0));
-        this.obstacles.add(this.add.sprite(50, 400, 'tree', 0));
-        this.obstacles.add(this.add.sprite(750, 400, 'tree', 0));
-        this.obstacles.add(this.add.sprite(350, 350, 'tree', 0));
-        this.obstacles.add(this.add.sprite(500, 350, 'tree', 0));
+        // Trees (2x scale)
+        [{x:50,y:50},{x:750,y:50},{x:50,y:400},{x:750,y:400},{x:350,y:350},{x:500,y:340},{x:200,y:60},{x:450,y:50}].forEach(p => {
+            const t = this.physics.add.sprite(p.x, p.y, 'tree', 0).setScale(2).setImmovable(true);
+            t.body.setSize(16, 16);
+            this.obstacles.add(t);
+        });
 
-        // Well
-        this.obstacles.add(this.add.sprite(400, 280, 'well', 0));
+        // Well (2x scale)
+        const well = this.physics.add.sprite(400, 280, 'well', 0).setScale(2).setImmovable(true);
+        well.body.setSize(16, 16);
+        this.obstacles.add(well);
 
         // Player
         this.player = new Player(this, 200, 225);

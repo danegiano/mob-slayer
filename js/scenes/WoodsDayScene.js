@@ -9,7 +9,7 @@ class WoodsDayScene extends Phaser.Scene {
         // Background image (covers the whole screen)
         this.add.image(400, 225, 'woods-day-bg');
 
-        // Trees you can't walk through
+        // Trees (2x scale) you can't walk through
         this.obstacles = this.physics.add.staticGroup();
         const treePositions = [
             {x:100,y:60}, {x:250,y:80}, {x:450,y:50}, {x:650,y:70}, {x:750,y:40},
@@ -18,7 +18,9 @@ class WoodsDayScene extends Phaser.Scene {
             {x:80,y:420}, {x:350,y:400}, {x:550,y:420}, {x:700,y:410}
         ];
         treePositions.forEach(p => {
-            this.obstacles.add(this.add.sprite(p.x, p.y, 'tree', 0));
+            const t = this.physics.add.sprite(p.x, p.y, 'tree', 0).setScale(2).setImmovable(true);
+            t.body.setSize(16, 16);
+            this.obstacles.add(t);
         });
 
         this.player = new Player(this, 50, 225);
