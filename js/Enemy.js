@@ -6,7 +6,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
 
         this.play(type + '_idle');
         this.setCollideWorldBounds(true);
-        this.setScale(2);
+        this.setScale(1);
 
         this.health = health || 30;
         this.maxHealth = this.health;

@@ -7,7 +7,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.play('player_idle_down');
         this.setCollideWorldBounds(true);
         this.body.setSize(20, 20);
-        this.setScale(2);
+        this.setScale(1);
 
         // Input
         this.cursors = scene.input.keyboard.createCursorKeys();
@@ -75,10 +75,10 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         // Spawn hitbox in facing direction
         let offsetX = 0, offsetY = 0;
         let hbW = hitboxSize, hbH = hitboxSize;
-        if (this.facing === 'right') { offsetX = 50; hbH = 40; }
-        else if (this.facing === 'left') { offsetX = -50; hbH = 40; }
-        else if (this.facing === 'down') { offsetY = 50; hbW = 40; }
-        else if (this.facing === 'up') { offsetY = -50; hbW = 40; }
+        if (this.facing === 'right') { offsetX = 25; hbH = 20; }
+        else if (this.facing === 'left') { offsetX = -25; hbH = 20; }
+        else if (this.facing === 'down') { offsetY = 25; hbW = 20; }
+        else if (this.facing === 'up') { offsetY = -25; hbW = 20; }
 
         this.attackHitbox = this.scene.add.rectangle(
             this.x + offsetX, this.y + offsetY, hbW, hbH, hitColor, 0.3

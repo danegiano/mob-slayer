@@ -5,7 +5,7 @@ class TrollBoss extends Phaser.Physics.Arcade.Sprite {
         scene.physics.add.existing(this);
 
         this.play('troll_idle');
-        this.setScale(2);
+        this.setScale(1);
         this.setCollideWorldBounds(true);
 
         this.health = 200;

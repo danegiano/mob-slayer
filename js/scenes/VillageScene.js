@@ -12,7 +12,7 @@ class VillageScene extends Phaser.Scene {
         // Blacksmith NPC
         this.blacksmith = this.physics.add.sprite(400, 200, 'blacksmith');
         this.blacksmith.play('blacksmith_idle');
-        this.blacksmith.setScale(2);
+        this.blacksmith.setScale(1);
         this.blacksmith.body.setImmovable(true);
 
         this.talkPrompt = this.add.text(400, 170, 'Press E to talk', {
