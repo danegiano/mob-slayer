@@ -24,21 +24,21 @@ class VillageScene extends Phaser.Scene {
 
         // Houses (3x scale — bigger than the player)
         [{x:120,y:100},{x:300,y:80},{x:570,y:100},{x:700,y:80},{x:120,y:350},{x:680,y:360}].forEach(p => {
-            const h = this.physics.add.sprite(p.x, p.y, 'house', 0).setScale(3).setImmovable(true);
-            h.body.setSize(32, 32);
+            const h = this.add.sprite(p.x, p.y, 'house', 0).setScale(3);
+            this.physics.add.existing(h, true); // true = static body
             this.obstacles.add(h);
         });
 
         // Trees (2x scale)
         [{x:50,y:50},{x:750,y:50},{x:50,y:400},{x:750,y:400},{x:350,y:350},{x:500,y:340},{x:200,y:60},{x:450,y:50}].forEach(p => {
-            const t = this.physics.add.sprite(p.x, p.y, 'tree', 0).setScale(2).setImmovable(true);
-            t.body.setSize(16, 16);
+            const t = this.add.sprite(p.x, p.y, 'tree', 0).setScale(2);
+            this.physics.add.existing(t, true);
             this.obstacles.add(t);
         });
 
         // Well (2x scale)
-        const well = this.physics.add.sprite(400, 280, 'well', 0).setScale(2).setImmovable(true);
-        well.body.setSize(16, 16);
+        const well = this.add.sprite(400, 280, 'well', 0).setScale(2);
+        this.physics.add.existing(well, true);
         this.obstacles.add(well);
 
         // Player

@@ -18,8 +18,8 @@ class WoodsNightScene extends Phaser.Scene {
             {x:80,y:420}, {x:400,y:400}, {x:600,y:430}, {x:750,y:410}
         ];
         treePositions.forEach(p => {
-            const t = this.physics.add.sprite(p.x, p.y, 'tree', 0).setScale(2).setImmovable(true);
-            t.body.setSize(16, 16);
+            const t = this.add.sprite(p.x, p.y, 'tree', 0).setScale(2);
+            this.physics.add.existing(t, true);
             this.obstacles.add(t);
         });
 
