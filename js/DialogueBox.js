@@ -6,23 +6,21 @@ class DialogueBox {
         this.currentLine = 0;
         this.onComplete = null;
 
-        // Create elements — we'll reposition them every frame based on camera
-        this.bg = scene.add.rectangle(0, 0, 360, 50, 0x000000, 0.9)
+        this.bg = scene.add.rectangle(0, 0, 180, 30, 0x000000, 0.9)
             .setDepth(200).setVisible(false);
 
         this.nameText = scene.add.text(0, 0, '', {
-            fontSize: '10px', fill: '#ffcc00', fontStyle: 'bold'
+            fontSize: '6px', fill: '#ffcc00', fontStyle: 'bold'
         }).setDepth(201).setVisible(false);
 
         this.text = scene.add.text(0, 0, '', {
-            fontSize: '9px', fill: '#fff', wordWrap: { width: 340 }
+            fontSize: '5px', fill: '#fff', wordWrap: { width: 170 }
         }).setDepth(201).setVisible(false);
 
         this.hint = scene.add.text(0, 0, '[E]', {
-            fontSize: '8px', fill: '#aaa'
+            fontSize: '5px', fill: '#aaa'
         }).setDepth(201).setVisible(false);
 
-        // E key
         this.eKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
     }
 
@@ -40,18 +38,17 @@ class DialogueBox {
     }
 
     update() {
-        // Reposition to bottom of camera view every frame
         if (this.isOpen) {
             const cam = this.scene.cameras.main;
             const viewW = cam.width / cam.zoom;
             const viewH = cam.height / cam.zoom;
             const cx = cam.scrollX + viewW / 2;
-            const cy = cam.scrollY + viewH - 30;
+            const cy = cam.scrollY + viewH - 20;
 
             this.bg.setPosition(cx, cy);
-            this.nameText.setPosition(cx - 175, cy - 20);
-            this.text.setPosition(cx - 175, cy - 8);
-            this.hint.setPosition(cx + 160, cy + 14);
+            this.nameText.setPosition(cx - 85, cy - 12);
+            this.text.setPosition(cx - 85, cy - 4);
+            this.hint.setPosition(cx + 75, cy + 8);
         }
 
         if (!this.isOpen) return;
