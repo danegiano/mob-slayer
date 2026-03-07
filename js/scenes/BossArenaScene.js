@@ -6,23 +6,35 @@ class BossArenaScene extends Phaser.Scene {
     }
 
     create() {
-        // Background image (covers the whole screen)
+        // Tile background to fill 1600x900
         this.add.image(400, 225, 'boss-arena-bg');
+        this.add.image(1200, 225, 'boss-arena-bg');
+        this.add.image(400, 675, 'boss-arena-bg');
+        this.add.image(1200, 675, 'boss-arena-bg');
 
-        this.player = new Player(this, 150, 225);
+        this.player = new Player(this, 150, 450);
 
         this.hud = new HUD(this);
         this.inventory = new InventoryMenu(this);
 
-        this.boss = new TrollBoss(this, 600, 225);
+        this.boss = new TrollBoss(this, 800, 450);
 
         this.bossDefeated = false;
+
+        // Locked door — opens when boss is dead
+        this.lockedDoor = new LockedDoor(this, 1400, 400);
+        this.physics.add.collider(this.player, this.lockedDoor);
+
+        // Track boss as enemy group for door unlock check
+        this.bossGroup = this.physics.add.group();
 
         // Camera: zoom in and follow player
         this.cameras.main.setZoom(1.5);
         this.cameras.main.startFollow(this.player, true);
-        this.cameras.main.setBounds(0, 0, 800, 450);
-        this.physics.world.setBounds(0, 0, 800, 450);
+        this.cameras.main.setBounds(0, 0, 1600, 900);
+        this.physics.world.setBounds(0, 0, 1600, 900);
+
+        this.transitioning = false;
     }
 
     update() {
@@ -57,7 +69,7 @@ class BossArenaScene extends Phaser.Scene {
             });
         }
 
-        // Boss attacks hitting player (distance-based during attacks)
+        // Boss attacks hitting player
         if (this.boss && this.boss.isAttacking && !this.player.isDodging) {
             const dist = Phaser.Math.Distance.Between(
                 this.player.x, this.player.y,
@@ -72,6 +84,31 @@ class BossArenaScene extends Phaser.Scene {
                 this.time.delayedCall(500, () => {
                     if (this.boss) this.boss.playerHitThisAttack = false;
                 });
+            }
+        }
+
+        // Locked door check — unlocks when boss is dead
+        if (this.lockedDoor && !this.lockedDoor.isUnlocked) {
+            if (this.boss && this.boss.isDead) {
+                this.lockedDoor.unlock();
+            } else {
+                // Show lock text if player is close
+                const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.lockedDoor.x, this.lockedDoor.y);
+                if (dist < 60) {
+                    this.lockedDoor.lockText.setVisible(true);
+                } else {
+                    this.lockedDoor.lockText.setVisible(false);
+                }
+            }
+        }
+
+        // Walk through unlocked door to secret room
+        if (!this.transitioning && this.lockedDoor && this.lockedDoor.isUnlocked) {
+            const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.lockedDoor.x, this.lockedDoor.y);
+            if (dist < 30) {
+                this.transitioning = true;
+                GameState.secretRooms.bossArena = true;
+                this.scene.start('BossArenaSecret');
             }
         }
 

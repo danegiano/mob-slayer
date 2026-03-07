@@ -416,6 +416,7 @@ const config = {
         BootScene,
         VillageScene, WoodsDayScene, WoodsNightScene,
         BossArenaScene, VictoryScene,
+        WoodsDaySecretScene, WoodsNightSecretScene, BossArenaSecretScene,
         TundraVillageScene, FrozenLakeScene, SnowCaveScene, BlizzardPassScene,
         TundraTargetPracticeScene,
         TundraScene, IceFortressScene, FrostGiantArenaScene,
