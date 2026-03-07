@@ -7,6 +7,8 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         this.play(type + '_idle');
         this.setCollideWorldBounds(true);
         this.setScale(1);
+        this.body.setSize(32, 32);
+        this.body.setOffset(8, 12);
 
         this.enemyType = type;
         this.health = health || 30;
@@ -56,12 +58,25 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
             onComplete: () => goldText.destroy()
         });
 
-        this.scene.tweens.add({
-            targets: this,
-            alpha: 0,
-            duration: 300,
-            onComplete: () => this.destroy()
-        });
+        // Play death animation then destroy
+        if (this.anims.animationManager.exists(this.enemyType + '_death')) {
+            this.play(this.enemyType + '_death');
+            this.once('animationcomplete', () => {
+                this.scene.tweens.add({
+                    targets: this,
+                    alpha: 0,
+                    duration: 200,
+                    onComplete: () => this.destroy()
+                });
+            });
+        } else {
+            this.scene.tweens.add({
+                targets: this,
+                alpha: 0,
+                duration: 300,
+                onComplete: () => this.destroy()
+            });
+        }
     }
 
     update(player) {
@@ -81,6 +96,12 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
                 this.setVelocityX(Math.cos(angle) * this.speed);
                 this.setVelocityY(Math.sin(angle) * this.speed);
                 this.setFlipX(player.x < this.x);
+
+                // Play walk animation when moving
+                const walkKey = this.enemyType + '_walk';
+                if (this.anims.currentAnim?.key !== walkKey) {
+                    this.play(walkKey);
+                }
             }
 
             if (dist < this.attackRange && !this.attackCooldown && !this.isUsingPower) {
@@ -89,6 +110,12 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         } else {
             this.setVelocityX(0);
             this.setVelocityY(0);
+
+            // Play idle when stopped
+            const idleKey = this.enemyType + '_idle';
+            if (this.anims.currentAnim?.key !== idleKey) {
+                this.play(idleKey);
+            }
         }
 
         // Shadow dash damage check

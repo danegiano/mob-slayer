@@ -5,8 +5,10 @@ class FrostGiant extends Phaser.Physics.Arcade.Sprite {
         scene.physics.add.existing(this);
 
         this.play('frost_giant_idle');
-        this.setScale(2);
+        this.setScale(1);
         this.setCollideWorldBounds(true);
+        this.body.setSize(60, 60);
+        this.body.setOffset(18, 28);
 
         this.health = 250;
         this.maxHealth = 250;

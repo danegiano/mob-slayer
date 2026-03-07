@@ -5,8 +5,10 @@ class RuneGuardian extends Phaser.Physics.Arcade.Sprite {
         scene.physics.add.existing(this);
 
         this.play('rune_guardian_idle');
-        this.setScale(2);
+        this.setScale(1);
         this.setCollideWorldBounds(true);
+        this.body.setSize(60, 60);
+        this.body.setOffset(18, 28);
 
         this.health = 350;
         this.maxHealth = 350;

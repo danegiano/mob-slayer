@@ -6,7 +6,8 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
         this.play('player_idle_down');
         this.setCollideWorldBounds(true);
-        this.body.setSize(20, 20);
+        this.body.setSize(28, 28);
+        this.body.setOffset(10, 16);
         this.setScale(1);
 
         // Input
@@ -58,6 +59,15 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
         this.isAttacking = true;
 
+        // Play attack animation
+        const prefix = GameState.equipment.sword === 'slayer' ? 'slayer_' : 'player_';
+        this.play(prefix + 'attack_' + this.facing);
+        this.once('animationcomplete', () => {
+            if (!this.isAttacking) return;
+            const idleKey = prefix + 'idle_' + this.facing;
+            this.play(idleKey);
+        });
+
         // Recalculate damage from current equipment each attack
         this.attackDamage = SWORD_DATA[GameState.equipment.sword].attack + GameState.attackBonus;
 
@@ -83,10 +93,10 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         // Spawn hitbox in facing direction
         let offsetX = 0, offsetY = 0;
         let hbW = hitboxSize, hbH = hitboxSize;
-        if (this.facing === 'right') { offsetX = 25; hbH = 20; }
-        else if (this.facing === 'left') { offsetX = -25; hbH = 20; }
-        else if (this.facing === 'down') { offsetY = 25; hbW = 20; }
-        else if (this.facing === 'up') { offsetY = -25; hbW = 20; }
+        if (this.facing === 'right') { offsetX = 35; hbH = 24; }
+        else if (this.facing === 'left') { offsetX = -35; hbH = 24; }
+        else if (this.facing === 'down') { offsetY = 35; hbW = 24; }
+        else if (this.facing === 'up') { offsetY = -35; hbW = 24; }
 
         this.attackHitbox = this.scene.add.rectangle(
             this.x + offsetX, this.y + offsetY, hbW, hbH, hitColor, 0.0
