@@ -20,6 +20,7 @@ class CrumblingBridgeScene extends Phaser.Scene {
 
         // HUD
         this.hud = new HUD(this);
+        this.inventory = new InventoryMenu(this);
 
         // Enemies — 5 Stone Golems
         this.enemies = this.physics.add.group();
@@ -49,8 +50,9 @@ class CrumblingBridgeScene extends Phaser.Scene {
     }
 
     update() {
-        this.player.update();
+        if (!this.inventory.isOpen) this.player.update();
         this.hud.update();
+        this.inventory.update();
 
         // Update enemies
         this.enemies.children.each(enemy => {

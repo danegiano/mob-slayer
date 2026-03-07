@@ -16,6 +16,7 @@ class IceFortressScene extends Phaser.Scene {
         this.physics.add.collider(this.player, this.ground);
 
         this.hud = new HUD(this);
+        this.inventory = new InventoryMenu(this);
 
         // Quest gate check
         const q = GameState.quests.tundra;
@@ -51,14 +52,16 @@ class IceFortressScene extends Phaser.Scene {
 
     update() {
         if (!this.questsComplete) {
-            this.player.update();
+            if (!this.inventory.isOpen) this.player.update();
             this.hud.update();
+            this.inventory.update();
             if (this.player.x < 20) this.scene.start('TundraVillage');
             return;
         }
 
-        this.player.update();
+        if (!this.inventory.isOpen) this.player.update();
         this.hud.update();
+        this.inventory.update();
 
         this.enemies.children.each(enemy => {
             if (!enemy.isDead) enemy.update(this.player);

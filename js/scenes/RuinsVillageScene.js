@@ -51,6 +51,7 @@ class RuinsVillageScene extends Phaser.Scene {
         this.npcs.forEach(n => this.physics.add.collider(this.player, n.sprite));
 
         this.hud = new HUD(this);
+        this.inventory = new InventoryMenu(this);
         this.dialogue = new DialogueBox(this);
         this.shop = new ShopMenu(this);
         this.eKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
@@ -72,8 +73,9 @@ class RuinsVillageScene extends Phaser.Scene {
     }
 
     update() {
-        if (!this.dialogue.isOpen && !this.shop.isOpen) this.player.update();
+        if (!this.dialogue.isOpen && !this.shop.isOpen && !this.inventory.isOpen) this.player.update();
         this.hud.update();
+        this.inventory.update();
         this.dialogue.update();
         this.shop.update();
 

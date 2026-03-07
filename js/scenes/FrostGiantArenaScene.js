@@ -16,6 +16,7 @@ class FrostGiantArenaScene extends Phaser.Scene {
         this.physics.add.collider(this.player, this.ground);
 
         this.hud = new HUD(this);
+        this.inventory = new InventoryMenu(this);
 
         this.boss = new FrostGiant(this, 600, 280);
         this.physics.add.collider(this.boss, this.ground);
@@ -24,8 +25,9 @@ class FrostGiantArenaScene extends Phaser.Scene {
     }
 
     update() {
-        this.player.update();
+        if (!this.inventory.isOpen) this.player.update();
         this.hud.update();
+        this.inventory.update();
 
         // Player attack hitting boss
         if (this.player.attackHitbox && this.boss && !this.boss.isDead) {

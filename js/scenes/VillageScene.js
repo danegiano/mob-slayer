@@ -72,6 +72,7 @@ class VillageScene extends Phaser.Scene {
 
         // HUD & Dialogue
         this.hud = new HUD(this);
+        this.inventory = new InventoryMenu(this);
         this.dialogue = new DialogueBox(this);
         this.eKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
@@ -188,10 +189,11 @@ class VillageScene extends Phaser.Scene {
 
     // --- Update ---
     update() {
-        if (!this.dialogue.isOpen) {
+        if (!this.dialogue.isOpen && !this.inventory.isOpen) {
             this.player.update();
         }
         this.hud.update();
+        this.inventory.update();
         this.dialogue.update();
 
         // Quest tracker

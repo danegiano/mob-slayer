@@ -16,6 +16,7 @@ class ShadowLordArenaScene extends Phaser.Scene {
         this.physics.add.collider(this.player, this.ground);
 
         this.hud = new HUD(this);
+        this.inventory = new InventoryMenu(this);
 
         this.enemies = this.physics.add.group();
         this.physics.add.collider(this.enemies, this.ground);
@@ -27,8 +28,9 @@ class ShadowLordArenaScene extends Phaser.Scene {
     }
 
     update() {
-        this.player.update();
+        if (!this.inventory.isOpen) this.player.update();
         this.hud.update();
+        this.inventory.update();
 
         this.enemies.children.each(enemy => {
             if (!enemy.isDead) enemy.update(this.player);

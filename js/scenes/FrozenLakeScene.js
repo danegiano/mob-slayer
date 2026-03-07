@@ -20,6 +20,7 @@ class FrozenLakeScene extends Phaser.Scene {
 
         // HUD
         this.hud = new HUD(this);
+        this.inventory = new InventoryMenu(this);
 
         // Enemies — 6 Ice Wolves
         this.enemies = this.physics.add.group();
@@ -52,8 +53,9 @@ class FrozenLakeScene extends Phaser.Scene {
     }
 
     update() {
-        this.player.update();
+        if (!this.inventory.isOpen) this.player.update();
         this.hud.update();
+        this.inventory.update();
 
         // Update enemies
         this.enemies.children.each(enemy => {

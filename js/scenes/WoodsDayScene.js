@@ -26,6 +26,7 @@ class WoodsDayScene extends Phaser.Scene {
         this.player = new Player(this, 50, 225);
         this.physics.add.collider(this.player, this.obstacles);
         this.hud = new HUD(this);
+        this.inventory = new InventoryMenu(this);
 
         // Glowing sword pickup
         if (GameState.storyPhase === 0) {
@@ -73,8 +74,9 @@ class WoodsDayScene extends Phaser.Scene {
     }
 
     update() {
-        this.player.update();
+        if (!this.inventory.isOpen) this.player.update();
         this.hud.update();
+        this.inventory.update();
 
         // Exit left — walk to left edge to go back to village
         if (!this.transitioning && this.player.x < 30) {

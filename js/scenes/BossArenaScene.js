@@ -12,6 +12,7 @@ class BossArenaScene extends Phaser.Scene {
         this.player = new Player(this, 150, 225);
 
         this.hud = new HUD(this);
+        this.inventory = new InventoryMenu(this);
 
         this.boss = new TrollBoss(this, 600, 225);
 
@@ -25,8 +26,9 @@ class BossArenaScene extends Phaser.Scene {
     }
 
     update() {
-        this.player.update();
+        if (!this.inventory.isOpen) this.player.update();
         this.hud.update();
+        this.inventory.update();
 
         // Player attack hitting boss
         if (this.player.attackHitbox && this.boss && !this.boss.isDead) {

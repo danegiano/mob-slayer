@@ -20,6 +20,7 @@ class CursedSwampScene extends Phaser.Scene {
 
         // HUD
         this.hud = new HUD(this);
+        this.inventory = new InventoryMenu(this);
 
         // Dialogue
         this.dialogue = new DialogueBox(this);
@@ -65,10 +66,11 @@ class CursedSwampScene extends Phaser.Scene {
 
     update() {
         // Don't move player when dialogue is open
-        if (!this.dialogue.isOpen) {
+        if (!this.dialogue.isOpen && !this.inventory.isOpen) {
             this.player.update();
         }
         this.hud.update();
+        this.inventory.update();
         this.dialogue.update();
 
         // Update enemies
