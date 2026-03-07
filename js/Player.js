@@ -19,6 +19,9 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         });
 
         this.moveSpeed = 200;
+        if (GameState.accessories.speedBoots) {
+            this.moveSpeed += 20;
+        }
         this.facing = 'down';
 
         // Attack
