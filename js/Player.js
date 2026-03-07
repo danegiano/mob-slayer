@@ -43,6 +43,20 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.dodgeCooldown = false;
     }
 
+    getSpritePrefix() {
+        const sword = GameState.equipment.sword;
+        // Each sword has its own sprite variant
+        const prefixMap = {
+            'wood': 'player_',     // default player sprite
+            'iron': 'iron_',
+            'fire': 'fire_',
+            'ice': 'ice_',
+            'dragon': 'dragon_',
+            'slayer': 'slayer_'
+        };
+        return prefixMap[sword] || 'player_';
+    }
+
     attack() {
         if (this.isAttacking) return;
 
@@ -60,7 +74,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.isAttacking = true;
 
         // Play attack animation
-        const prefix = GameState.equipment.sword === 'slayer' ? 'slayer_' : 'player_';
+        const prefix = this.getSpritePrefix();
         this.play(prefix + 'attack_' + this.facing);
         this.once('animationcomplete', () => {
             if (!this.isAttacking) return;
@@ -238,7 +252,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
             // Play walk or idle animation — use slayer sprite if weapon equipped
             const moving = vx !== 0 || vy !== 0;
-            const prefix = GameState.equipment.sword === 'slayer' ? 'slayer_' : 'player_';
+            const prefix = this.getSpritePrefix();
             const animKey = prefix + (moving ? 'walk_' : 'idle_') + this.facing;
             if (this.anims.currentAnim?.key !== animKey) {
                 this.play(animKey);

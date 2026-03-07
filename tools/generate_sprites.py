@@ -37,6 +37,51 @@ PLAYER_SLAYER = {
     'outline':  OUTLINE,
 }
 
+PLAYER_WOOD = {
+    'skin':     ((255, 220, 177), (230, 190, 150)),
+    'hair':     ((139, 90, 43),   (110, 70, 30)),
+    'tunic':    ((76, 153, 76),   (50, 120, 50),  (35, 90, 35)),
+    'boots':    ((101, 67, 33),   (80, 50, 25)),
+    'sword':    ((139, 90, 43),   (101, 67, 33)),
+    'outline':  OUTLINE,
+}
+
+PLAYER_IRON = {
+    'skin':     ((255, 220, 177), (230, 190, 150)),
+    'hair':     ((139, 90, 43),   (110, 70, 30)),
+    'tunic':    ((70, 100, 160),  (50, 75, 130),  (35, 55, 100)),
+    'boots':    ((101, 67, 33),   (80, 50, 25)),
+    'sword':    ((200, 200, 210), (170, 170, 180)),
+    'outline':  OUTLINE,
+}
+
+PLAYER_FIRE = {
+    'skin':     ((255, 220, 177), (230, 190, 150)),
+    'hair':     ((139, 90, 43),   (110, 70, 30)),
+    'tunic':    ((200, 80, 40),   (170, 55, 25),  (130, 40, 15)),
+    'boots':    ((101, 67, 33),   (80, 50, 25)),
+    'sword':    ((255, 140, 0),   (255, 100, 0)),
+    'outline':  OUTLINE,
+}
+
+PLAYER_ICE = {
+    'skin':     ((255, 220, 177), (230, 190, 150)),
+    'hair':     ((139, 90, 43),   (110, 70, 30)),
+    'tunic':    ((100, 170, 220), (70, 140, 200), (45, 110, 170)),
+    'boots':    ((101, 67, 33),   (80, 50, 25)),
+    'sword':    ((100, 200, 255), (60, 160, 255)),
+    'outline':  OUTLINE,
+}
+
+PLAYER_DRAGON = {
+    'skin':     ((255, 220, 177), (230, 190, 150)),
+    'hair':     ((139, 90, 43),   (110, 70, 30)),
+    'tunic':    ((180, 40, 40),   (140, 25, 25),  (100, 15, 15)),
+    'boots':    ((101, 67, 33),   (80, 50, 25)),
+    'sword':    ((255, 50, 50),   (220, 30, 30)),
+    'outline':  OUTLINE,
+}
+
 GOBLIN_PAL = {
     'skin':      ((76, 175, 80),  (56, 142, 60)),
     'loincloth': ((139, 90, 43),),
@@ -1353,6 +1398,11 @@ def main():
     print("Generating player sprites...")
     results['player'] = img_to_base64(generate_player_sheet(PLAYER_NORMAL))
     results['player_slayer'] = img_to_base64(generate_player_sheet(PLAYER_SLAYER))
+    results['player_wood'] = img_to_base64(generate_player_sheet(PLAYER_WOOD))
+    results['player_iron'] = img_to_base64(generate_player_sheet(PLAYER_IRON))
+    results['player_fire'] = img_to_base64(generate_player_sheet(PLAYER_FIRE))
+    results['player_ice'] = img_to_base64(generate_player_sheet(PLAYER_ICE))
+    results['player_dragon'] = img_to_base64(generate_player_sheet(PLAYER_DRAGON))
 
     # Enemies
     enemies = ['goblin', 'night_goblin', 'ice_wolf', 'shadow_beast', 'stone_golem']
