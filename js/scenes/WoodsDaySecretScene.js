@@ -47,7 +47,7 @@ class WoodsDaySecretScene extends Phaser.Scene {
         }
 
         // Exit bottom
-        if (!this.transitioning && this.player.y > 280) {
+        if (!this.transitioning && this.player.y >= 275) {
             this.transitioning = true;
             this.scene.start('WoodsDay');
         }

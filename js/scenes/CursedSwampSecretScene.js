@@ -38,7 +38,7 @@ class CursedSwampSecretScene extends Phaser.Scene {
             this.chest.tryOpen(this.player, this);
         }
 
-        if (!this.transitioning && this.player.y > 280) {
+        if (!this.transitioning && this.player.y >= 275) {
             this.transitioning = true;
             this.scene.start('CursedSwamp');
         }

@@ -81,7 +81,7 @@ class LavaPitSecretScene extends Phaser.Scene {
             }
         }
 
-        if (!this.transitioning && this.player.y > 280) {
+        if (!this.transitioning && this.player.y >= 275) {
             this.transitioning = true;
             this.scene.start('LavaPit');
         }
