@@ -40,6 +40,16 @@ class Chest extends Phaser.Physics.Arcade.Sprite {
                 GameState.inventory.armors.push(this.reward.id);
             }
             GameState.equipment.armor = this.reward.id;
+        } else if (this.reward.type === 'gold') {
+            GameState.gold += this.reward.amount;
+        } else if (this.reward.type === 'potion') {
+            GameState.health = Math.min(GameState.health + this.reward.amount, GameState.maxHealth);
+        } else if (this.reward.type === 'accessory') {
+            GameState.accessories[this.reward.id] = true;
+            if (this.reward.id === 'lifeRing') {
+                GameState.maxHealth += 25;
+                GameState.health = Math.min(GameState.health + 25, GameState.maxHealth);
+            }
         }
 
         const text = scene.add.text(this.x, this.y - 40, 'Found: ' + this.reward.name + '!', {

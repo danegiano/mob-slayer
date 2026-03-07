@@ -39,7 +39,37 @@ const GameState = {
     },
     chests: {
         woodsNightFire: false,
-        snowCaveIce: false
+        snowCaveIce: false,
+        woodsDayGold: false,
+        woodsNightGold: false,
+        bossArenaPotion: false,
+        frozenLakeGold: false,
+        snowCaveBoots: false,
+        blizzardPassGold: false,
+        mushroomGroveLore: false,
+        cursedSwampArmor: false,
+        hollowTreeLore: false,
+        crumblingBridgeGold: false,
+        buriedLibraryLore: false,
+        lavaPitRing: false
+    },
+    secretRooms: {
+        woodsDay: false,
+        woodsNight: false,
+        bossArena: false,
+        frozenLake: false,
+        snowCave: false,
+        blizzardPass: false,
+        mushroomGrove: false,
+        cursedSwamp: false,
+        hollowTree: false,
+        crumblingBridge: false,
+        buriedLibrary: false,
+        lavaPit: false
+    },
+    accessories: {
+        speedBoots: false,
+        lifeRing: false
     }
 };
 
@@ -70,7 +100,13 @@ const SPRITE_DATA = {
     sword_pickup: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAgCAYAAAAbifjMAAAAlElEQVR4nGNgGNTgv8v///9d/v/Hp4YJp+Zp/wOwsYkyAK6hALuBRLlg66St67GxiTaAWIBhAD7/YpOjvgtGDaCCAYxZjBtwKcYmNwi9wMCA5NQJWMSo7QJGZM7/Mwz/GQSM8Ov4cI6B0QShj2IXsGCzgWrg/xmG/ycWMJBXJhILRg1AS0jI4P8Z1NBHTjxUdcHAAwDYpDHEZfeBfwAAAABJRU5ErkJggg==',
     sword_slash: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAArElEQVR4nO2TwQ3CMAxF/Vml2QEGYghG6BAMBDu0s3wujWRS2yGVONXv0kOdvOdKFTk7GD3wWviI3t8K5r8E9MRHQ7oBlvg6yd2afa/yHA0JA7Tck3romCjCDejIJ+fYOhphBgRyT+yG9CJ2AZYcQCHJH+WynQHJpRdx8S6w5ABQnxZ6hiQBFH2XxVdA9KttG7EKjs60DvcLACh1g3a7iHZW35MkSZIkSZIkFh+Gzk3aLac5SQAAAABJRU5ErkJggg==',
     chest_closed: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAeElEQVR4nGNgGAWMMEaKjch/UjTOOfKGkYGBgYEFJqAuJ06i3W8YUAxgYGBgKMljJ0prz6SfcDYLLgliAROMcfPRS6I1IatlwqOOKACPhf8njEiKBUaLc6ixkFryCCMmYIGKHjbIXkAJRHRATKBSHAYoLiAlJqgGAJn5ID42nnWuAAAAAElFTkSuQmCC',
-    chest_open: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAjUlEQVR4nGNgoBAwInNSbET+E6txzpE3jAwMDAws6BLqcuIENd989BLOxjCgJI+doAGpJQg2hgE9k34SNGAUoAJ4OkixEfmvLifOUNKjysDApYFd9bcbDD0ltxluPnqJOx3AFJLsgv8njIhOhQwMDAyMFudQXZBa8oioVMjAgJoSmUixFRtACQNkk+kGAMbDJCS5Ly4eAAAAAElFTkSuQmCC'
+    chest_open: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAjUlEQVR4nGNgoBAwInNSbET+E6txzpE3jAwMDAws6BLqcuIENd989BLOxjCgJI+doAGpJQg2hgE9k34SNGAUoAJ4OkixEfmvLifOUNKjysDApYFd9bcbDD0ltxluPnqJOx3AFJLsgv8njIhOhQwMDAyMFudQXZBa8oioVMjAgJoSmUixFRtACQNkk+kGAMbDJCS5Ly4eAAAAAElFTkSuQmCC',
+    cracked_rock: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAa0lEQVR4nGNgGPKAEcYI8Hb7T4rGDVt3MTIwMDCwIAtqaGgQpfnGjRtwNhNW0zdsYNiwYQNRhmE1ICAgAG4QWQZgMwSXYTgNINYQFnSBDRs2wDUiG4IL4HUBMQDDAEI2Ut0FKGGAnECGDgAAzsIfxCEKsloAAAAASUVORK5CYII=',
+    rock_debris: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAPUlEQVR4nGNgGGjAiE8yJT7qPwMDA4OcnBxDXXMHVrWMpCgm2QXkumqIAQw/kOpHogNhGAYeDOD0y9DxMwCuAxgHIocDygAAAABJRU5ErkJggg==',
+    locked_door: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAdUlEQVR4nGNgoBAwMjAwMNhoiPwnR/ORG28YWWAcfyNxuMTbjz8YhPk5UBSji20895KBgYGBgYkcm5HBMDCABZ9kSe1VOLuyRJk8F2zdj1+eoAHejvjl8Xqhp1kbifeDPBcQAgNvADwMYGkbAT5iUY5NjEIAACt/GHaK588gAAAAAElFTkSuQmCC',
+    open_door: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAATElEQVR4nGNgoBAwMjAwMNhoiPwnR/ORG28YWWAcfyPxkzeffz636zJXJjGa5UTeMDAwMDAwkWMzMhg1YNSAwWEAAwMDeZmJ3AyIAQC9IA8K1JNdUwAAAABJRU5ErkJggg==',
+    lore_scroll: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAYUlEQVR4nGNgGPKAEZmzZUHFf2I0+SR0wPWxIEuIiIiQ7AIUA+Tk5Eg2gAmf5COfEoZHPiXkGYCsEZ8heF1ADMBpgNyWHqxsqruABZ8kPpuxGvDo0SPKXPDmzRuSDRh4AAA9yxTCq0XPaAAAAABJRU5ErkJggg==',
+    hidden_tree: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAcElEQVR4nGNgoBAw4pII2BJwB11sg88GFXQxJmI14xLHMACbIhE5kTe45LG6AFkDAwMDw5tHb0SwqcNpAD4NRBmAyyUkG0CMSzAMwBZV+OSxugCXIdjEWXDZZLPhjTIyv2TOEayJDm8YEAOGgQEUAwDfrCPuEXANsAAAAABJRU5ErkJggg=='
 };
 
 class BootScene extends Phaser.Scene {
@@ -342,6 +378,21 @@ class BootScene extends Phaser.Scene {
 
         // Sword Slash: 1 frame of 32x32
         this.textures.get('sword_slash').add(0, 0, 0, 0, 32, 32);
+
+        // Cracked Rock: 1 frame of 16x16 (static)
+        this.textures.get('cracked_rock').add(0, 0, 0, 0, 16, 16);
+
+        // Locked Door: 1 frame of 16x16 (static)
+        this.textures.get('locked_door').add(0, 0, 0, 0, 16, 16);
+
+        // Open Door: 1 frame of 16x16 (static)
+        this.textures.get('open_door').add(0, 0, 0, 0, 16, 16);
+
+        // Lore Scroll: 1 frame of 16x16 (static)
+        this.textures.get('lore_scroll').add(0, 0, 0, 0, 16, 16);
+
+        // Hidden Tree: 1 frame of 16x16 (static)
+        this.textures.get('hidden_tree').add(0, 0, 0, 0, 16, 16);
 
         this.scene.start('Village');
     }
