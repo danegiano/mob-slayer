@@ -1,7 +1,6 @@
 const GameState = {
     health: 100,
     maxHealth: 100,
-    weapon: 'wood',        // 'wood' or 'slayer'
     comboUnlocked: false,
     storyPhase: 0,          // 0=start, 1=found sword, 2=talked to blacksmith, 3=night
     swordPowers: [],
@@ -29,6 +28,18 @@ const GameState = {
         tundra: { maxHp: false, attack: false },
         darkforest: { maxHp: false, attack: false },
         ruins: { maxHp: false, attack: false }
+    },
+    equipment: {
+        sword: 'wood',
+        armor: 'none'
+    },
+    inventory: {
+        swords: ['wood'],
+        armors: ['none']
+    },
+    chests: {
+        woodsNightFire: false,
+        snowCaveIce: false
     }
 };
 

@@ -53,9 +53,8 @@ class WoodsDayScene extends Phaser.Scene {
     pickUpSword() {
         if (this.swordPickedUp) return;
         this.swordPickedUp = true;
-        GameState.weapon = 'slayer';
+        GameState.equipment.sword = 'slayer';
         GameState.storyPhase = 1;
-        this.player.attackDamage = 25;
         this.sword.destroy();
 
         const swordText = this.add.text(400, 200, '\u30E2\u30D6\u30B9\u30EC\u30A4\u30E4\u30FC', {

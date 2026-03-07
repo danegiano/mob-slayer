@@ -81,7 +81,9 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         if (player.isDodging) return;
         this.attackCooldown = true;
 
-        GameState.health -= this.damage;
+        const armor = ARMOR_DATA[GameState.equipment.armor];
+        const reducedDamage = Math.round(this.damage * (1 - armor.reduction));
+        GameState.health -= reducedDamage;
         if (GameState.health < 0) GameState.health = 0;
 
         // Knockback away from enemy in any direction

@@ -13,7 +13,6 @@ class IceFortressScene extends Phaser.Scene {
         this.physics.add.existing(this.ground, true);
 
         this.player = new Player(this, 50, 340);
-        this.player.attackDamage = 25 + GameState.attackBonus;
         this.physics.add.collider(this.player, this.ground);
 
         this.hud = new HUD(this);

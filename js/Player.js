@@ -25,7 +25,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.attackKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         this.isAttacking = false;
         this.attackHitbox = null;
-        this.attackDamage = 10;
+        this.attackDamage = SWORD_DATA[GameState.equipment.sword].attack + GameState.attackBonus;
         this.currentHitDamage = this.attackDamage;
 
         // Combo
@@ -54,6 +54,9 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         }
 
         this.isAttacking = true;
+
+        // Recalculate damage from current equipment each attack
+        this.attackDamage = SWORD_DATA[GameState.equipment.sword].attack + GameState.attackBonus;
 
         let hitDamage = this.attackDamage;
         let hitboxSize = 24;
@@ -188,7 +191,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
             // Play walk or idle animation — use slayer sprite if weapon equipped
             const moving = vx !== 0 || vy !== 0;
-            const prefix = GameState.weapon === 'slayer' ? 'slayer_' : 'player_';
+            const prefix = GameState.equipment.sword === 'slayer' ? 'slayer_' : 'player_';
             const animKey = prefix + (moving ? 'walk_' : 'idle_') + this.facing;
             if (this.anims.currentAnim?.key !== animKey) {
                 this.play(animKey);

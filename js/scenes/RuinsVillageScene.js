@@ -47,7 +47,6 @@ class RuinsVillageScene extends Phaser.Scene {
 
         // Player
         this.player = new Player(this, 200, 225);
-        this.player.attackDamage = 25 + GameState.attackBonus;
         this.physics.add.collider(this.player, this.obstacles);
         this.npcs.forEach(n => this.physics.add.collider(this.player, n.sprite));
 

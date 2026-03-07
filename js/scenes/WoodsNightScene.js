@@ -24,7 +24,6 @@ class WoodsNightScene extends Phaser.Scene {
         });
 
         this.player = new Player(this, 50, 225);
-        this.player.attackDamage = 25;
         this.physics.add.collider(this.player, this.obstacles);
 
         this.hud = new HUD(this);

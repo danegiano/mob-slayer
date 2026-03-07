@@ -40,7 +40,7 @@ class HUD {
         else if (ratio > 0.25) this.healthBar.setFillStyle(0xcccc00);
         else this.healthBar.setFillStyle(0xcc0000);
 
-        const weaponName = GameState.weapon === 'slayer' ? 'モブスレイヤー' : 'Wood Sword';
+        const weaponName = GameState.equipment.sword === 'slayer' ? 'モブスレイヤー' : 'Wood Sword';
         this.weaponText.setText(weaponName);
 
         const kanjiMap = { ice: '氷', shadow: '影', power: '力' };

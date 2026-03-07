@@ -10,7 +10,6 @@ class BossArenaScene extends Phaser.Scene {
         this.add.image(400, 225, 'boss-arena-bg');
 
         this.player = new Player(this, 150, 225);
-        this.player.attackDamage = 25; // has slayer sword
 
         this.hud = new HUD(this);
 

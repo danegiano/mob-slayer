@@ -16,7 +16,6 @@ class CrumblingBridgeScene extends Phaser.Scene {
 
         // Player
         this.player = new Player(this, 50, 340);
-        this.player.attackDamage = 25 + GameState.attackBonus;
         this.physics.add.collider(this.player, this.ground);
 
         // HUD

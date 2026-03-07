@@ -13,7 +13,6 @@ class FrostGiantArenaScene extends Phaser.Scene {
         this.physics.add.existing(this.ground, true);
 
         this.player = new Player(this, 100, 340);
-        this.player.attackDamage = 25;
         this.physics.add.collider(this.player, this.ground);
 
         this.hud = new HUD(this);
