@@ -82,8 +82,8 @@ class ForestVillageScene extends Phaser.Scene {
         const vw = cam.width / cam.zoom;
         const vh = cam.height / cam.zoom;
         const q = GameState.quests.darkforest;
-        const done = (q.mushrooms?1:0)+(q.villager?1:0)+(q.nest?1:0)+(q.miniGame?1:0);
-        this.questBar.setText('Quests: ' + done + '/4');
+        const done = (q.mushrooms?1:0)+(q.villager?1:0)+(q.nest?1:0);
+        this.questBar.setText('Quests: ' + done + '/3');
         this.questBar.setPosition(cam.scrollX + vw/2, cam.scrollY + vh - 4);
 
         let nearest = null, minDist = Infinity;
