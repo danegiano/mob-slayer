@@ -127,38 +127,42 @@ class SnowCaveScene extends Phaser.Scene {
             }
         }
 
-        // Chest interaction
+        // Chest + amulet prompts
         if (this.swordChest) {
             this.swordChest.showPrompt(this.player);
-            if (Phaser.Input.Keyboard.JustDown(this.eKey)) {
-                this.swordChest.tryOpen(this.player, this);
-            }
         }
-
-        // Amulet pickup
         if (this.amulet && !GameState.quests.tundra.amulet) {
             const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.amulet.x, this.amulet.y);
             this.pickupPrompt.setPosition(this.amulet.x, this.amulet.y - 30);
             this.pickupPrompt.setVisible(dist < 50);
-
-            if (dist < 50 && Phaser.Input.Keyboard.JustDown(this.eKey)) {
-                GameState.quests.tundra.amulet = true;
-                this.amulet.destroy();
-                this.amulet = null;
-                this.pickupPrompt.setVisible(false);
-
-                const pickText = this.add.text(this.player.x, this.player.y - 40, 'Ancient Amulet Found!', {
-                    fontSize: '24px', fill: '#ffdd00'
-                }).setOrigin(0.5).setDepth(50);
-                this.tweens.add({
-                    targets: pickText,
-                    alpha: 0, y: pickText.y - 30,
-                    duration: 2000, delay: 1000,
-                    onComplete: () => pickText.destroy()
-                });
-            }
         } else {
             this.pickupPrompt.setVisible(false);
+        }
+
+        // Single E key check for all interactions
+        if (Phaser.Input.Keyboard.JustDown(this.eKey)) {
+            if (this.swordChest) {
+                this.swordChest.tryOpen(this.player, this);
+            }
+            if (this.amulet && !GameState.quests.tundra.amulet) {
+                const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.amulet.x, this.amulet.y);
+                if (dist < 50) {
+                    GameState.quests.tundra.amulet = true;
+                    this.amulet.destroy();
+                    this.amulet = null;
+                    this.pickupPrompt.setVisible(false);
+
+                    const pickText = this.add.text(this.player.x, this.player.y - 40, 'Ancient Amulet Found!', {
+                        fontSize: '24px', fill: '#ffdd00'
+                    }).setOrigin(0.5).setDepth(50);
+                    this.tweens.add({
+                        targets: pickText,
+                        alpha: 0, y: pickText.y - 30,
+                        duration: 2000, delay: 1000,
+                        onComplete: () => pickText.destroy()
+                    });
+                }
+            }
         }
 
         // Secret passage
