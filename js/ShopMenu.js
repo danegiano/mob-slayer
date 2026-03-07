@@ -6,25 +6,25 @@ class ShopMenu {
         this.items = [];
 
         this.bg = scene.add.rectangle(400, 225, 500, 300, 0x000000, 0.85)
-            .setDepth(200).setVisible(false);
+            .setScrollFactor(0).setDepth(200).setVisible(false);
         this.titleText = scene.add.text(400, 100, 'SHOP', {
             fontSize: '20px', fill: '#ffdd00'
-        }).setOrigin(0.5).setDepth(201).setVisible(false);
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(201).setVisible(false);
         this.goldText = scene.add.text(400, 130, '', {
             fontSize: '14px', fill: '#ffdd00'
-        }).setOrigin(0.5).setDepth(201).setVisible(false);
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(201).setVisible(false);
 
         this.itemTexts = [];
         for (let i = 0; i < 3; i++) {
             const t = scene.add.text(400, 170 + i * 50, '', {
                 fontSize: '14px', fill: '#fff'
-            }).setOrigin(0.5).setDepth(201).setVisible(false);
+            }).setOrigin(0.5).setScrollFactor(0).setDepth(201).setVisible(false);
             this.itemTexts.push(t);
         }
 
         this.hintText = scene.add.text(400, 340, 'UP/DOWN to select, E to buy, Q to close', {
             fontSize: '11px', fill: '#aaa'
-        }).setOrigin(0.5).setDepth(201).setVisible(false);
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(201).setVisible(false);
 
         this.eKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
         this.qKey = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
