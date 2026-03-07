@@ -39,6 +39,12 @@ class SnowCaveScene extends Phaser.Scene {
             this.enemies.add(enemy);
         }
 
+        // Ice Sword chest
+        this.swordChest = new Chest(this, 700, 250, 'snowCaveIce', {
+            type: 'sword', id: 'ice', name: 'Ice Sword'
+        });
+        this.physics.add.collider(this.player, this.swordChest);
+
         // Collectible amulet at x=650 (only if quest not done)
         this.amulet = null;
         if (!GameState.quests.tundra.amulet) {
@@ -84,6 +90,13 @@ class SnowCaveScene extends Phaser.Scene {
                     this.time.delayedCall(300, () => { if (enemy) enemy.justHit = false; });
                 }
             });
+        }
+
+        if (this.swordChest) {
+            this.swordChest.showPrompt(this.player);
+            if (Phaser.Input.Keyboard.JustDown(this.eKey)) {
+                this.swordChest.tryOpen(this.player, this);
+            }
         }
 
         // Amulet pickup

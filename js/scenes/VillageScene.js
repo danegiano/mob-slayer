@@ -74,6 +74,7 @@ class VillageScene extends Phaser.Scene {
         this.hud = new HUD(this);
         this.inventory = new InventoryMenu(this);
         this.dialogue = new DialogueBox(this);
+        this.shop = new ShopMenu(this);
         this.eKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
         this.talkPrompt = this.add.text(0, 0, 'Press E', {
@@ -189,12 +190,13 @@ class VillageScene extends Phaser.Scene {
 
     // --- Update ---
     update() {
-        if (!this.dialogue.isOpen && !this.inventory.isOpen) {
+        if (!this.dialogue.isOpen && !this.inventory.isOpen && !this.shop?.isOpen) {
             this.player.update();
         }
         this.hud.update();
         this.inventory.update();
         this.dialogue.update();
+        this.shop.update();
 
         // Quest tracker
         const cam = this.cameras.main;
@@ -313,56 +315,8 @@ class VillageScene extends Phaser.Scene {
             return;
         }
 
-        // Shop — offer upgrades
-        if (!shop.attackBoost && GameState.gold >= 100) {
-            this.dialogue.open('Blacksmith', [
-                'I can sharpen your blade!',
-                'Attack Boost: +10 damage',
-                'Cost: 100 gold',
-                'You have ' + GameState.gold + ' gold.'
-            ], () => {
-                shop.attackBoost = true;
-                GameState.gold -= 100;
-                GameState.attackBonus += 10;
-                this.showPickupText('Attack +10!');
-            }, npc);
-        } else if (!shop.hpBoost && GameState.gold >= 75) {
-            this.dialogue.open('Blacksmith', [
-                'I made some armor for you!',
-                'HP Boost: +50 max health',
-                'Cost: 75 gold',
-                'You have ' + GameState.gold + ' gold.'
-            ], () => {
-                shop.hpBoost = true;
-                GameState.gold -= 75;
-                GameState.maxHealth += 50;
-                GameState.health += 50;
-                this.showPickupText('Max HP +50!');
-            }, npc);
-        } else if (!shop.speedBoost && GameState.gold >= 120) {
-            this.dialogue.open('Blacksmith', [
-                'Light boots! You will run faster!',
-                'Speed Boost: move faster',
-                'Cost: 120 gold',
-                'You have ' + GameState.gold + ' gold.'
-            ], () => {
-                shop.speedBoost = true;
-                GameState.gold -= 120;
-                this.player.moveSpeed += 30;
-                this.showPickupText('Speed up!');
-            }, npc);
-        } else if (!shop.attackBoost || !shop.hpBoost || !shop.speedBoost) {
-            this.dialogue.open('Blacksmith', [
-                'I have upgrades but you need more gold!',
-                'Go help the villagers for gold.',
-                'You have ' + GameState.gold + ' gold.'
-            ], null, npc);
-        } else {
-            this.dialogue.open('Blacksmith', [
-                "You're fully upgraded!",
-                'Go show those monsters who is boss!'
-            ], null, npc);
-        }
+        // Open shop for equipment purchases
+        this.shop.open('village');
     }
 
     talkFarmer(vq, npc) {

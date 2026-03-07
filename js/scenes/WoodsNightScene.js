@@ -49,6 +49,14 @@ class WoodsNightScene extends Phaser.Scene {
         this.cameras.main.setBounds(0, 0, 800, 450);
         this.physics.world.setBounds(0, 0, 800, 450);
 
+        // Fire Sword chest
+        this.chest = new Chest(this, 720, 300, 'woodsNightFire', {
+            type: 'sword', id: 'fire', name: 'Fire Sword'
+        });
+        this.physics.add.collider(this.player, this.chest);
+
+        this.eKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
+
         this.add.text(400, 30, 'The woods are cursed...', {
             fontSize: '20px', fill: '#ff4444'
         }).setOrigin(0.5);
@@ -76,6 +84,13 @@ class WoodsNightScene extends Phaser.Scene {
                     this.time.delayedCall(300, () => { if (enemy) enemy.justHit = false; });
                 }
             });
+        }
+
+        if (this.chest) {
+            this.chest.showPrompt(this.player);
+            if (Phaser.Input.Keyboard.JustDown(this.eKey)) {
+                this.chest.tryOpen(this.player, this);
+            }
         }
 
         // Exit right — walk to right edge after killing all enemies

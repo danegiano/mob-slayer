@@ -4,6 +4,12 @@ class FinalVictoryScene extends Phaser.Scene {
     create() {
         this.cameras.main.setBackgroundColor('#000000');
 
+        // Award Dragon Sword
+        if (!GameState.inventory.swords.includes('dragon')) {
+            GameState.inventory.swords.push('dragon');
+        }
+        GameState.equipment.sword = 'dragon';
+
         this.add.text(400, 60, 'モブスレイヤー', {
             fontSize: '48px', fill: '#ff44ff'
         }).setOrigin(0.5);
@@ -56,6 +62,15 @@ class FinalVictoryScene extends Phaser.Scene {
         this.tweens.add({
             targets: endText, alpha: 1,
             duration: 1000, delay: 5000
+        });
+
+        const dragonText = this.add.text(400, 430, 'You received the Dragon Sword!', {
+            fontSize: '16px', fill: '#ff4444'
+        }).setOrigin(0.5).setAlpha(0);
+
+        this.tweens.add({
+            targets: dragonText, alpha: 1,
+            duration: 1000, delay: 6000
         });
     }
 }

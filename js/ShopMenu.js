@@ -15,14 +15,14 @@ class ShopMenu {
         }).setOrigin(0.5).setScrollFactor(0).setDepth(201).setVisible(false);
 
         this.itemTexts = [];
-        for (let i = 0; i < 3; i++) {
-            const t = scene.add.text(400, 170 + i * 50, '', {
-                fontSize: '14px', fill: '#fff'
+        for (let i = 0; i < 5; i++) {
+            const t = scene.add.text(400, 160 + i * 35, '', {
+                fontSize: '13px', fill: '#fff'
             }).setOrigin(0.5).setScrollFactor(0).setDepth(201).setVisible(false);
             this.itemTexts.push(t);
         }
 
-        this.hintText = scene.add.text(400, 340, 'UP/DOWN to select, E to buy, Q to close', {
+        this.hintText = scene.add.text(400, 345, 'UP/DOWN to select, E to buy, Q to close', {
             fontSize: '11px', fill: '#aaa'
         }).setOrigin(0.5).setScrollFactor(0).setDepth(201).setVisible(false);
 
@@ -39,14 +39,35 @@ class ShopMenu {
         this.selectedIndex = 0;
         this.area = area;
 
-        const hpBought = GameState.shopUpgrades[area].maxHp;
-        const atkBought = GameState.shopUpgrades[area].attack;
-
+        // Base items every shop has
         this.items = [
-            { name: 'Health Potion', desc: 'Restore 50 HP', cost: 50, type: 'potion' },
-            { name: 'Max HP Up', desc: '+25 Max HP', cost: 100, type: 'maxhp', bought: hpBought },
-            { name: 'Attack Up', desc: '+5 Damage', cost: 150, type: 'attack', bought: atkBought }
+            { name: 'Health Potion', desc: 'Restore 50 HP', cost: 50, type: 'potion' }
         ];
+
+        // Area-specific equipment
+        if (area === 'village') {
+            if (!GameState.inventory.swords.includes('iron')) {
+                this.items.push({ name: 'Iron Sword', desc: 'ATK 20', cost: 200, type: 'sword', itemId: 'iron' });
+            }
+            if (!GameState.inventory.armors.includes('leather')) {
+                this.items.push({ name: 'Leather Armor', desc: 'DEF 20%', cost: 150, type: 'armor', itemId: 'leather' });
+            }
+        } else if (area === 'tundra') {
+            if (!GameState.inventory.armors.includes('chain')) {
+                this.items.push({ name: 'Chain Armor', desc: 'DEF 40%', cost: 300, type: 'armor', itemId: 'chain' });
+            }
+        }
+
+        // Stat upgrades (skip for village — it has its own system via dialogue)
+        if (area !== 'village' && GameState.shopUpgrades[area]) {
+            const upgrades = GameState.shopUpgrades[area];
+            if (!upgrades.maxHp) {
+                this.items.push({ name: 'Max HP Up', desc: '+25 Max HP', cost: 100, type: 'maxhp' });
+            }
+            if (!upgrades.attack) {
+                this.items.push({ name: 'Attack Up', desc: '+5 Damage', cost: 150, type: 'attack' });
+            }
+        }
 
         this.bg.setVisible(true);
         this.titleText.setVisible(true);
@@ -65,6 +86,10 @@ class ShopMenu {
             this.itemTexts[i].setText(prefix + line);
             this.itemTexts[i].setFill(i === this.selectedIndex ? '#ffdd00' : '#fff');
         });
+        // Clear unused text slots
+        for (let i = this.items.length; i < this.itemTexts.length; i++) {
+            this.itemTexts[i].setText('');
+        }
     }
 
     update() {
@@ -105,6 +130,18 @@ class ShopMenu {
         } else if (item.type === 'attack') {
             GameState.attackBonus += 5;
             GameState.shopUpgrades[this.area].attack = true;
+            item.bought = true;
+        } else if (item.type === 'sword') {
+            if (!GameState.inventory.swords.includes(item.itemId)) {
+                GameState.inventory.swords.push(item.itemId);
+            }
+            GameState.equipment.sword = item.itemId;
+            item.bought = true;
+        } else if (item.type === 'armor') {
+            if (!GameState.inventory.armors.includes(item.itemId)) {
+                GameState.inventory.armors.push(item.itemId);
+            }
+            GameState.equipment.armor = item.itemId;
             item.bought = true;
         }
 
