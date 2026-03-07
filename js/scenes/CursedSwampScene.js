@@ -6,17 +6,34 @@ class CursedSwampScene extends Phaser.Scene {
     }
 
     create() {
-        // Background
+        // Tile background to fill 1600x900
         this.add.image(400, 225, 'cursed-swamp-bg');
+        this.add.image(1200, 225, 'cursed-swamp-bg');
+        this.add.image(400, 675, 'cursed-swamp-bg');
+        this.add.image(1200, 675, 'cursed-swamp-bg');
 
-        // Invisible ground for physics
-        this.ground = this.add.rectangle(400, 415, 800, 20);
-        this.ground.setVisible(false);
-        this.physics.add.existing(this.ground, true);
+        // Tree obstacles
+        this.obstacles = this.physics.add.staticGroup();
+        const treePositions = [
+            {x:150,y:100}, {x:400,y:80}, {x:650,y:120}, {x:300,y:280},
+            {x:550,y:300}, {x:700,y:200}, {x:100,y:400}, {x:450,y:380},
+            // Expanded area
+            {x:900,y:100}, {x:1150,y:150}, {x:1350,y:80}, {x:1500,y:200},
+            {x:850,y:300}, {x:1050,y:350}, {x:1250,y:280}, {x:1450,y:400},
+            {x:200,y:550}, {x:450,y:600}, {x:700,y:540},
+            {x:900,y:550}, {x:1150,y:620}, {x:1350,y:560}, {x:1500,y:640},
+            {x:150,y:750}, {x:400,y:780}, {x:650,y:720},
+            {x:900,y:750}, {x:1150,y:800}, {x:1400,y:730}
+        ];
+        treePositions.forEach(p => {
+            const t = this.add.sprite(p.x, p.y, 'tree', 0).setScale(2);
+            this.physics.add.existing(t, true);
+            this.obstacles.add(t);
+        });
 
         // Player
-        this.player = new Player(this, 50, 340);
-        this.physics.add.collider(this.player, this.ground);
+        this.player = new Player(this, 50, 450);
+        this.physics.add.collider(this.player, this.obstacles);
 
         // HUD
         this.hud = new HUD(this);
@@ -25,47 +42,58 @@ class CursedSwampScene extends Phaser.Scene {
         // Dialogue
         this.dialogue = new DialogueBox(this);
 
-        // E key for interacting
+        // E key
         this.eKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
-        // Enemies — 6 Shadow Beasts
+        // Enemies — 8 Shadow Beasts spread across area
         this.enemies = this.physics.add.group();
-        this.physics.add.collider(this.enemies, this.ground);
-
-        for (let i = 0; i < 6; i++) {
-            const x = 150 + i * 90;
-            const enemy = new Enemy(this, x, 340, 'shadow_beast', 12);
+        const beastPositions = [
+            {x:250,y:200}, {x:500,y:350}, {x:700,y:180},
+            {x:350,y:500}, {x:600,y:600},
+            {x:950,y:300}, {x:1200,y:450}, {x:1400,y:250}
+        ];
+        beastPositions.forEach(pos => {
+            const enemy = new Enemy(this, pos.x, pos.y, 'shadow_beast', 12);
             enemy.speed = 120;
             enemy.aggroRange = 250;
             enemy.damage = 15;
             enemy.goldValue = 8;
             this.enemies.add(enemy);
-        }
+        });
 
-        // Lost child NPC at x=720 (only if quest not done)
+        // Lost child NPC (only if quest not done)
         this.child = null;
         if (!GameState.quests.darkforest.villager) {
-            this.child = this.physics.add.sprite(720, 360, 'lost_child');
+            this.child = this.physics.add.sprite(720, 400, 'lost_child');
             this.child.play('lost_child_idle');
             this.child.setScale(2);
-            this.physics.add.collider(this.child, this.ground);
         }
 
         // Talk prompt
-        this.talkPrompt = this.add.text(720, 330, 'Press E to talk', {
+        this.talkPrompt = this.add.text(720, 370, 'Press E to talk', {
             fontSize: '11px', fill: '#fff'
         }).setOrigin(0.5).setVisible(false).setDepth(50);
+
+        // Breakable wall for secret room
+        this.breakableWall = new BreakableWall(this, 1400, 650);
+        this.physics.add.collider(this.player, this.breakableWall);
+        this.secretPassageOpen = false;
 
         // Scene title
         this.add.text(400, 50, 'Cursed Swamp', {
             fontSize: '20px', fill: '#88ff88'
         }).setOrigin(0.5);
 
+        // Camera
+        this.cameras.main.setZoom(1.5);
+        this.cameras.main.startFollow(this.player, true);
+        this.cameras.main.setBounds(0, 0, 1600, 900);
+        this.physics.world.setBounds(0, 0, 1600, 900);
+
         this.transitioning = false;
     }
 
     update() {
-        // Don't move player when dialogue is open
         if (!this.dialogue.isOpen && !this.inventory.isOpen) {
             this.player.update();
         }
@@ -91,19 +119,26 @@ class CursedSwampScene extends Phaser.Scene {
                     this.time.delayedCall(300, () => { if (enemy) enemy.justHit = false; });
                 }
             });
+
+            // Check breakable wall
+            if (this.breakableWall && !this.breakableWall.isBroken) {
+                this.breakableWall.checkAttack(this.player.attackHitbox, this);
+                if (this.breakableWall.isBroken) {
+                    this.secretPassageOpen = true;
+                }
+            }
         }
 
         // Lost child interaction
         if (this.child && !GameState.quests.darkforest.villager) {
-            const childDist = Math.abs(this.player.x - this.child.x);
-            this.talkPrompt.setVisible(childDist < 80 && !this.dialogue.isOpen);
+            const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.child.x, this.child.y);
+            this.talkPrompt.setVisible(dist < 50 && !this.dialogue.isOpen);
 
-            if (childDist < 80 && !this.dialogue.isOpen && Phaser.Input.Keyboard.JustDown(this.eKey)) {
+            if (dist < 50 && !this.dialogue.isOpen && Phaser.Input.Keyboard.JustDown(this.eKey)) {
                 this.dialogue.open('Lost Child', [
                     'You found me! I was so scared!',
                     'Thank you! I\'ll run back to the village!'
                 ], () => {
-                    // On dialogue complete — mark quest done and remove child
                     GameState.quests.darkforest.villager = true;
                     if (this.child) {
                         this.child.destroy();
@@ -116,14 +151,24 @@ class CursedSwampScene extends Phaser.Scene {
             this.talkPrompt.setVisible(false);
         }
 
-        // Exit left → Mushroom Grove
+        // Secret passage
+        if (!this.transitioning && this.secretPassageOpen) {
+            const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, 1400, 650);
+            if (dist < 30) {
+                this.transitioning = true;
+                GameState.secretRooms.cursedSwamp = true;
+                this.scene.start('CursedSwampSecret');
+            }
+        }
+
+        // Exit left -> Mushroom Grove
         if (!this.transitioning && this.player.x < 20) {
             this.transitioning = true;
             this.scene.start('MushroomGrove');
         }
 
-        // Exit right → Hollow Tree
-        if (!this.transitioning && this.player.x > 750) {
+        // Exit right -> Hollow Tree
+        if (!this.transitioning && this.player.x > 1570) {
             this.transitioning = true;
             this.scene.start('HollowTree');
         }

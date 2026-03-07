@@ -422,6 +422,7 @@ const config = {
         TundraTargetPracticeScene,
         TundraScene, IceFortressScene, FrostGiantArenaScene,
         ForestVillageScene, MushroomGroveScene, CursedSwampScene, HollowTreeScene,
+        MushroomGroveSecretScene, CursedSwampSecretScene, HollowTreeSecretScene,
         ForestObstacleCourseScene,
         DarkForestScene, ShadowKeepScene, ShadowLordArenaScene,
         RuinsVillageScene, CrumblingBridgeScene, BuriedLibraryScene, LavaPitScene,
