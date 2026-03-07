@@ -46,7 +46,7 @@ class BlizzardPassScene extends Phaser.Scene {
             {x:950,y:300}, {x:1200,y:500}, {x:1400,y:350}
         ];
         wolfPositions.forEach(pos => {
-            const enemy = new Enemy(this, pos.x, pos.y, 'ice_wolf', 25);
+            const enemy = new Enemy(this, pos.x, pos.y, 'ice_wolf', 50);
             enemy.speed = 120;
             enemy.aggroRange = 300;
             enemy.damage = 12;

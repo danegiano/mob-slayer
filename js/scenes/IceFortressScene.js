@@ -28,7 +28,7 @@ class IceFortressScene extends Phaser.Scene {
         if (this.questsComplete) {
             for (let i = 0; i < 4; i++) {
                 const x = 250 + i * 130;
-                const enemy = new Enemy(this, x, 340, 'ice_wolf', 20);
+                const enemy = new Enemy(this, x, 340, 'ice_wolf', 45);
                 enemy.speed = 110;
                 enemy.aggroRange = 300;
                 enemy.damage = 10;

@@ -51,7 +51,7 @@ class MushroomGroveScene extends Phaser.Scene {
             {x:350,y:500}, {x:900,y:300}, {x:1150,y:450}, {x:1350,y:250}
         ];
         beastPositions.forEach(pos => {
-            const enemy = new Enemy(this, pos.x, pos.y, 'shadow_beast', 12);
+            const enemy = new Enemy(this, pos.x, pos.y, 'shadow_beast', 30);
             enemy.speed = 120;
             enemy.aggroRange = 250;
             enemy.damage = 15;

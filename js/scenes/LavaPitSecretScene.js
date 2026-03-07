@@ -17,7 +17,7 @@ class LavaPitSecretScene extends Phaser.Scene {
 
         // Mini-boss — big stone golem
         this.enemies = this.physics.add.group();
-        this.miniBoss = new Enemy(this, 200, 120, 'stone_golem', 80);
+        this.miniBoss = new Enemy(this, 200, 120, 'stone_golem', 160);
         this.miniBoss.speed = 40;
         this.miniBoss.damage = 25;
         this.miniBoss.goldValue = 60;

@@ -48,7 +48,7 @@ class SnowCaveScene extends Phaser.Scene {
             {x:900,y:300}, {x:1150,y:500}, {x:1350,y:250}
         ];
         wolfPositions.forEach(pos => {
-            const enemy = new Enemy(this, pos.x, pos.y, 'ice_wolf', 15);
+            const enemy = new Enemy(this, pos.x, pos.y, 'ice_wolf', 35);
             enemy.speed = 100;
             enemy.aggroRange = 250;
             enemy.damage = 8;

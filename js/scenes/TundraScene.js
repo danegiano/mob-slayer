@@ -29,7 +29,7 @@ class TundraScene extends Phaser.Scene {
         // 3 Ice Wolves — fast, low health
         for (let i = 0; i < 3; i++) {
             const x = 300 + i * 150;
-            const enemy = new Enemy(this, x, 340, 'ice_wolf', 15);
+            const enemy = new Enemy(this, x, 340, 'ice_wolf', 35);
             enemy.speed = 100;
             enemy.aggroRange = 250;
             enemy.damage = 8;

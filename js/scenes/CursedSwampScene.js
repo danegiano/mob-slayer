@@ -53,7 +53,7 @@ class CursedSwampScene extends Phaser.Scene {
             {x:950,y:300}, {x:1200,y:450}, {x:1400,y:250}
         ];
         beastPositions.forEach(pos => {
-            const enemy = new Enemy(this, pos.x, pos.y, 'shadow_beast', 12);
+            const enemy = new Enemy(this, pos.x, pos.y, 'shadow_beast', 30);
             enemy.speed = 120;
             enemy.aggroRange = 250;
             enemy.damage = 15;

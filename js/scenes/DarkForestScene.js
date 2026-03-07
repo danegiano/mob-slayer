@@ -23,7 +23,7 @@ class DarkForestScene extends Phaser.Scene {
 
         for (let i = 0; i < 3; i++) {
             const x = 300 + i * 150;
-            const enemy = new Enemy(this, x, 340, 'shadow_beast', 12);
+            const enemy = new Enemy(this, x, 340, 'shadow_beast', 30);
             enemy.speed = 120;
             enemy.aggroRange = 250;
             enemy.damage = 15;

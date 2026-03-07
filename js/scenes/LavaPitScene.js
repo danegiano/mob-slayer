@@ -49,7 +49,7 @@ class LavaPitScene extends Phaser.Scene {
             {x:950,y:280}, {x:1200,y:450}, {x:1400,y:300}
         ];
         golemPositions.forEach(pos => {
-            const enemy = new Enemy(this, pos.x, pos.y, 'stone_golem', 70);
+            const enemy = new Enemy(this, pos.x, pos.y, 'stone_golem', 140);
             enemy.speed = 50;
             enemy.aggroRange = 200;
             enemy.damage = 25;

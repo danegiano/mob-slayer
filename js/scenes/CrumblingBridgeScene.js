@@ -45,7 +45,7 @@ class CrumblingBridgeScene extends Phaser.Scene {
             {x:350,y:500}, {x:950,y:280}, {x:1200,y:450}, {x:1400,y:300}
         ];
         golemPositions.forEach(pos => {
-            const enemy = new Enemy(this, pos.x, pos.y, 'stone_golem', 50);
+            const enemy = new Enemy(this, pos.x, pos.y, 'stone_golem', 100);
             enemy.speed = 40;
             enemy.aggroRange = 180;
             enemy.damage = 20;

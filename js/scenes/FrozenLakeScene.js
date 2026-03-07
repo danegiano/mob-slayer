@@ -46,7 +46,7 @@ class FrozenLakeScene extends Phaser.Scene {
             {x:900,y:250}, {x:1100,y:400}, {x:1300,y:550}, {x:1500,y:300}
         ];
         wolfPositions.forEach(pos => {
-            const enemy = new Enemy(this, pos.x, pos.y, 'ice_wolf', 15);
+            const enemy = new Enemy(this, pos.x, pos.y, 'ice_wolf', 35);
             enemy.speed = 100;
             enemy.aggroRange = 250;
             enemy.damage = 8;

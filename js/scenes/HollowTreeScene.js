@@ -47,7 +47,7 @@ class HollowTreeScene extends Phaser.Scene {
             {x:950,y:250}, {x:1200,y:400}, {x:1400,y:300}, {x:1100,y:600}
         ];
         beastPositions.forEach(pos => {
-            const enemy = new Enemy(this, pos.x, pos.y, 'shadow_beast', 20);
+            const enemy = new Enemy(this, pos.x, pos.y, 'shadow_beast', 45);
             enemy.speed = 140;
             enemy.aggroRange = 300;
             enemy.damage = 18;

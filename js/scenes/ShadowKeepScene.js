@@ -28,7 +28,7 @@ class ShadowKeepScene extends Phaser.Scene {
         if (this.questsComplete) {
             for (let i = 0; i < 4; i++) {
                 const x = 250 + i * 130;
-                const enemy = new Enemy(this, x, 340, 'shadow_beast', 15);
+                const enemy = new Enemy(this, x, 340, 'shadow_beast', 35);
                 enemy.speed = 130;
                 enemy.aggroRange = 300;
                 enemy.damage = 18;

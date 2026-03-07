@@ -23,7 +23,7 @@ class RuinsScene extends Phaser.Scene {
 
         for (let i = 0; i < 3; i++) {
             const x = 300 + i * 150;
-            const enemy = new Enemy(this, x, 340, 'stone_golem', 50);
+            const enemy = new Enemy(this, x, 340, 'stone_golem', 100);
             enemy.speed = 40;
             enemy.aggroRange = 180;
             enemy.damage = 20;

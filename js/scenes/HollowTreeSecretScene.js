@@ -18,7 +18,7 @@ class HollowTreeSecretScene extends Phaser.Scene {
 
         // Mini-boss — big shadow beast
         this.enemies = this.physics.add.group();
-        this.miniBoss = new Enemy(this, 200, 120, 'shadow_beast', 60);
+        this.miniBoss = new Enemy(this, 200, 120, 'shadow_beast', 120);
         this.miniBoss.speed = 80;
         this.miniBoss.damage = 20;
         this.miniBoss.goldValue = 50;

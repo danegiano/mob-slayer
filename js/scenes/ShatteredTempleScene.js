@@ -28,7 +28,7 @@ class ShatteredTempleScene extends Phaser.Scene {
         if (this.questsComplete) {
             for (let i = 0; i < 4; i++) {
                 const x = 250 + i * 130;
-                const enemy = new Enemy(this, x, 340, 'stone_golem', 60);
+                const enemy = new Enemy(this, x, 340, 'stone_golem', 120);
                 enemy.speed = 45;
                 enemy.aggroRange = 200;
                 enemy.damage = 22;

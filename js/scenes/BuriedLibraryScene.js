@@ -49,7 +49,7 @@ class BuriedLibraryScene extends Phaser.Scene {
             {x:950,y:300}, {x:1200,y:450}, {x:1400,y:250}
         ];
         golemPositions.forEach(pos => {
-            const enemy = new Enemy(this, pos.x, pos.y, 'stone_golem', 50);
+            const enemy = new Enemy(this, pos.x, pos.y, 'stone_golem', 100);
             enemy.speed = 40;
             enemy.aggroRange = 180;
             enemy.damage = 20;
