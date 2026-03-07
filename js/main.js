@@ -418,6 +418,7 @@ const config = {
         BossArenaScene, VictoryScene,
         WoodsDaySecretScene, WoodsNightSecretScene, BossArenaSecretScene,
         TundraVillageScene, FrozenLakeScene, SnowCaveScene, BlizzardPassScene,
+        FrozenLakeSecretScene, SnowCaveSecretScene, BlizzardPassSecretScene,
         TundraTargetPracticeScene,
         TundraScene, IceFortressScene, FrostGiantArenaScene,
         ForestVillageScene, MushroomGroveScene, CursedSwampScene, HollowTreeScene,
