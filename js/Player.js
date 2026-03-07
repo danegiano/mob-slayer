@@ -72,6 +72,8 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.setTint(hitColor);
         this.currentHitDamage = hitDamage;
 
+        const attackDuration = this.comboCount === 3 ? 250 : 150;
+
         // Spawn hitbox in facing direction
         let offsetX = 0, offsetY = 0;
         let hbW = hitboxSize, hbH = hitboxSize;
@@ -86,13 +88,21 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         this.scene.physics.add.existing(this.attackHitbox, false);
         this.attackHitbox.body.setAllowGravity(false);
 
-        // Sword slash visual
+        // Sword slash visual — animated swing
         this.slashSprite = this.scene.add.sprite(this.x + offsetX, this.y + offsetY, 'sword_slash', 0);
         this.slashSprite.setDepth(50);
-        if (this.facing === 'left') this.slashSprite.setAngle(90);
-        else if (this.facing === 'right') this.slashSprite.setAngle(-90);
-        else if (this.facing === 'up') this.slashSprite.setAngle(180);
-        else this.slashSprite.setAngle(0);
+        let startAngle, endAngle;
+        if (this.facing === 'down')  { startAngle = -90; endAngle = 90; }
+        else if (this.facing === 'up')    { startAngle = 90;  endAngle = -90; }
+        else if (this.facing === 'left')  { startAngle = 0;   endAngle = 180; }
+        else                              { startAngle = 180;  endAngle = 0; }
+        this.slashSprite.setAngle(startAngle);
+        this.scene.tweens.add({
+            targets: this.slashSprite,
+            angle: endAngle,
+            duration: attackDuration,
+            ease: 'Power2'
+        });
 
         if (this.comboCount === 3 && GameState.comboUnlocked) {
             const comboText = this.scene.add.text(this.x, this.y - 40, 'COMBO!', {
@@ -105,8 +115,6 @@ class Player extends Phaser.Physics.Arcade.Sprite {
                 onComplete: () => comboText.destroy()
             });
         }
-
-        const attackDuration = this.comboCount === 3 ? 250 : 150;
         this.scene.time.delayedCall(attackDuration, () => {
             if (this.attackHitbox) {
                 this.attackHitbox.destroy();
@@ -178,9 +186,10 @@ class Player extends Phaser.Physics.Arcade.Sprite {
             this.setVelocityX(vx);
             this.setVelocityY(vy);
 
-            // Play walk or idle animation based on movement
+            // Play walk or idle animation — use slayer sprite if weapon equipped
             const moving = vx !== 0 || vy !== 0;
-            const animKey = (moving ? 'player_walk_' : 'player_idle_') + this.facing;
+            const prefix = GameState.weapon === 'slayer' ? 'slayer_' : 'player_';
+            const animKey = prefix + (moving ? 'walk_' : 'idle_') + this.facing;
             if (this.anims.currentAnim?.key !== animKey) {
                 this.play(animKey);
             }

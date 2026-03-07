@@ -7,6 +7,12 @@ const GameState = {
     swordPowers: [],
     gold: 0,
     attackBonus: 0,
+    villageQuests: {
+        delivery: 'none',     // none -> active -> done
+        ingredients: 'none',  // none -> active -> done (count tracks items)
+        ingredientCount: 0,
+        lostToy: 'none'       // none -> active -> done
+    },
     quests: {
         tundra: { wolves: false, amulet: false, blizzard: false, miniGame: false },
         darkforest: { mushrooms: false, villager: false, nest: false, miniGame: false },
@@ -20,7 +26,8 @@ const GameState = {
 };
 
 const SPRITE_DATA = {
-    player: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAAgCAYAAAD9qabkAAABkUlEQVR4nO3c0U3DMBSFYQexAGKDrkBGKKukEzAFEzSr0BHKCt0AMUJ5znXlK8sktnP+7w0IOQm1jnJr0SE4Pt9f794xKR9fP0PJ7/eWX5rXWr5V+3q2zu9t/eXmP5WcHEDfKABAGAUACIvmg9KZw+PNJHvLz50Ba+dbta9n6/y9rT8vnycAQBgFAAijAABh0Txyv54XM8gwnuzP0yd0jh/GU3IGqp0fQljke3kP8kv3vWvnJ9nXx2Nfj/BgzbWUz3sAAGRQAIAwCgAQ5s5juTNXFFA4k7aeX3vmXjvfU/v61s7nfwEA7BYFAAijAABh0XxwmK6r7kPe5jE5k+wt38trLd+qfT1b5+9t/Xn5PAEAwigAQBgFAAijAABhFAAgjAIAhFEAgDB3T/Z4nIr2JS+XuWgfurf80rzW8q3a17N1fm/rLzefJwBAGAUACKMAAGHP9hvT2/Iz6WYzQ3gziZ05ovN9530m3OF3Xnx9e5myjs+Ve////d9Wd/+l9+tR+3uorX+eAABhFAAgjAIAhP0BcIYJHMacwugAAAAASUVORK5CYII=',
+    player: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAAgCAYAAAD9qabkAAACL0lEQVR4nO3cv0oDQRDH8ShWaRVLWwUrUwkGSwsFsRIUwSZPIER9BP+ATxBbbcXCIqWksIqVRdqUom060XonsMO4ent38/10Fy77W++WYcc7nWkorg9Xv7VzYrp3bzMp369afmpe2fKl3PMpOr9q68+aP5syOIBqowAAjlEAAMem+oPUnkOj9SR1y7f2gLnzpdzzKTq/butPy2cHADhGAQAcowAAjs3JD46PdoLjzZPH4Pj5Zjc6oHZ+9+4t+v3c+bfDL1OetLh9ldRz586XZM/4/nRq6lHl/ahaft2xAwAcowAAjlEAAMfUftHac0mpPWnZ8/+65y5bvib3/P47v+zrLzWfHQDgGAUAcIwCADg21R+0Oi/RnmPyMY4O2FxYCscb7wfHvf442pMUnX99thfk3X+eR8eX+TJv2Fu3veueOd9K3h9tPtLB/EVw3L18MM33v/O9rX92AIBjFADAMQoA4NjU3wJotB5LWl5rhR/04z1M3fL/Wu58Kfd8is6v2vrT8tkBAI5RAADHKACAY1O/A5DPkdvtvbT/UbZhO73o/NHrMMzv2/IHA9tzbC2/OQmfU8vx5XxS862s90fOr7W1lHQ/tXzteo2a4fW2jm9W8vXPDgBwjAIAOEYBABxT3wNYaYQ9U28Qf5e50w57vO5l/Hzt+73EHnelEe85tXez5c8vDX4xp1h+p90Ie1plPqn5qazXR7veqfna9bLm1339swMAHKMAAI5RAADHfgDv9DW4scNfxgAAAABJRU5ErkJggg==',
+    player_slayer: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAAgCAYAAAD9qabkAAACKElEQVR4nO3bsU4CQRDGcTFW1sYSWxM7GilOH0ATY21MbKgojfoQSiytsLXVWPgASgEF1/EClMbazmC9Q7KTdYTlbv6/7gjctx6byX05bKwp7s72Ztp7Yq6fJg3L56uWb81btXwp93qWnV+1/Zeav245OYBqYwAAjjEAAMfm+oG1c2i0TlK3/NQOmDtfyr2eZefXbf9p+dwBAI4xAADHGACAYxvyhYvz4+D48PI1OH6/P4meUHv/9dMk+vnc+Y/lT1KetH10a+rcufMl2Rk/326SOqr8PqqWX3fcAQCOMQAAxxgAgGNqX0ztXJK1k656/n937lXL1+Re36LzV33/WfO5AwAcYwAAjjEAAMfm+kGrM4x2ju+vafSEm1vN4Hjc6YaB7TLaSZadP2zNgrxuaxQ9v8yXeWW/ndT5cuenkt+Pth7podwPjttlI2m9i873tv+5AwAcYwAAjjEAAMfm/hdAo3UsadQdi1dsFbVq+f8td76Uez3Lzq/a/tPyuQMAHGMAAI4xAADH1EJSFKem3yL3vp+D49TnvovOnw1bwfnlc1ItfzB4MZU6mX9wFXY8eX65Hmu+Ver10a63NV+7Xh+98Dm6ll/3/c8dAOAYAwBwjAEAOKb+DmB3rQyO+4NptMN0imbQWVI7j/x839hx+8VOtENpHVD+/dLgD2uK5XeKr7DTKuux5lulXh9r59fytevVaMf3r3b+uu1/7gAAxxgAgGMMAMCxXzLIMrgK1m1kAAAAAElFTkSuQmCC',
     goblin: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAYCAYAAAC8/X7cAAAB0klEQVR4nO1XIXPCMBh93W0mJqYGw2wN2JkZNJhZ9BQGg+EXYDAzqJkZfgGYGQxiGkzEzGYwNTW1mRhhSZN+Tdfsxu727rhLwuN7ecn3fS0RCDDGJfW9Qp5nkQ/PFbszT0jefiJIjcsQAoxxWccEY1x25slpc/uJQH/VMzjrweakfeQ6NS4oAX2T7aRlfJS4EvC9rWJsAOivepiNBGajz5izkcCu3TI4ZRqWgdACReR5FunmFaaLBNNFYo0V9hPhTCMrhY4Clgk94GksDpUChAnD7HqwMTh6SlGxnTUQUqAMeZ5F+o29vtxgnDIAwEOcY5yaXADY7d5kt3tt6JQWcSgBH7yLA+4AABkAGGMFxrgUwm4YpQZCCVTBVQ8uHGNasSsNNBUooljo8TBGss3QjpnFfU6ukC5TsjlYBkILuKAahO/hUM8i5w2EFPhpOB9k54rt09haC2rAJRASj5uDtebVhZoIuFBMTXHLQSUrlcpWx3AVMYV0mRrzui91PjwqZq2W9x2BKjDGpTokdRj6vCo2WQPqx/EwNm5CnzfZfAj8qS7kwp83ELQL1YWqsWIj0OdV71a/WsSMcXnf+/pjpNpwca2RgaYCVfF9eGd7A/8A8AF5OD9bBXRTPAAAAABJRU5ErkJggg==',
     blacksmith: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAwCAYAAAChS3wfAAACPUlEQVR4nO1Zr0/DQBT+SsDMzMw8c+GH2X9Qg5hCLgQ5OcGCAUeCmSAkYJlpZpCTZEGiEJj+BzNjpOZMzczsIchGB213be96ZL3P3b27+16+e/fu9QpYVBtO1gmd46bYNGb0Psm8rin+HdXkWcZlhQ7+TAJsI3ZlBzIicXfdkV74feqJgHNlR0EXv7QA2wBGtHY0As6dXAK0eh4A4G14IdWvGnn4GZG4vX9c6+vfXIlcAkQJPmcB9g9YIrEOqORXkgQ/Z4GKZYzwF8oBy5ADytt91fyZsvTvJJIGlTeACv64uQHnTm4nP15u/yx42O5rqwCL8jMi0XHrAICRP18JFDuBEYlLlxS5+oOBz6UiQwf/wOeIE8BWgr87GJGIJpRWz8NyN17nNYThXGrhRqOOk/oCwLf6b8MLnHUBAKLV8xIjQQf/WfcUA9+LHVdqJRjN2oxIaamcF2sCpKlfBJcuodXzEFeJRUXQxf/8NP7Tt9wAmwNMO1AWopF13v05jjYCyiTr31yttf9DEiw1AjpufVWM/BdIRcBkEQIA2B7ApJPyHJPvaxjNWiOHa+Xw2xwgM2ipYN5KrCh08lfmGkz6UrRHINoIOHcO2/1VO8sDhAwexul/bHTyJ317pEZAwLkz8Hlhctl3ABP8lT8ClRdAKiwZkWgeubG2ydRHmk1FuauTv/IRYAUw7YBpWAFMO2AalRdA6i9No5ZsDxfAJnuRq1A3f+UjwApg2gHTkHoQCTc8rGyyF4VpfgsLi+3FF8qCLOEZpC40AAAAAElFTkSuQmCC',
     night_goblin: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAYCAYAAAC8/X7cAAAB5UlEQVR4nO1WIXDCMBR93W0mJmYGU4PB1NRQMTMzhcCgsPjaqenZ+llUDQKFGAbBDAZTU1ODmamJmejECGuaNE3X7AZ3e3fckeT3v7z8/Nc60IAQWujWORjLHZM4Ve7exNXGHeJMy3Ftg4AQWrQRQQgtehP3tLnh2kM6S4WY/ksfb/d78D0c4kzJcaUj4BiuPdz2ifAbrr3Tem/iGlermhsA0lmK7W6LaBEBAKJFhLk/F2LqOCQBtgmqYCx3+MmXEfgBwnEIAAjHIQI/ENYPcaa8RtIVOhJIIgI/AHycCL6UNRNoRAhi98+JEOM9DoxyK3vAJkEdGMudcsVelx7CzQcAILq7Of3nsQCwXG6L0SgQeGqb2BaBCd5ThmmpmtNUjiGEFkmSSIZRK8AWQRNU/aDCMaeUu1FAV4Iqqo1OfIpB4sIlsl2v3A3YLteagyTANoEK3CBMD0f3LlJWwCbBb0P5IjtXbOInac6qABWBTaz2uTRn5EJdCFSoXs1kkCFB/XXVXWXJMVRNrAPbiZtu+1FnEqfL2cryfkLQBEJowQ+JH0Z53JRb2wP8YeJToRLlcZfN28BFuZAKFy/Aqgu1Be8xyQhK46Zvqz9tYkJo8eB99xa34epcJwFdCZrym8SdbQX+AeATVatCb5qONgIAAAAASUVORK5CYII=',
@@ -114,6 +121,23 @@ class BootScene extends Phaser.Scene {
             key: 'player_walk_up',
             frames: [{ key: 'player', frame: 6 }, { key: 'player', frame: 7 }],
             frameRate: 8, repeat: -1
+        });
+
+        // Player Slayer: 8 frames of 32x32 (same layout, purple sword)
+        for (let i = 0; i < 8; i++) {
+            this.textures.get('player_slayer').add(i, 0, i * 32, 0, 32, 32);
+        }
+        ['down', 'left', 'right', 'up'].forEach((dir, idx) => {
+            this.anims.create({
+                key: 'slayer_idle_' + dir,
+                frames: [{ key: 'player_slayer', frame: idx * 2 }],
+                frameRate: 1, repeat: -1
+            });
+            this.anims.create({
+                key: 'slayer_walk_' + dir,
+                frames: [{ key: 'player_slayer', frame: idx * 2 }, { key: 'player_slayer', frame: idx * 2 + 1 }],
+                frameRate: 8, repeat: -1
+            });
         });
 
         // Goblin: 2 frames of 24x24
@@ -309,6 +333,10 @@ const config = {
     height: 450,
     pixelArt: true,
     backgroundColor: '#87CEEB',
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH
+    },
     physics: {
         default: 'arcade',
         arcade: { gravity: { y: 0 }, debug: false }
