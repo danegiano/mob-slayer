@@ -6,57 +6,85 @@ class BuriedLibraryScene extends Phaser.Scene {
     }
 
     create() {
-        // Background
+        // Tile background to fill 1600x900
         this.add.image(400, 225, 'buried-library-bg');
+        this.add.image(1200, 225, 'buried-library-bg');
+        this.add.image(400, 675, 'buried-library-bg');
+        this.add.image(1200, 675, 'buried-library-bg');
 
-        // Invisible ground for physics
-        this.ground = this.add.rectangle(400, 415, 800, 20);
-        this.ground.setVisible(false);
-        this.physics.add.existing(this.ground, true);
+        // Rock obstacles
+        this.obstacles = this.physics.add.staticGroup();
+        const rockPositions = [
+            {x:200,y:100}, {x:450,y:80}, {x:700,y:130}, {x:300,y:280},
+            {x:550,y:320}, {x:150,y:420}, {x:650,y:380},
+            {x:900,y:100}, {x:1150,y:160}, {x:1400,y:120}, {x:1500,y:280},
+            {x:850,y:350}, {x:1100,y:400}, {x:1300,y:320},
+            {x:200,y:580}, {x:500,y:550}, {x:700,y:600},
+            {x:900,y:580}, {x:1200,y:620}, {x:1400,y:560},
+            {x:150,y:750}, {x:450,y:780}, {x:700,y:720},
+            {x:950,y:760}, {x:1200,y:800}, {x:1450,y:740}
+        ];
+        rockPositions.forEach(p => {
+            const r = this.add.rectangle(p.x, p.y, 24, 24, 0x997744).setDepth(3);
+            this.physics.add.existing(r, true);
+            this.obstacles.add(r);
+        });
 
         // Player
-        this.player = new Player(this, 50, 340);
-        this.physics.add.collider(this.player, this.ground);
+        this.player = new Player(this, 50, 450);
+        this.physics.add.collider(this.player, this.obstacles);
 
         // HUD
         this.hud = new HUD(this);
         this.inventory = new InventoryMenu(this);
 
-        // E key for picking up scroll
+        // E key
         this.eKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 
-        // Enemies — 6 Stone Golems
+        // Enemies — 8 Stone Golems
         this.enemies = this.physics.add.group();
-        this.physics.add.collider(this.enemies, this.ground);
-
-        for (let i = 0; i < 6; i++) {
-            const x = 150 + i * 100;
-            const enemy = new Enemy(this, x, 340, 'stone_golem', 50);
+        const golemPositions = [
+            {x:250,y:200}, {x:500,y:350}, {x:700,y:180},
+            {x:350,y:500}, {x:600,y:600},
+            {x:950,y:300}, {x:1200,y:450}, {x:1400,y:250}
+        ];
+        golemPositions.forEach(pos => {
+            const enemy = new Enemy(this, pos.x, pos.y, 'stone_golem', 50);
             enemy.speed = 40;
             enemy.aggroRange = 180;
             enemy.damage = 20;
             enemy.goldValue = 12;
             this.enemies.add(enemy);
-        }
+        });
 
-        // Collectible scroll at x=650 (only if quest not done)
-        this.scroll = null;
+        // Collectible scroll (only if quest not done)
+        this.questScroll = null;
         if (!GameState.quests.ruins.scroll) {
-            this.scroll = this.physics.add.sprite(650, 390, 'collectible');
-            this.scroll.play('collectible_idle');
-            this.scroll.setScale(2);
-            this.physics.add.collider(this.scroll, this.ground);
+            this.questScroll = this.physics.add.sprite(650, 400, 'collectible');
+            this.questScroll.play('collectible_idle');
+            this.questScroll.setScale(2);
         }
 
         // Pickup prompt
-        this.pickupPrompt = this.add.text(650, 360, 'Press E to pick up', {
+        this.pickupPrompt = this.add.text(650, 370, 'Press E to pick up', {
             fontSize: '11px', fill: '#fff'
         }).setOrigin(0.5).setVisible(false).setDepth(50);
+
+        // Breakable wall for secret room
+        this.breakableWall = new BreakableWall(this, 1400, 600);
+        this.physics.add.collider(this.player, this.breakableWall);
+        this.secretPassageOpen = false;
 
         // Scene title
         this.add.text(400, 50, 'Buried Library', {
             fontSize: '20px', fill: '#ddaa44'
         }).setOrigin(0.5);
+
+        // Camera
+        this.cameras.main.setZoom(1.5);
+        this.cameras.main.startFollow(this.player, true);
+        this.cameras.main.setBounds(0, 0, 1600, 900);
+        this.physics.world.setBounds(0, 0, 1600, 900);
 
         this.transitioning = false;
     }
@@ -84,26 +112,34 @@ class BuriedLibraryScene extends Phaser.Scene {
                     this.time.delayedCall(300, () => { if (enemy) enemy.justHit = false; });
                 }
             });
+
+            // Check breakable wall
+            if (this.breakableWall && !this.breakableWall.isBroken) {
+                this.breakableWall.checkAttack(this.player.attackHitbox, this);
+                if (this.breakableWall.isBroken) {
+                    this.secretPassageOpen = true;
+                }
+            }
         }
 
-        // Scroll pickup
-        if (this.scroll && !GameState.quests.ruins.scroll) {
-            const scrollDist = Math.abs(this.player.x - this.scroll.x);
-            this.pickupPrompt.setVisible(scrollDist < 80);
+        // Quest scroll pickup
+        if (this.questScroll && !GameState.quests.ruins.scroll) {
+            const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, this.questScroll.x, this.questScroll.y);
+            this.pickupPrompt.setPosition(this.questScroll.x, this.questScroll.y - 30);
+            this.pickupPrompt.setVisible(dist < 50);
 
-            if (scrollDist < 80 && Phaser.Input.Keyboard.JustDown(this.eKey)) {
+            if (dist < 50 && Phaser.Input.Keyboard.JustDown(this.eKey)) {
                 GameState.quests.ruins.scroll = true;
-                this.scroll.destroy();
-                this.scroll = null;
+                this.questScroll.destroy();
+                this.questScroll = null;
                 this.pickupPrompt.setVisible(false);
 
-                // Show pickup text
-                const pickText = this.add.text(400, 200, 'Ancient Scroll Found!', {
+                const pickText = this.add.text(this.player.x, this.player.y - 40, 'Ancient Scroll Found!', {
                     fontSize: '24px', fill: '#ffdd00'
                 }).setOrigin(0.5).setDepth(50);
                 this.tweens.add({
                     targets: pickText,
-                    alpha: 0, y: 170,
+                    alpha: 0, y: pickText.y - 30,
                     duration: 2000, delay: 1000,
                     onComplete: () => pickText.destroy()
                 });
@@ -112,14 +148,24 @@ class BuriedLibraryScene extends Phaser.Scene {
             this.pickupPrompt.setVisible(false);
         }
 
-        // Exit left → Crumbling Bridge
+        // Secret passage
+        if (!this.transitioning && this.secretPassageOpen) {
+            const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, 1400, 600);
+            if (dist < 30) {
+                this.transitioning = true;
+                GameState.secretRooms.buriedLibrary = true;
+                this.scene.start('BuriedLibrarySecret');
+            }
+        }
+
+        // Exit left -> Crumbling Bridge
         if (!this.transitioning && this.player.x < 20) {
             this.transitioning = true;
             this.scene.start('CrumblingBridge');
         }
 
-        // Exit right → Lava Pit
-        if (!this.transitioning && this.player.x > 750) {
+        // Exit right -> Lava Pit
+        if (!this.transitioning && this.player.x > 1570) {
             this.transitioning = true;
             this.scene.start('LavaPit');
         }

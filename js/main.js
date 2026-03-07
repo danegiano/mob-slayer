@@ -426,6 +426,7 @@ const config = {
         ForestObstacleCourseScene,
         DarkForestScene, ShadowKeepScene, ShadowLordArenaScene,
         RuinsVillageScene, CrumblingBridgeScene, BuriedLibraryScene, LavaPitScene,
+        CrumblingBridgeSecretScene, BuriedLibrarySecretScene, LavaPitSecretScene,
         RuinsMemoryPuzzleScene,
         RuinsScene, ShatteredTempleScene, RuneGuardianArenaScene,
         FinalVictoryScene
