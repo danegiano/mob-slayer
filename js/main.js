@@ -11,7 +11,14 @@ const GameState = {
         delivery: 'none',     // none -> active -> done
         ingredients: 'none',  // none -> active -> done (count tracks items)
         ingredientCount: 0,
-        lostToy: 'none'       // none -> active -> done
+        lostToy: 'none',      // none -> active -> done
+        timeChallenge: 'none', // none -> active -> done
+        escort: 'none'        // none -> active -> walking -> done
+    },
+    villageShop: {
+        attackBoost: false,    // +10 attack for 100g
+        hpBoost: false,        // +50 max HP for 75g
+        speedBoost: false      // +30 speed for 120g
     },
     quests: {
         tundra: { wolves: false, amulet: false, blizzard: false, miniGame: false },
