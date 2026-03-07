@@ -172,6 +172,40 @@ class Player extends Phaser.Physics.Arcade.Sprite {
         });
     }
 
+    applySwordEffect(enemy, allEnemies) {
+        const effect = SWORD_DATA[GameState.equipment.sword].effect;
+        if (effect === 'burn') {
+            enemy.applyBurn(this.scene);
+        } else if (effect === 'freeze') {
+            enemy.applyFreeze(this.scene);
+        } else if (effect === 'lightning') {
+            enemy.applyBurn(this.scene);
+            // Chain lightning to nearest alive enemy within 100px
+            let nearest = null;
+            let minDist = Infinity;
+            allEnemies.children.each(other => {
+                if (other === enemy || other.isDead) return;
+                const d = Phaser.Math.Distance.Between(enemy.x, enemy.y, other.x, other.y);
+                if (d < 100 && d < minDist) {
+                    minDist = d;
+                    nearest = other;
+                }
+            });
+            if (nearest) {
+                nearest.takeDamage(15);
+                nearest.setTint(0xFFFFFF);
+                this.scene.time.delayedCall(200, () => {
+                    if (nearest && !nearest.isDead) nearest.clearTint();
+                });
+                const line = this.scene.add.graphics();
+                line.lineStyle(2, 0xFFFF00, 1);
+                line.lineBetween(enemy.x, enemy.y, nearest.x, nearest.y);
+                line.setDepth(50);
+                this.scene.time.delayedCall(200, () => line.destroy());
+            }
+        }
+    }
+
     update() {
         if (!this.isDodging) {
             const left = this.cursors.left.isDown || this.wasd.left.isDown;

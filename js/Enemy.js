@@ -77,6 +77,39 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
+    applyBurn(scene) {
+        if (this.isDead || this.isBurning) return;
+        this.isBurning = true;
+        this.setTint(0xFF6600);
+        let ticks = 0;
+        const burnTimer = scene.time.addEvent({
+            delay: 1000,
+            repeat: 2,
+            callback: () => {
+                if (this.isDead) { burnTimer.remove(); return; }
+                this.takeDamage(3);
+                ticks++;
+                if (ticks >= 3) {
+                    this.isBurning = false;
+                    if (!this.isDead) this.clearTint();
+                }
+            }
+        });
+    }
+
+    applyFreeze(scene) {
+        if (this.isDead || this.isFrozen) return;
+        this.isFrozen = true;
+        this.setTint(0x44AAFF);
+        const origSpeed = this.speed;
+        this.speed = 0;
+        scene.time.delayedCall(1000, () => {
+            this.isFrozen = false;
+            this.speed = origSpeed;
+            if (!this.isDead) this.clearTint();
+        });
+    }
+
     attackPlayer(player) {
         if (player.isDodging) return;
         this.attackCooldown = true;

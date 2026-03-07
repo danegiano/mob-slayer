@@ -71,6 +71,7 @@ class ShatteredTempleScene extends Phaser.Scene {
                 const b2 = enemy.getBounds();
                 if (Phaser.Geom.Intersects.RectangleToRectangle(b1, b2)) {
                     enemy.takeDamage(this.player.currentHitDamage);
+                    this.player.applySwordEffect(enemy, this.enemies);
                     enemy.justHit = true;
                     this.time.delayedCall(300, () => { if (enemy) enemy.justHit = false; });
                 }

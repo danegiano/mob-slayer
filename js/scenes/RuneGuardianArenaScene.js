@@ -33,6 +33,9 @@ class RuneGuardianArenaScene extends Phaser.Scene {
             if (Phaser.Geom.Intersects.RectangleToRectangle(b1, b2)) {
                 if (!this.boss.justHit) {
                     this.boss.takeDamage(this.player.currentHitDamage);
+                    const fx = SWORD_DATA[GameState.equipment.sword].effect;
+                    if (fx === 'burn' || fx === 'lightning') this.boss.applyBurn(this);
+                    else if (fx === 'freeze') this.boss.applyFreeze(this);
                     this.boss.justHit = true;
                     this.time.delayedCall(300, () => {
                         if (this.boss) this.boss.justHit = false;

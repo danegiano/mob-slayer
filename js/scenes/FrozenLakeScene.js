@@ -69,6 +69,7 @@ class FrozenLakeScene extends Phaser.Scene {
                 if (Phaser.Geom.Intersects.RectangleToRectangle(b1, b2)) {
                     const wasDead = enemy.isDead;
                     enemy.takeDamage(this.player.currentHitDamage);
+                    this.player.applySwordEffect(enemy, this.enemies);
                     enemy.justHit = true;
                     this.time.delayedCall(300, () => { if (enemy) enemy.justHit = false; });
 
